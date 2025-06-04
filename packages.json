@@ -1,0 +1,7 @@
+{
+  "homepage": "https://progitanas.github.io/genidoc-web-app",
+  "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
+  }
+}
