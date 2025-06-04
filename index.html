@@ -1,49 +1,1393 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GeniDoc - Santé Intelligente</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <header>
-    <h1>GeniDoc</h1>
-    <nav>
-      <button onclick="showSection('appointment')">Rendez-vous</button>
-      <button onclick="showSection('monitoring')">Surveillance</button>
-      <button onclick="showSection('interop')">Interopérabilité</button>
-    </nav>
-  </header>
+Comment je peux déployer ce code sur mon site https://genidoc.ma: import React, { useState, useEffect } from 'react';
 
-  <main>
-    <section id="appointment" class="section active">
-      <h2>Prise de rendez-vous</h2>
-      <form id="appointmentForm">
-        <input type="text" placeholder="Nom du patient" required />
-        <input type="datetime-local" required />
-        <button type="submit">Confirmer</button>
-      </form>
-    </section>
+import { Calendar, Clock, Users, Activity, Database, Settings, Bell, Phone, Video, FileText, Heart, Thermometer, Droplets, Zap, Shield, CheckCircle, AlertCircle, Star, Menu, X, Plus, Edit, Trash2, Eye, Download, Upload } from 'lucide-react';
 
-    <section id="monitoring" class="section">
-      <h2>Surveillance à distance</h2>
-      <div id="monitoringData">
-        <p>Fréquence cardiaque : <span id="heartRate">--</span> bpm</p>
-        <p>Température : <span id="temperature">--</span> °C</p>
-      </div>
-    </section>
 
-    <section id="interop" class="section">
-      <h2>Interopérabilité</h2>
-      <p>Connexion aux systèmes de santé...</p>
-    </section>
-  </main>
 
-  <footer>
-    <p>© 2025 GeniDoc</p>
-  </footer>
+const GeniDocApp = () => {
 
-  <script src="app.js"></script>
-</body>
-</html>
+  const [activeTab, setActiveTab] = useState('dashboard');
+
+  const [appointments, setAppointments] = useState([
+
+    { id: 1, patient: 'Ahmed Benali', date: '2025-05-30', time: '09:00', type: 'Consultation', status: 'confirmed' },
+
+    { id: 2, patient: 'Fatima Zahra', date: '2025-05-30', time: '10:30', type: 'Suivi', status: 'pending' },
+
+    { id: 3, patient: 'Mohamed Alami', date: '2025-05-31', time: '14:00', type: 'Urgence', status: 'confirmed' }
+
+  ]);
+
+
+
+  const [patients, setPatients] = useState([
+
+    { id: 1, name: 'Ahmed Benali', age: 45, condition: 'Hypertension', lastVisit: '2025-05-25', status: 'stable' },
+
+    { id: 2, name: 'Fatima Zahra', age: 32, condition: 'Diabète', lastVisit: '2025-05-28', status: 'monitoring' },
+
+    { id: 3, name: 'Mohamed Alami', age: 28, condition: 'Asthme', lastVisit: '2025-05-20', status: 'stable' }
+
+  ]);
+
+
+
+  const [monitoringData, setMonitoringData] = useState([
+
+    { id: 1, patient: 'Ahmed Benali', vitals: { bp: '140/90', hr: 75, temp: 36.8, spo2: 98 }, timestamp: '2025-05-30 08:00' },
+
+    { id: 2, patient: 'Fatima Zahra', vitals: { bp: '120/80', hr: 82, temp: 37.1, spo2: 96 }, timestamp: '2025-05-30 07:30' }
+
+  ]);
+
+
+
+  const [showNewAppointment, setShowNewAppointment] = useState(false);
+
+  const [selectedPatient, setSelectedPatient] = useState(null);
+
+
+
+  const pricingPlans = [
+
+    {
+
+      name: "License Hospitalière",
+
+      price: "10 assignations gratuites/mois",
+
+      then: "2.99 MAD/assignation",
+
+      features: ["Gestion des rendez-vous", "Dossiers patients", "Support 24/7"]
+
+    },
+
+    {
+
+      name: "GeniDoc Agent AI",
+
+      price: "Gratuit 30 jours",
+
+      then: "48.99 MAD/mois",
+
+      features: ["IA d'assistance", "Analyse prédictive", "Recommandations automatiques"]
+
+    },
+
+    {
+
+      name: "GeniDoc Agent AI +",
+
+      price: "99 MAD/mois",
+
+      then: "",
+
+      features: ["Toutes les fonctionnalités AI", "Intégration avancée", "Support prioritaire"]
+
+    },
+
+    {
+
+      name: "Surveillance à Distance",
+
+      price: "1 spécialité gratuite/mois",
+
+      then: "38.99 MAD pour 2 spécialités",
+
+      features: ["Monitoring temps réel", "Alertes automatiques", "Rapports détaillés"]
+
+    },
+
+    {
+
+      name: "Base de Données IoT",
+
+      price: "399 MAD/an",
+
+      then: "",
+
+      features: ["Stockage sécurisé", "Intégration IoT", "Sauvegarde automatique"]
+
+    }
+
+  ];
+
+
+
+  const renderDashboard = () => (
+
+    <div className="space-y-6">
+
+      <div className="flex items-center justify-between">
+
+        <h2 className="text-2xl font-bold text-gray-800">Tableau de Bord</h2>
+
+        <div className="flex space-x-2">
+
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+
+            <Plus size={16} />
+
+            <span>Nouveau RDV</span>
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+
+        <div className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-blue-500">
+
+          <div className="flex items-center justify-between">
+
+            <div>
+
+              <p className="text-gray-600 text-sm">RDV Aujourd'hui</p>
+
+              <p className="text-2xl font-bold text-gray-800">12</p>
+
+            </div>
+
+            <Calendar className="text-blue-500" size={32} />
+
+          </div>
+
+        </div>
+
+
+
+        <div className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-green-500">
+
+          <div className="flex items-center justify-between">
+
+            <div>
+
+              <p className="text-gray-600 text-sm">Patients Actifs</p>
+
+              <p className="text-2xl font-bold text-gray-800">247</p>
+
+            </div>
+
+            <Users className="text-green-500" size={32} />
+
+          </div>
+
+        </div>
+
+
+
+        <div className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-yellow-500">
+
+          <div className="flex items-center justify-between">
+
+            <div>
+
+              <p className="text-gray-600 text-sm">Surveillance</p>
+
+              <p className="text-2xl font-bold text-gray-800">18</p>
+
+            </div>
+
+            <Activity className="text-yellow-500" size={32} />
+
+          </div>
+
+        </div>
+
+
+
+        <div className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-purple-500">
+
+          <div className="flex items-center justify-between">
+
+            <div>
+
+              <p className="text-gray-600 text-sm">Alertes</p>
+
+              <p className="text-2xl font-bold text-gray-800">3</p>
+
+            </div>
+
+            <Bell className="text-purple-500" size={32} />
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <div className="bg-white p-6 rounded-xl shadow-lg">
+
+          <h3 className="text-lg font-semibold mb-4">Prochains Rendez-vous</h3>
+
+          <div className="space-y-3">
+
+            {appointments.slice(0, 5).map(apt => (
+
+              <div key={apt.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+
+                <div>
+
+                  <p className="font-medium">{apt.patient}</p>
+
+                  <p className="text-sm text-gray-600">{apt.date} à {apt.time}</p>
+
+                </div>
+
+                <span className={`px-2 py-1 rounded-full text-xs ${
+
+                  apt.status === 'confirmed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+
+                }`}>
+
+                  {apt.status === 'confirmed' ? 'Confirmé' : 'En attente'}
+
+                </span>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        </div>
+
+
+
+        <div className="bg-white p-6 rounded-xl shadow-lg">
+
+          <h3 className="text-lg font-semibold mb-4">Surveillance Temps Réel</h3>
+
+          <div className="space-y-3">
+
+            {monitoringData.map(data => (
+
+              <div key={data.id} className="p-3 bg-gray-50 rounded-lg">
+
+                <div className="flex items-center justify-between mb-2">
+
+                  <p className="font-medium">{data.patient}</p>
+
+                  <span className="text-xs text-gray-500">{data.timestamp}</span>
+
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-sm">
+
+                  <div className="flex items-center space-x-1">
+
+                    <Heart size={14} className="text-red-500" />
+
+                    <span>{data.vitals.bp}</span>
+
+                  </div>
+
+                  <div className="flex items-center space-x-1">
+
+                    <Activity size={14} className="text-blue-500" />
+
+                    <span>{data.vitals.hr} bpm</span>
+
+                  </div>
+
+                  <div className="flex items-center space-x-1">
+
+                    <Thermometer size={14} className="text-orange-500" />
+
+                    <span>{data.vitals.temp}°C</span>
+
+                  </div>
+
+                  <div className="flex items-center space-x-1">
+
+                    <Droplets size={14} className="text-blue-400" />
+
+                    <span>{data.vitals.spo2}%</span>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  );
+
+
+
+  const renderAppointments = () => (
+
+    <div className="space-y-6">
+
+      <div className="flex items-center justify-between">
+
+        <h2 className="text-2xl font-bold text-gray-800">Gestion des Rendez-vous</h2>
+
+        <button 
+
+          onClick={() => setShowNewAppointment(true)}
+
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
+
+        >
+
+          <Plus size={16} />
+
+          <span>Nouveau RDV</span>
+
+        </button>
+
+      </div>
+
+
+
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+
+        <div className="overflow-x-auto">
+
+          <table className="w-full">
+
+            <thead className="bg-gray-50">
+
+              <tr>
+
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Patient</th>
+
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Heure</th>
+
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody className="divide-y divide-gray-200">
+
+              {appointments.map(apt => (
+
+                <tr key={apt.id} className="hover:bg-gray-50">
+
+                  <td className="px-6 py-4 whitespace-nowrap">
+
+                    <div className="font-medium text-gray-900">{apt.patient}</div>
+
+                  </td>
+
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-500">{apt.date}</td>
+
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-500">{apt.time}</td>
+
+                  <td className="px-6 py-4 whitespace-nowrap">
+
+                    <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">{apt.type}</span>
+
+                  </td>
+
+                  <td className="px-6 py-4 whitespace-nowrap">
+
+                    <span className={`px-2 py-1 text-xs rounded-full ${
+
+                      apt.status === 'confirmed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+
+                    }`}>
+
+                      {apt.status === 'confirmed' ? 'Confirmé' : 'En attente'}
+
+                    </span>
+
+                  </td>
+
+                  <td className="px-6 py-4 whitespace-nowrap">
+
+                    <div className="flex space-x-2">
+
+                      <button className="text-blue-600 hover:text-blue-800">
+
+                        <Edit size={16} />
+
+                      </button>
+
+                      <button className="text-red-600 hover:text-red-800">
+
+                        <Trash2 size={16} />
+
+                      </button>
+
+                      <button className="text-green-600 hover:text-green-800">
+
+                        <Video size={16} />
+
+                      </button>
+
+                    </div>
+
+                  </td>
+
+                </tr>
+
+              ))}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+
+
+      {showNewAppointment && (
+
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+
+          <div className="bg-white p-6 rounded-xl shadow-xl w-96">
+
+            <div className="flex items-center justify-between mb-4">
+
+              <h3 className="text-lg font-semibold">Nouveau Rendez-vous</h3>
+
+              <button onClick={() => setShowNewAppointment(false)}>
+
+                <X size={20} />
+
+              </button>
+
+            </div>
+
+            <div className="space-y-4">
+
+              <div>
+
+                <label className="block text-sm font-medium text-gray-700 mb-1">Patient</label>
+
+                <input type="text" className="w-full p-2 border rounded-lg" placeholder="Nom du patient" />
+
+              </div>
+
+              <div>
+
+                <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+
+                <input type="date" className="w-full p-2 border rounded-lg" />
+
+              </div>
+
+              <div>
+
+                <label className="block text-sm font-medium text-gray-700 mb-1">Heure</label>
+
+                <input type="time" className="w-full p-2 border rounded-lg" />
+
+              </div>
+
+              <div>
+
+                <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+
+                <select className="w-full p-2 border rounded-lg">
+
+                  <option>Consultation</option>
+
+                  <option>Suivi</option>
+
+                  <option>Urgence</option>
+
+                </select>
+
+              </div>
+
+              <div className="flex space-x-2">
+
+                <button className="flex-1 bg-blue-600 text-white py-2 rounded-lg">Créer</button>
+
+                <button 
+
+                  onClick={() => setShowNewAppointment(false)}
+
+                  className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg"
+
+                >
+
+                  Annuler
+
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
+    </div>
+
+  );
+
+
+
+  const renderPatients = () => (
+
+    <div className="space-y-6">
+
+      <div className="flex items-center justify-between">
+
+        <h2 className="text-2xl font-bold text-gray-800">Gestion des Patients</h2>
+
+        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+
+          <Plus size={16} />
+
+          <span>Nouveau Patient</span>
+
+        </button>
+
+      </div>
+
+
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        {patients.map(patient => (
+
+          <div key={patient.id} className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
+
+            <div className="flex items-center justify-between mb-4">
+
+              <h3 className="text-lg font-semibold text-gray-800">{patient.name}</h3>
+
+              <span className={`px-2 py-1 rounded-full text-xs ${
+
+                patient.status === 'stable' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+
+              }`}>
+
+                {patient.status === 'stable' ? 'Stable' : 'Surveillance'}
+
+              </span>
+
+            </div>
+
+            <div className="space-y-2 text-sm text-gray-600">
+
+              <p><span className="font-medium">Âge:</span> {patient.age} ans</p>
+
+              <p><span className="font-medium">Condition:</span> {patient.condition}</p>
+
+              <p><span className="font-medium">Dernière visite:</span> {patient.lastVisit}</p>
+
+            </div>
+
+            <div className="flex space-x-2 mt-4">
+
+              <button 
+
+                onClick={() => setSelectedPatient(patient)}
+
+                className="flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm flex items-center justify-center space-x-1"
+
+              >
+
+                <Eye size={14} />
+
+                <span>Voir</span>
+
+              </button>
+
+              <button className="flex-1 bg-green-600 text-white py-2 rounded-lg text-sm flex items-center justify-center space-x-1">
+
+                <Activity size={14} />
+
+                <span>Surveiller</span>
+
+              </button>
+
+            </div>
+
+          </div>
+
+        ))}
+
+      </div>
+
+
+
+      {selectedPatient && (
+
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+
+          <div className="bg-white p-6 rounded-xl shadow-xl w-96 max-h-[80vh] overflow-y-auto">
+
+            <div className="flex items-center justify-between mb-4">
+
+              <h3 className="text-lg font-semibold">Dossier Patient</h3>
+
+              <button onClick={() => setSelectedPatient(null)}>
+
+                <X size={20} />
+
+              </button>
+
+            </div>
+
+            <div className="space-y-4">
+
+              <div className="text-center">
+
+                <h4 className="text-xl font-bold text-gray-800">{selectedPatient.name}</h4>
+
+                <p className="text-gray-600">{selectedPatient.age} ans</p>
+
+              </div>
+
+              <div className="space-y-2">
+
+                <p><span className="font-medium">Condition principale:</span> {selectedPatient.condition}</p>
+
+                <p><span className="font-medium">Dernière visite:</span> {selectedPatient.lastVisit}</p>
+
+                <p><span className="font-medium">Statut:</span> {selectedPatient.status}</p>
+
+              </div>
+
+              <div className="border-t pt-4">
+
+                <h5 className="font-medium mb-2">Dernières données vitales</h5>
+
+                <div className="grid grid-cols-2 gap-2 text-sm">
+
+                  <div className="flex items-center space-x-1">
+
+                    <Heart size={14} className="text-red-500" />
+
+                    <span>140/90 mmHg</span>
+
+                  </div>
+
+                  <div className="flex items-center space-x-1">
+
+                    <Activity size={14} className="text-blue-500" />
+
+                    <span>75 bpm</span>
+
+                  </div>
+
+                  <div className="flex items-center space-x-1">
+
+                    <Thermometer size={14} className="text-orange-500" />
+
+                    <span>36.8°C</span>
+
+                  </div>
+
+                  <div className="flex items-center space-x-1">
+
+                    <Droplets size={14} className="text-blue-400" />
+
+                    <span>98%</span>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+              <div className="flex space-x-2">
+
+                <button className="flex-1 bg-blue-600 text-white py-2 rounded-lg">Modifier</button>
+
+                <button className="flex-1 bg-green-600 text-white py-2 rounded-lg">RDV</button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
+    </div>
+
+  );
+
+
+
+  const renderMonitoring = () => (
+
+    <div className="space-y-6">
+
+      <div className="flex items-center justify-between">
+
+        <h2 className="text-2xl font-bold text-gray-800">Surveillance à Distance</h2>
+
+        <div className="flex space-x-2">
+
+          <button className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+
+            <Activity size={16} />
+
+            <span>Temps Réel</span>
+
+          </button>
+
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+
+            <Download size={16} />
+
+            <span>Exporter</span>
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <div className="bg-white p-6 rounded-xl shadow-lg">
+
+          <h3 className="text-lg font-semibold mb-4">Patients Surveillés</h3>
+
+          <div className="space-y-4">
+
+            {monitoringData.map(data => (
+
+              <div key={data.id} className="p-4 border rounded-lg">
+
+                <div className="flex items-center justify-between mb-2">
+
+                  <h4 className="font-medium">{data.patient}</h4>
+
+                  <span className="text-xs text-gray-500">{data.timestamp}</span>
+
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+
+                  <div className="flex items-center space-x-2">
+
+                    <Heart size={16} className="text-red-500" />
+
+                    <span className="text-sm">{data.vitals.bp}</span>
+
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+
+                    <Activity size={16} className="text-blue-500" />
+
+                    <span className="text-sm">{data.vitals.hr} bpm</span>
+
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+
+                    <Thermometer size={16} className="text-orange-500" />
+
+                    <span className="text-sm">{data.vitals.temp}°C</span>
+
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+
+                    <Droplets size={16} className="text-blue-400" />
+
+                    <span className="text-sm">{data.vitals.spo2}%</span>
+
+                  </div>
+
+                </div>
+
+                <div className="mt-2">
+
+                  <div className="flex items-center space-x-2">
+
+                    <CheckCircle size={16} className="text-green-500" />
+
+                    <span className="text-sm text-green-600">Valeurs normales</span>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        </div>
+
+
+
+        <div className="bg-white p-6 rounded-xl shadow-lg">
+
+          <h3 className="text-lg font-semibold mb-4">Alertes & Notifications</h3>
+
+          <div className="space-y-3">
+
+            <div className="p-3 bg-red-50 border-l-4 border-red-500 rounded">
+
+              <div className="flex items-center space-x-2">
+
+                <AlertCircle size={16} className="text-red-500" />
+
+                <span className="font-medium text-red-800">Alerte Critique</span>
+
+              </div>
+
+              <p className="text-sm text-red-700 mt-1">Patient Ahmed Benali - Tension élevée (180/100)</p>
+
+              <p className="text-xs text-red-600 mt-1">Il y a 15 minutes</p>
+
+            </div>
+
+            <div className="p-3 bg-yellow-50 border-l-4 border-yellow-500 rounded">
+
+              <div className="flex items-center space-x-2">
+
+                <Bell size={16} className="text-yellow-500" />
+
+                <span className="font-medium text-yellow-800">Rappel</span>
+
+              </div>
+
+              <p className="text-sm text-yellow-700 mt-1">Fatima Zahra - Contrôle glycémie</p>
+
+              <p className="text-xs text-yellow-600 mt-1">Dans 2 heures</p>
+
+            </div>
+
+            <div className="p-3 bg-green-50 border-l-4 border-green-500 rounded">
+
+              <div className="flex items-center space-x-2">
+
+                <CheckCircle size={16} className="text-green-500" />
+
+                <span className="font-medium text-green-800">Normal</span>
+
+              </div>
+
+              <p className="text-sm text-green-700 mt-1">Mohamed Alami - Toutes les valeurs OK</p>
+
+              <p className="text-xs text-green-600 mt-1">Il y a 1 heure</p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div className="bg-white p-6 rounded-xl shadow-lg">
+
+        <h3 className="text-lg font-semibold mb-4">Intégration IoT</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+          <div className="p-4 border rounded-lg text-center">
+
+            <Zap size={32} className="text-blue-500 mx-auto mb-2" />
+
+            <h4 className="font-medium">Capteurs Connectés</h4>
+
+            <p className="text-2xl font-bold text-blue-600">24</p>
+
+          </div>
+
+          <div className="p-4 border rounded-lg text-center">
+
+            <Database size={32} className="text-green-500 mx-auto mb-2" />
+
+            <h4 className="font-medium">Données/Jour</h4>
+
+            <p className="text-2xl font-bold text-green-600">1.2K</p>
+
+          </div>
+
+          <div className="p-4 border rounded-lg text-center">
+
+            <Shield size={32} className="text-purple-500 mx-auto mb-2" />
+
+            <h4 className="font-medium">Sécurité</h4>
+
+            <p className="text-2xl font-bold text-purple-600">99.9%</p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  );
+
+
+
+  const renderInteroperability = () => (
+
+    <div className="space-y-6">
+
+      <div className="flex items-center justify-between">
+
+        <h2 className="text-2xl font-bold text-gray-800">Interopérabilité</h2>
+
+        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+
+          <Plus size={16} />
+
+          <span>Nouvelle Intégration</span>
+
+        </button>
+
+      </div>
+
+
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <div className="bg-white p-6 rounded-xl shadow-lg">
+
+          <h3 className="text-lg font-semibold mb-4">Systèmes Connectés</h3>
+
+          <div className="space-y-3">
+
+            <div className="flex items-center justify-between p-3 border rounded-lg">
+
+              <div className="flex items-center space-x-3">
+
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+
+                <span className="font-medium">HIS Hospital Management</span>
+
+              </div>
+
+              <span className="text-sm text-green-600">Connecté</span>
+
+            </div>
+
+            <div className="flex items-center justify-between p-3 border rounded-lg">
+
+              <div className="flex items-center space-x-3">
+
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+
+                <span className="font-medium">Laboratoire Central</span>
+
+              </div>
+
+              <span className="text-sm text-green-600">Connecté</span>
+
+            </div>
+
+            <div className="flex items-center justify-between p-3 border rounded-lg">
+
+              <div className="flex items-center space-x-3">
+
+                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+
+                <span className="font-medium">Pharmacie Hospitalière</span>
+
+              </div>
+
+              <span className="text-sm text-yellow-600">En attente</span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+
+        <div className="bg-white p-6 rounded-xl shadow-lg">
+
+          <h3 className="text-lg font-semibold mb-4">Échange de Données</h3>
+
+          <div className="space-y-4">
+
+            <div className="p-3 bg-blue-50 rounded-lg">
+
+              <div className="flex items-center justify-between">
+
+                <span className="font-medium">Résultats Lab</span>
+
+                <Upload size={16} className="text-blue-500" />
+
+              </div>
+
+              <p className="text-sm text-gray-600">127 résultats synchronisés aujourd'hui</p>
+
+            </div>
+
+            <div className="p-3 bg-green-50 rounded-lg">
+
+              <div className="flex items-center justify-between">
+
+                <span className="font-medium">Dossiers Patients</span>
+
+                <Download size={16} className="text-green-500" />
+
+              </div>
+
+              <p className="text-sm text-gray-600">89 dossiers mis à jour</p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div className="bg-white p-6 rounded-xl shadow-lg">
+
+        <h3 className="text-lg font-semibold mb-4">Standards Supportés</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+          <div className="p-4 border rounded-lg text-center">
+
+            <FileText size={32} className="text-blue-500 mx-auto mb-2" />
+
+            <h4 className="font-medium">HL7 FHIR</h4>
+
+            <p className="text-sm text-gray-600">Échange de données médicales</p>
+
+          </div>
+
+          <div className="p-4 border rounded-lg text-center">
+
+            <Database size={32} className="text-green-500 mx-auto mb-2" />
+
+            <h4 className="font-medium">DICOM</h4>
+
+            <p className="text-sm text-gray-600">Images médicales</p>
+
+          </div>
+
+          <div className="p-4 border rounded-lg text-center">
+
+            <Shield size={32} className="text-purple-500 mx-auto mb-2" />
+
+            <h4 className="font-medium">IHE</h4>
+
+            <p className="text-sm text-gray-600">Intégration Healthcare</p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  );
+
+
+
+  const renderPricing = () => (
+
+    <div className="space-y-6">
+
+      <div className="text-center mb-8">
+
+        <h2 className="text-3xl font-bold text-gray-800 mb-2">Plans & Tarification</h2>
+
+        <p className="text-gray-600">Choisissez le plan adapté à vos besoins</p>
+
+      </div>
+
+
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        {pricingPlans.map((plan, index) => (
+
+          <div key={index} className="bg-white p-6 rounded-xl shadow-lg border hover:shadow-xl transition-shadow">
+
+            <div className="text-center mb-6">
+
+              <h3 className="text-xl font-bold text-gray-800 mb-2">{plan.name}</h3>
+
+              <div className="text-2xl font-bold text-blue-600 mb-1">{plan.price}</div>
+
+              {plan.then && <div className="text-sm text-gray-600">{plan.then}</div>}
+
+            </div>
+
+            <ul className="space-y-3 mb-6">
+
+              {plan.features.map((feature, i) => (
+
+                <li key={i} className="flex items-center space-x-2">
+
+                  <CheckCircle size={16} className="text-green-500" />
+
+                  <span className="text-sm text-gray-600">{feature}</span>
+
+                </li>
+
+              ))}
+
+            </ul>
+
+            <button className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
+
+              Choisir ce plan
+
+            </button>
+
+          </div>
+
+        ))}
+
+      </div>
+
+
+
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-8 rounded-xl text-white">
+
+        <div className="text-center">
+
+          <h3 className="text-2xl font-bold mb-4">GeniDoc - Innovation Médicale</h3>
+
+          <p className="text-lg mb-4">Fondé par SENHAJI Anas</p>
+
+          <p className="mb-6">Solution complète de gestion hospitalière avec surveillance IoT</p>
+
+          <div className="flex items-center justify-center space-x-4">
+
+            <div className="text-center">
+
+              <div className="text-3xl font-bold">24/7</div>
+
+              <div className="text-sm">Support</div>
+
+            </div>
+
+            <div className="text-center">
+
+              <div className="text-3xl font-bold">99.9%</div>
+
+              <div className="text-sm">Uptime</div>
+
+            </div>
+
+            <div className="text-center">
+
+              <div className="text-3xl font-bold">RGPD</div>
+
+              <div className="text-sm">Conforme</div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  );
+
+
+
+  const navItems = [
+
+    { id: 'dashboard', label: 'Tableau de Bord', icon: Activity },
+
+    { id: 'appointments', label: 'Rendez-vous', icon: Calendar },
+
+    { id: 'patients', label: 'Patients', icon: Users },
+
+    { id: 'monitoring', label: 'Surveillance', icon: Heart },
+
+    { id: 'interoperability', label: 'Interopérabilité', icon: Database },
+
+    { id: 'pricing', label: 'Tarification', icon: Star }
+
+  ];
+
+
+
+  return (
+
+    <div className="min-h-screen bg-gray-100">
+
+      {/* Header */}
+
+      <header className="bg-white shadow-lg border-b">
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+          <div className="flex items-center justify-between h-16">
+
+            <div className="flex items-center space-x-3">
+
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+
+                <Activity className="text-white" size={24} />
+
+              </div>
+
+              <div>
+
+                <h1 className="text-xl font-bold text-gray-800">GeniDoc</h1>
+
+                <p className="text-xs text-gray-600">by genidoc.ma</p>
+
+              </div>
+
+            </div>
+
+            <div className="flex items-center space-x-4">
+
+              <button className="relative p-2 text-gray-600 hover:text-gray-800">
+
+                <Bell size={20} />
+
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">3</span>
+
+              </button>
+
+              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-medium">
+
+                SA
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </header>
+
+
+
+      <div className="flex">
+
+        {/* Sidebar */}
+
+        <nav className="w-64 bg-white shadow-lg h-screen sticky top-0">
+
+          <div className="p-4">
+
+            <ul className="space-y-2">
+
+              {navItems.map(item => {
+
+                const Icon = item.icon;
+
+                return (
+
+                  <li key={item.id}>
+
+                    <button
+
+                      onClick={() => setActiveTab(item.id)}
+
+                      className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+
+                        activeTab === item.id
+
+                          ? 'bg-blue-600 text-white'
+
+                          : 'text-gray-600 hover:bg-gray-100'
+
+                      }`}
+
+                    >
+
+                      <Icon size={20} />
+
+                      <span className="font-medium">{item.label}</span>
+
+                    </button>
+
+                  </li>
+
+                );
+
+              })}
+
+            </ul>
+
+          </div>
+
+        </nav>
+
+
+
+        {/* Main Content */}
+
+        <main className="flex-1 p-8">
+
+          <div className="max-w-7xl mx-auto">
+
+            {activeTab === 'dashboard' && renderDashboard()}
+
+            {activeTab === 'appointments' && renderAppointments()}
+
+            {activeTab === 'patients' && renderPatients()}
+
+            {activeTab === 'monitoring' && renderMonitoring()}
+
+            {activeTab === 'interoperability' && renderInteroperability()}
+
+            {activeTab === 'pricing' && renderPricing()}
+
+          </div>
+
+        </main>
+
+      </div>
+
+    </div>
+
+  );
+
+};
+
+
+
+export default GeniDocApp;
