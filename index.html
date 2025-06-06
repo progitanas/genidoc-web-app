@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>GeniDoc - Tableau de Bord</title>
+    <title>GeniDoc - Plateforme Médicale Complète</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:400,600&display=swap">
     <style>
         body {
@@ -54,6 +54,7 @@
             font-size: 16px;
             border-left: 4px solid transparent;
             transition: background 0.2s, border-color 0.2s;
+            cursor: pointer;
         }
         .sidebar nav a.active, .sidebar nav a:hover {
             background: #f0f4ff;
@@ -72,7 +73,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 24px 32px 0 32px;
+            padding: 32px 32px 0 32px;
         }
         .header .title {
             font-size: 26px;
@@ -81,36 +82,6 @@
         }
         .header .actions {
             display: flex; align-items: center; gap: 18px;
-        }
-        .header .notif {
-            position: relative;
-            font-size: 22px;
-            color: #4f8cff;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .header .notif:hover {
-            color: #1749b1;
-        }
-        .header .notif .badge {
-            position: absolute;
-            top: -6px; right: -8px;
-            background: #ff3b3b;
-            color: #fff;
-            font-size: 11px;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-weight: bold;
-        }
-        .header .user {
-            width: 38px; height: 38px;
-            background: #4f8cff;
-            color: #fff;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 600;
-            font-size: 18px;
-            letter-spacing: 1px;
         }
         .header .new-btn {
             background: #2563eb;
@@ -126,13 +97,20 @@
         .header .new-btn:hover {
             background: #1749b1;
         }
-        .dashboard {
-            padding: 32px;
+        .section {
+            margin: 32px;
+            margin-top: 24px;
+            display: none;
         }
+        .section.active {
+            display: block;
+        }
+        /* Dashboard */
         .dashboard-cards {
             display: flex;
             gap: 24px;
             flex-wrap: wrap;
+            margin-bottom: 32px;
         }
         .card {
             background: #fff;
@@ -178,69 +156,229 @@
         .card.yellow .card-icon svg { fill: #fbbf24; }
         .card.purple .card-icon { background: #f3e8ff; }
         .card.purple .card-icon svg { fill: #a78bfa; }
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+            background: none;
+        }
+        .data-table th {
+            text-align: left;
+            font-size: 15px;
+            color: #555;
+            font-weight: 600;
+            padding-bottom: 8px;
+        }
+        .data-table td {
+            background: #fff;
+            font-size: 16px;
+            padding: 14px 10px;
+            vertical-align: middle;
+        }
+        .data-table td:first-child {
+            border-radius: 8px 0 0 8px;
+        }
+        .data-table td:last-child {
+            border-radius: 0 8px 8px 0;
+        }
+        .badge {
+            padding: 3px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .badge.type { background: #e8f0fe; color: #2563eb; }
+        .badge.confirmed { background: #e6fbe9; color: #22c55e; }
+        .badge.pending { background: #fffbe6; color: #fbbf24; }
+        .badge.stable { background: #e6fbe9; color: #22c55e; }
+        .badge.surveillance { background: #fffbe6; color: #fbbf24; }
+        .badge.connected { background: #e6fbe9; color: #22c55e; }
+        /* Patient Cards */
+        .patient-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px #e0e0e0;
+            padding: 24px 32px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+        .patient-card .status {
+            position: absolute;
+            top: 24px;
+            right: 32px;
+            padding: 4px 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .patient-card .name {
+            font-weight: 600;
+            font-size: 18px;
+        }
+        .patient-card .info {
+            color: #555;
+            margin-top: 6px;
+            font-size: 15px;
+        }
+        .patient-card .actions {
+            display: flex;
+            gap: 16px;
+            margin-top: 18px;
+        }
+        .patient-card .actions button {
+            flex: 1;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 0;
+            font-size: 16px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.18s;
+        }
+        .btn-primary { background: #2563eb; color: #fff; }
+        .btn-primary:hover { background: #1749b1; }
+        .btn-success { background: #16a34a; color: #fff; }
+        .btn-success:hover { background: #12813a; }
+        /* Surveillance */
+        .surveillance-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px #e0e0e0;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+        .surveillance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .surveillance-header .name {
+            font-weight: 600;
+            font-size: 18px;
+        }
+        .surveillance-header .time {
+            color: #888;
+            font-size: 14px;
+        }
+        .vitals {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 16px;
+        }
+        .vital {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .vital .icon {
+            font-size: 18px;
+        }
+        .vital .value {
+            font-weight: 500;
+        }
+        /* Plans tarifaires */
+        .pricing-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        .pricing-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px #e0e0e0;
+            padding: 32px 28px;
+            text-align: center;
+        }
+        .pricing-card h3 {
+            margin-top: 0;
+            color: #222;
+            font-size: 20px;
+        }
+        .pricing-card .price {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2563eb;
+            margin: 16px 0;
+        }
+        .pricing-card .price-desc {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        .pricing-card .features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 24px 0;
+        }
+        .pricing-card .features li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        .pricing-card .features li::before {
+            content: "✓";
+            color: #22c55e;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        /* Interoperability */
+        .systems-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .system-item {
+            background: #fff;
+            border-radius: 8px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px #e0e0e0;
+        }
+        .system-item .system-name {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .system-item .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .status-dot.connected { background: #22c55e; }
+        .status-dot.pending { background: #fbbf24; }
+        .data-exchange {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px #e0e0e0;
+            padding: 24px;
+        }
+        .data-exchange h3 {
+            margin-top: 0;
+            color: #222;
+        }
+        .exchange-item {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
         @media (max-width: 900px) {
-            .dashboard-cards { flex-direction: column; }
             .main { margin-left: 0; }
             .sidebar { position: static; width: 100%; height: auto; flex-direction: row; }
-        }
-        /* Modal styles */
-        .modal-bg {
-            display: none;
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.18);
-            align-items: center; justify-content: center;
-            z-index: 1000;
-        }
-        .modal-bg.active { display: flex; }
-        .modal {
-            background: #fff;
-            border-radius: 10px;
-            padding: 28px 32px 22px 32px;
-            box-shadow: 0 8px 32px #b6b6b6;
-            min-width: 320px;
-            animation: modalIn 0.22s;
-        }
-        @keyframes modalIn {
-            from { transform: scale(0.92); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        .modal h3 { margin-top: 0; font-size: 20px; }
-        .modal label { display: block; margin: 12px 0 4px 0; font-size: 14px; }
-        .modal input, .modal select {
-            width: 100%; padding: 7px 10px; border-radius: 5px; border: 1px solid #d1d5db;
-            font-size: 15px; margin-bottom: 10px;
-        }
-        .modal .modal-actions {
-            display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;
-        }
-        .modal .modal-btn {
-            background: #2563eb; color: #fff; border: none; border-radius: 5px;
-            padding: 7px 16px; font-size: 15px; cursor: pointer; transition: background 0.2s;
-        }
-        .modal .modal-btn.cancel { background: #e0e0e0; color: #222; }
-        .modal .modal-btn:hover:not(.cancel) { background: #1749b1; }
-        .specs-section {
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 12px #e0e0e0;
-            margin: 32px;
-            padding: 28px 32px;
-            max-width: 900px;
-        }
-        .specs-section h2 {
-            margin-top: 0;
-            color: #2563eb;
-            font-size: 22px;
-        }
-        .specs-section ul {
-            padding-left: 20px;
-        }
-        .specs-section li {
-            margin-bottom: 12px;
-            font-size: 16px;
-        }
-        .specs-section strong {
-            color: #1749b1;
         }
     </style>
 </head>
@@ -253,195 +391,417 @@
                 </div>
                 <div>
                     <div class="logo-text">GeniDoc</div>
-                    <div class="logo-desc">by genidoc.ma</div>
+                    <div class="logo-desc">by SENHAJI Anas</div>
                 </div>
             </div>
             <nav>
-                <a href="#" class="active"><span class="icon">
-                    <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/></svg>
-                </span> Tableau de Bord</a>
-                <a href="#"><span class="icon">
-                    <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zm0-13H5V6h14v1z"/></svg>
-                </span> Rendez-vous</a>
-                <a href="#"><span class="icon">
-                    <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 8 1.34 8 4v4H4v-4c0-2.66 5.3-4 8-4zm0-2c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/></svg>
-                </span> Patients</a>
-                <a href="#"><span class="icon">
-                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                </span> Surveillance</a>
-                <a href="#"><span class="icon">
-                    <svg viewBox="0 0 24 24"><path d="M20 6H4v12h16V6zm-2 10H6V8h12v8z"/></svg>
-                </span> Interopérabilité</a>
-                <a href="#"><span class="icon">
-                    <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                </span> Tarification</a>
+                <a href="#" data-section="dashboard" class="nav-item active">
+                    <span class="icon">
+                        <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-10h-8v10zm0-18v6h8V3h-8z"/></svg>
+                    </span> Tableau de Bord
+                </a>
+                <a href="#" data-section="rendez-vous" class="nav-item">
+                    <span class="icon">
+                        <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zm0-13H5V6h14v1z"/></svg>
+                    </span> Rendez-vous
+                </a>
+                <a href="#" data-section="patients" class="nav-item">
+                    <span class="icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 8 1.34 8 4v4H4v-4c0-2.66 5.3-4 8-4zm0-2c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/></svg>
+                    </span> Patients
+                </a>
+                <a href="#" data-section="surveillance" class="nav-item">
+                    <span class="icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    </span> Surveillance
+                </a>
+                <a href="#" data-section="interoperabilite" class="nav-item">
+                    <span class="icon">
+                        <svg viewBox="0 0 24 24"><path d="M20 6H4v12h16V6zm-2 10H6V8h12v8z"/></svg>
+                    </span> Interopérabilité
+                </a>
+                <a href="#" data-section="tarification" class="nav-item">
+                    <span class="icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    </span> Tarification
+                </a>
             </nav>
         </div>
     </div>
+
     <div class="main">
-        <div class="header">
-            <div class="title">Tableau de Bord</div>
-            <div class="actions">
-                <button class="new-btn" id="openModalBtn">+ Nouveau RDV</button>
-                <div class="notif" id="notifBtn" title="Voir les notifications">
-                    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6V11c0-3.07-1.63-5.64-4.5-6.32V4a1.5 1.5 0 0 0-3 0v.68C7.63 5.36 6 7.92 6 11v5l-1.29 1.29A1 1 0 0 0 6 20h12a1 1 0 0 0 .71-1.71L18 16z"/></svg>
-                    <span class="badge" id="notif-badge">3</span>
-                </div>
-                <div class="user">SA</div>
-            </div>
-        </div>
-        <div class="dashboard">
-            <div class="dashboard-cards">
-                <div class="card blue" onclick="showCardDetail('RDV Aujourd\'hui', '12 rendez-vous prévus aujourd\'hui.')">
-                    <div class="card-info">
-                        <div class="card-title">RDV Aujourd'hui</div>
-                        <div class="card-value" id="rdv-today">12</div>
-                    </div>
-                    <div class="card-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zm0-13H5V6h14v1z"/></svg>
-                    </div>
-                </div>
-                <div class="card green" onclick="showCardDetail('Patients Actifs', '247 patients actuellement suivis.')">
-                    <div class="card-info">
-                        <div class="card-title">Patients Actifs</div>
-                        <div class="card-value" id="patients-actifs">247</div>
-                    </div>
-                    <div class="card-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24"><path d="M12 12c2.7 0 8 1.34 8 4v4H4v-4c0-2.66 5.3-4 8-4zm0-2c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/></svg>
-                    </div>
-                </div>
-                <div class="card yellow" onclick="showCardDetail('Surveillance', '18 patients sous surveillance rapprochée.')">
-                    <div class="card-info">
-                        <div class="card-title">Surveillance</div>
-                        <div class="card-value" id="surveillance">18</div>
-                    </div>
-                    <div class="card-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                    </div>
-                </div>
-                <div class="card purple" onclick="showCardDetail('Alertes', '3 alertes à traiter.')">
-                    <div class="card-info">
-                        <div class="card-title">Alertes</div>
-                        <div class="card-value" id="alertes">3</div>
-                    </div>
-                    <div class="card-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6V11c0-3.07-1.63-5.64-4.5-6.32V4a1.5 1.5 0 0 0-3 0v.68C7.63 5.36 6 7.92 6 11v5l-1.29 1.29A1 1 0 0 0 6 20h12a1 1 0 0 0 .71-1.71L18 16z"/></svg>
-                    </div>
+        <!-- Dashboard Section -->
+        <div id="dashboard-section" class="section active">
+            <div class="header">
+                <div class="title">Tableau de Bord</div>
+                <div class="actions">
+                    <button class="new-btn">+ Nouveau RDV</button>
                 </div>
             </div>
-        </div>
-        <div class="specs-section">
-            <h2>Spécifications des sections principales</h2>
-            <ul>
-                <li>
-                    <strong>Rendez-vous&nbsp;:</strong>
-                    Gestion des consultations : création, modification, annulation et affichage des rendez-vous à venir ou passés. Possibilité de filtrer par date, patient ou praticien.
-                </li>
-                <li>
-                    <strong>Patients&nbsp;:</strong>
-                    Accès à la liste des patients, leurs dossiers médicaux, historique des consultations, informations de contact et gestion des nouveaux patients.
-                </li>
-                <li>
-                    <strong>Surveillance&nbsp;:</strong>
-                    Suivi des patients sous surveillance : alertes médicales, indicateurs de santé, notifications en temps réel sur les anomalies ou urgences.
-                </li>
-                <li>
-                    <strong>Interopérabilité&nbsp;:</strong>
-                    Intégration et échange de données avec d’autres systèmes de santé (laboratoires, pharmacies, hôpitaux) via des standards (HL7, FHIR, etc.).
-                </li>
-                <li>
-                    <strong>Tarification&nbsp;:</strong>
-                    Gestion des actes médicaux, facturation, suivi des paiements, génération de devis et rapports financiers pour la structure médicale.
-                </li>
-            </ul>
-        </div>
-    </div>
-    <!-- Modal pour Nouveau RDV -->
-    <div class="modal-bg" id="modalBg">
-        <div class="modal">
-            <h3>Nouveau Rendez-vous</h3>
-            <form id="rdvForm">
-                <label for="patient">Patient</label>
-                <input type="text" id="patient" name="patient" required placeholder="Nom du patient">
-                <label for="date">Date</label>
-                <input type="date" id="date" name="date" required>
-                <label for="heure">Heure</label>
-                <input type="time" id="heure" name="heure" required>
-                <div class="modal-actions">
-                    <button type="button" class="modal-btn cancel" id="closeModalBtn">Annuler</button>
-                    <button type="submit" class="modal-btn">Créer</button>
+            <div style="margin: 32px;">
+                <div class="dashboard-cards">
+                    <div class="card blue">
+                        <div class="card-info">
+                            <div class="card-title">RDV Aujourd'hui</div>
+                            <div class="card-value">12</div>
+                        </div>
+                        <div class="card-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zm0-13H5V6h14v1z"/></svg>
+                        </div>
+                    </div>
+                    <div class="card green">
+                        <div class="card-info">
+                            <div class="card-title">Patients Actifs</div>
+                            <div class="card-value">247</div>
+                        </div>
+                        <div class="card-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24"><path d="M12 12c2.7 0 8 1.34 8 4v4H4v-4c0-2.66 5.3-4 8-4zm0-2c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/></svg>
+                        </div>
+                    </div>
+                    <div class="card yellow">
+                        <div class="card-info">
+                            <div class="card-title">Surveillance</div>
+                            <div class="card-value">18</div>
+                        </div>
+                        <div class="card-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                        </div>
+                    </div>
+                    <div class="card purple">
+                        <div class="card-info">
+                            <div class="card-title">Alertes</div>
+                            <div class="card-value">3</div>
+                        </div>
+                        <div class="card-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6V11c0-3.07-1.63-5.64-4.5-6.32V4a1.5 1.5 0 0 0-3 0v.68C7.63 5.36 6 7.92 6 11v5l-1.29 1.29A1 1 0 0 0 6 20h12a1 1 0 0 0 .71-1.71L18 16z"/></svg>
+                        </div>
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
-    </div>
-    <!-- Modal pour détails carte -->
-    <div class="modal-bg" id="cardDetailBg">
-        <div class="modal">
-            <h3 id="cardDetailTitle"></h3>
-            <p id="cardDetailText"></p>
-            <div class="modal-actions">
-                <button type="button" class="modal-btn cancel" onclick="closeCardDetail()">Fermer</button>
+
+        <!-- Rendez-vous Section -->
+        <div id="rendez-vous-section" class="section">
+            <div class="header">
+                <div class="title">Gestion des Rendez-vous</div>
+                <div class="actions">
+                    <button class="new-btn">+ Nouveau RDV</button>
+                </div>
+            </div>
+            <div style="margin: 32px;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>PATIENT</th>
+                            <th>DATE</th>
+                            <th>HEURE</th>
+                            <th>TYPE</th>
+                            <th>STATUT</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Ahmed Benali</td>
+                            <td>2025-05-30</td>
+                            <td>09:00</td>
+                            <td><span class="badge type">Consultation</span></td>
+                            <td><span class="badge confirmed">Confirmé</span></td>
+                            <td>
+                                <span style="color:#2563eb;cursor:pointer;margin-right:8px;" title="Éditer">✏️</span>
+                                <span style="color:#ff3b3b;cursor:pointer;margin-right:8px;" title="Supprimer">🗑️</span>
+                                <span style="color:#22c55e;cursor:pointer;" title="Visio">📹</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Fatima Zahra</td>
+                            <td>2025-05-30</td>
+                            <td>10:30</td>
+                            <td><span class="badge type">Suivi</span></td>
+                            <td><span class="badge pending">En attente</span></td>
+                            <td>
+                                <span style="color:#2563eb;cursor:pointer;margin-right:8px;" title="Éditer">✏️</span>
+                                <span style="color:#ff3b3b;cursor:pointer;margin-right:8px;" title="Supprimer">🗑️</span>
+                                <span style="color:#22c55e;cursor:pointer;" title="Visio">📹</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Mohamed Alami</td>
+                            <td>2025-05-31</td>
+                            <td>14:00</td>
+                            <td><span class="badge type">Urgence</span></td>
+                            <td><span class="badge confirmed">Confirmé</span></td>
+                            <td>
+                                <span style="color:#2563eb;cursor:pointer;margin-right:8px;" title="Éditer">✏️</span>
+                                <span style="color:#ff3b3b;cursor:pointer;margin-right:8px;" title="Supprimer">🗑️</span>
+                                <span style="color:#22c55e;cursor:pointer;" title="Visio">📹</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Patients Section -->
+        <div id="patients-section" class="section">
+            <div class="header">
+                <div class="title">Gestion des Patients</div>
+                <div class="actions">
+                    <button class="new-btn">+ Nouveau Patient</button>
+                </div>
+            </div>
+            <div style="margin: 32px;">
+                <div class="patient-card">
+                    <span class="badge stable status">Stable</span>
+                    <div class="name">Ahmed Benali</div>
+                    <div class="info">Âge: 45 ans</div>
+                    <div class="info">Condition: <strong>Hypertension</strong></div>
+                    <div class="info">Dernière visite: 2025-05-25</div>
+                    <div class="actions">
+                        <button class="btn-primary">👁️ Voir</button>
+                        <button class="btn-success">⚡ Surveiller</button>
+                    </div>
+                </div>
+                <div class="patient-card">
+                    <span class="badge surveillance status">Surveillance</span>
+                    <div class="name">Fatima Zahra</div>
+                    <div class="info">Âge: 32 ans</div>
+                    <div class="info">Condition: <strong>Diabète</strong></div>
+                    <div class="info">Dernière visite: 2025-05-28</div>
+                    <div class="actions">
+                        <button class="btn-primary">👁️ Voir</button>
+                        <button class="btn-success">⚡ Surveiller</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Surveillance Section -->
+        <div id="surveillance-section" class="section">
+            <div class="header">
+                <div class="title">Surveillance à Distance</div>
+                <div class="actions">
+                    <button class="btn-success" style="margin-right:10px;">⚡ Temps Réel</button>
+                    <button class="new-btn">📊 Exporter</button>
+                </div>
+            </div>
+            <div style="margin: 32px;">
+                <h3>Patients Surveillés</h3>
+                <div class="surveillance-card">
+                    <div class="surveillance-header">
+                        <div class="name">Ahmed Benali</div>
+                        <div class="time">2025-05-30 08:00</div>
+                    </div>
+                    <div class="vitals">
+                        <div class="vital">
+                            <span class="icon" style="color:#ff3b3b;">❤️</span>
+                            <span class="value">140/90</span>
+                        </div>
+                        <div class="vital">
+                            <span class="icon" style="color:#2563eb;">📈</span>
+                            <span class="value">75 bpm</span>
+                        </div>
+                        <div class="vital">
+                            <span class="icon" style="color:#fbbf24;">🌡️</span>
+                            <span class="value">36.8°C</span>
+                        </div>
+                        <div class="vital">
+                            <span class="icon" style="color:#22c55e;">💧</span>
+                            <span class="value">98%</span>
+                        </div>
+                    </div>
+                    <div style="margin-top:12px;">
+                        <span class="badge confirmed">Valeurs normales</span>
+                    </div>
+                </div>
+                <div class="surveillance-card">
+                    <div class="surveillance-header">
+                        <div class="name">Fatima Zahra</div>
+                        <div class="time">2025-05-30 07:30</div>
+                    </div>
+                    <div class="vitals">
+                        <div class="vital">
+                            <span class="icon" style="color:#ff3b3b;">❤️</span>
+                            <span class="value">120/80</span>
+                        </div>
+                        <div class="vital">
+                            <span class="icon" style="color:#2563eb;">📈</span>
+                            <span class="value">82 bpm</span>
+                        </div>
+                        <div class="vital">
+                            <span class="icon" style="color:#fbbf24;">🌡️</span>
+                            <span class="value">37.1°C</span>
+                        </div>
+                        <div class="vital">
+                            <span class="icon" style="color:#22c55e;">💧</span>
+                            <span class="value">96%</span>
+                        </div>
+                    </div>
+                    <div style="margin-top:12px;">
+                        <span class="badge confirmed">Valeurs normales</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interopérabilité Section -->
+        <div id="interoperabilite-section" class="section">
+            <div class="header">
+                <div class="title">Interopérabilité</div>
+                <div class="actions">
+                    <button class="new-btn">+ Nouvelle Intégration</button>
+                </div>
+            </div>
+            <div style="margin: 32px;">
+                <h3>Systèmes Connectés</h3>
+                <div class="systems-grid">
+                    <div class="system-item">
+                        <div class="system-name">
+                            <div class="status-dot connected"></div>
+                            <span>HIS Hospital Management</span>
+                        </div>
+                        <span class="badge connected">Connecté</span>
+                    </div>
+                    <div class="system-item">
+                        <div class="system-name">
+                            <div class="status-dot connected"></div>
+                            <span>Laboratoire Central</span>
+                        </div>
+                        <span class="badge connected">Connecté</span>
+                    </div>
+                    <div class="system-item">
+                        <div class="system-name">
+                            <div class="status-dot pending"></div>
+                            <span>Pharmacie Hospitalière</span>
+                        </div>
+                        <span class="badge pending">En attente</span>
+                    </div>
+                </div>
+                <div class="data-exchange">
+                    <h3>Échange de Données</h3>
+                    <div class="exchange-item">
+                        <div>
+                            <strong>Résultats Lab</strong>
+                            <div style="color:#666;font-size:14px;">127 résultats synchronisés aujourd'hui</div>
+                        </div>
+                        <span style="color:#2563eb;cursor:pointer;">📊</span>
+                    </div>
+                    <div class="exchange-item">
+                        <div>
+                            <strong>Dossiers Patients</strong>
+                            <div style="color:#666;font-size:14px;">89 dossiers mis à jour</div>
+                        </div>
+                        <span style="color:#22c55e;cursor:pointer;">📥</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarification Section -->
+        <div id="tarification-section" class="section">
+            <div class="header">
+                <div class="title">Plans & Tarification</div>
+            </div>
+            <div style="margin: 32px;">
+                <div style="text-align:center;margin-bottom:32px;">
+                    <p style="color:#666;font-size:18px;">Choisissez le plan adapté à vos besoins</p>
+                </div>
+                <div class="pricing-section">
+                    <div class="pricing-card">
+                        <h3>License Hospitalière</h3>
+                        <div class="price">10 assignations gratuites/mois</div>
+                        <div class="price-desc">2.99 MAD/assignation</div>
+                        <ul class="features">
+                            <li>Gestion des rendez-vous</li>
+                            <li>Dossiers patients</li>
+                            <li>Support 24/7</li>
+                        </ul>
+                        <button class="btn-primary" style="width:100%;">Choisir ce plan</button>
+                    </div>
+                    <div class="pricing-card">
+                        <h3>GeniDoc Agent AI</h3>
+                        <div class="price">Gratuit 30 jours</div>
+                        <div class="price-desc">48.99 MAD/mois</div>
+                        <ul class="features">
+                            <li>Intelligence artificielle</li>
+                            <li>Analyse prédictive</li>
+                            <li>Recommandations automatiques</li>
+                        </ul>
+                        <button class="btn-primary" style="width:100%;">Essai gratuit</button>
+                    </div>
+                    <div class="pricing-card">
+                        <h3>GeniDoc Agent AI +</h3>
+                        <div class="price">99 MAD/mois</div>
+                        <div class="price-desc">Fonctionnalités avancées</div>
+                        <ul class="features">
+                            <li>IA avancée</li>
+                            <li>Intégrations illimitées</li>
+                            <li>Support prioritaire</li>
+                        </ul>
+                        <button class="btn-primary" style="width:100%;">Choisir ce plan</button>
+                    </div>
+                    <div class="pricing-card">
+                        <h3>Surveillance à distance</h3>
+                        <div class="price">1 spécialité gratuite/mois</div>
+                        <div class="price-desc">38.99 MAD pour 2 spécialités</div>
+                        <ul class="features">
+                            <li>Monitoring IoT</li>
+                            <li>Alertes temps réel</li>
+                            <li>Tableau de bord avancé</li>
+                        </ul>
+                        <button class="btn-primary" style="width:100%;">Commencer</button>
+                    </div>
+                    <div class="pricing-card">
+                        <h3>Base de données IoT</h3>
+                        <div class="price">399 MAD/an</div>
+                        <div class="price-desc">Stockage et analyse</div>
+                        <ul class="features">
+                            <li>Stockage illimité</li>
+                            <li>Analytics avancés</li>
+                            <li>API complète</li>
+                        </ul>
+                        <button class="btn-primary" style="width:100%;">Souscrire</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <!-- Modal pour notifications -->
-    <div class="modal-bg" id="notifModalBg">
-        <div class="modal">
-            <h3>Notifications</h3>
-            <ul id="notifList" style="padding-left:18px; margin:0 0 10px 0;">
-                <li>Rendez-vous confirmé pour Mme Dupont.</li>
-                <li>Patient M. Benali ajouté.</li>
-                <li>3 alertes non lues.</li>
-            </ul>
-            <div class="modal-actions">
-                <button type="button" class="modal-btn cancel" onclick="closeNotifModal()">Fermer</button>
-            </div>
-        </div>
-    </div>
+
     <script>
-        // Modal RDV
-        const openModalBtn = document.getElementById('openModalBtn');
-        const modalBg = document.getElementById('modalBg');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        openModalBtn.onclick = () => modalBg.classList.add('active');
-        closeModalBtn.onclick = () => modalBg.classList.remove('active');
-        modalBg.onclick = e => { if(e.target === modalBg) modalBg.classList.remove('active'); };
-        document.getElementById('rdvForm').onsubmit = function(e) {
-            e.preventDefault();
-            modalBg.classList.remove('active');
-            alert('Rendez-vous créé pour ' + this.patient.value + ' le ' + this.date.value + ' à ' + this.heure.value);
-        };
+        // Navigation entre sections
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = document.querySelectorAll('.section');
 
-        // Modal Notifications
-        const notifBtn = document.getElementById('notifBtn');
-        const notifModalBg = document.getElementById('notifModalBg');
-        notifBtn.onclick = () => notifModalBg.classList.add('active');
-        notifModalBg.onclick = e => { if(e.target === notifModalBg) notifModalBg.classList.remove('active'); };
-        function closeNotifModal() { notifModalBg.classList.remove('active'); }
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all nav items
+                navItems.forEach(nav => nav.classList.remove('active'));
+                
+                // Add active class to clicked item
+                this.classList.add('active');
+                
+                // Hide all sections
+                sections.forEach(section => section.classList.remove('active'));
+                
+                // Show target section
+                const targetSection = this.getAttribute('data-section');
+                document.getElementById(targetSection + '-section').classList.add('active');
+            });
+        });
 
-        // Modal Détail Carte
-        function showCardDetail(title, text) {
-            document.getElementById('cardDetailTitle').textContent = title;
-            document.getElementById('cardDetailText').textContent = text;
-            document.getElementById('cardDetailBg').classList.add('active');
-        }
-        function closeCardDetail() {
-            document.getElementById('cardDetailBg').classList.remove('active');
-        }
-        document.getElementById('cardDetailBg').onclick = function(e) {
-            if(e.target === this) this.classList.remove('active');
-        };
-
-        // Dynamique: exemple pour notifications badge
-        let notifCount = 3;
+        // Simuler des données en temps réel
         setInterval(() => {
-            notifCount++;
-            document.getElementById('notif-badge').textContent = notifCount;
-            const notifList = document.getElementById('notifList');
-            const li = document.createElement('li');
-            li.textContent = "Nouvelle notification #" + notifCount;
-            notifList.appendChild(li);
-        }, 15000); // toutes les 15s, pour la démo
+            const vitals = document.querySelectorAll('.vital .value');
+            vitals.forEach(vital => {
+                if (vital.textContent.includes('bpm')) {
+                    const currentValue = parseInt(vital.textContent);
+                    const newValue = currentValue + Math.floor(Math.random() * 10 - 5);
+                    vital.textContent = Math.max(60, Math.min(100, newValue)) + ' bpm';
+                }
+            });
+        }, 5000);
     </script>
 </body>
 </html>
