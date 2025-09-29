@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeniDocGPT — Assistant IA Santé</title>
+  <link rel="icon" type="image/png" href="/static/GPT-removebg-preview.png" />
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      min-height: 100vh;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 32px 0 18px 0;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    .header .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: 32px;
+    }
+    .header .logo img {
+      height: 48px;
+    }
+    .header .title {
+      font-size: 2.1em;
+      font-weight: 800;
+      color: #2056AE;
+      letter-spacing: 0.01em;
+    }
+    .header .actions {
+      display: flex;
+      gap: 18px;
+      margin-right: 32px;
+    }
+    .header .actions button {
+      background: #2056AE;
+      color: #fff;
+      font-weight: 700;
+      border: none;
+      border-radius: 24px;
+      padding: 10px 28px;
+      font-size: 1.08em;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .header .actions button:hover {
+      background: #4D3AFF;
+    }
+    .main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: 0 16px;
+    }
+    .gpt-box {
+    background: #fff;
+    border-radius: 22px;
+    box-shadow: 0 2px 16px #2056ae22;
+    max-width: 600px;
+    width: 100%;
+    margin: 18px auto 0 auto;
+  padding: 1px 24px 18px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .gpt-desc {
+      color: #444;
+      font-size: 1.08em;
+      margin-bottom: 18px;
+      text-align: center;
+      line-height: 1.5;
+    }
+    .gpt-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+      justify-content: center;
+    }
+    .gpt-suggestions button {
+      background: #e3eaff;
+      color: #2056AE;
+      border: none;
+      border-radius: 16px;
+      padding: 7px 18px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .gpt-suggestions button:hover {
+      background: #2056AE;
+      color: #fff;
+    }
+    .gpt-history {
+      width: 100%;
+      max-height: 220px;
+      overflow-y: auto;
+      margin-bottom: 12px;
+      background: #f5f7fa;
+      border-radius: 14px;
+      box-shadow: 0 1px 4px #2056ae11;
+      padding: 10px 12px;
+      font-size: 1.04em;
+    }
+    .gpt-history .q {
+      color: #2056AE;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .gpt-history .a {
+      color: #222;
+      margin-bottom: 10px;
+    }
+    .gpt-loader {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      margin: 10px 0;
+    }
+    .gpt-loader span {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      margin: 0 2px;
+      background: #2056AE;
+      border-radius: 50%;
+      animation: gpt-bounce 1s infinite alternate;
+    }
+    .gpt-loader span:nth-child(2) { animation-delay: 0.2s; }
+    .gpt-loader span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes gpt-bounce {
+      to { transform: translateY(-8px); opacity: 0.5; }
+    }
+    .gpt-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+  margin-bottom: -32px;
+    }
+    .gpt-logo img {
+  height: 230px;
+    }
+    .gpt-title {
+  font-size: 2em;
+  font-weight: 700;
+  color: #2056AE;
+  margin-top: -32px;
+      margin-bottom: 0;
+  text-align: center;
+    }
+    .gpt-input {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .gpt-input input {
+      flex: 1 1 auto;
+      padding: 14px 18px;
+      border-radius: 14px;
+      border: 1.5px solid #2056AE33;
+      font-size: 1.13em;
+      outline: none;
+      transition: border-color 0.2s;
+      background: #f5f7fa;
+    }
+    .gpt-input input:focus {
+      border-color: #2056AE;
+    }
+      .gpt-input button {
+        background: #2056AE; /* Changed to match GeniDoc logo */
+        color: #fff;
+        font-weight: 700;
+        border: none;
+        border-radius: 14px;
+        padding: 12px 22px;
+        font-size: 1.08em;
+        cursor: pointer;
+        transition: background 0.2s;
+        /* Arrow color for SVG or icon inside button */
+      }
+      .gpt-input button svg {
+        fill: #2056AE;
+        color: #2056AE;
+    }
+    .gpt-input button:hover {
+      background: #4D3AFF;
+    }
+    .gpt-response {
+      width: 100%;
+      min-height: 60px;
+      background: #e3eaff;
+      border-radius: 14px;
+      padding: 18px 16px;
+      color: #2056AE;
+      font-size: 1.08em;
+      margin-top: 8px;
+      box-shadow: 0 1px 4px #2056ae11;
+      word-break: break-word;
+    }
+    @media (max-width:700px) {
+      .gpt-box { padding: 18px 6px 12px 6px; }
+      .header .logo img { height: 36px; }
+      .header .title { font-size: 1.3em; }
+    }
+  </style>
+</head>
+<body>
+  <div class="main" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;">
+  <div class="gpt-box" style="flex:1;max-width:540px;align-self:flex-start;">
+      <div class="gpt-logo">
+  <img src="static/GPT-removebg-preview.png" alt="GeniDocGPT logo" style="height:230px;max-width:98%;width:auto;display:block;margin:auto;" />
+  <!-- Removed duplicate logo -->
+      </div>
+      <div class="gpt-title">Votre assistant IA santé<br><span style="font-size:0.7em;color:#444;font-weight:400;">Confidentiel, rapide, personnalisé</span></div>
+      <div class="gpt-suggestions" aria-label="Suggestions rapides">
+        <button type="button" onclick="setGptInput('Quels sont les symptômes du diabète ?')">Symptômes du diabète</button>
+        <button type="button" onclick="setGptInput('Comment prévenir l’hypertension ?')">Prévention hypertension</button>
+        <button type="button" onclick="setGptInput('Quels vaccins pour enfant ?')">Vaccins enfant</button>
+        <button type="button" onclick="setGptInput('Quels sont les effets secondaires du médicament X ?')">Effets secondaires</button>
+      </div>
+      <form class="gpt-input" onsubmit="event.preventDefault();genidocGptSend();" aria-label="Formulaire question IA">
+        <input id="gptInput" type="text" placeholder="Posez votre question..." required aria-label="Votre question santé" autocomplete="on" />
+        <button type="submit" aria-label="Envoyer la question">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </form>
+      <div id="gptLoader" class="gpt-loader" style="display:none;margin-bottom:10px;">
+        <span></span><span></span><span></span>
+      </div>
+      <div id="gptResponse" class="gpt-response" style="display:none;"></div>
+      <div style="margin-top:10px;color:#888;font-size:0.98em;text-align:center;">⚠️ Les réponses sont informatives, pas un avis médical. Consultez un professionnel pour toute urgence.</div>
+
+      <!-- Actions & Conseils section, GeniDoc style -->
+      <div style="display:flex;flex-direction:row;gap:28px;justify-content:center;margin:32px 0 0 0;width:100%;">
+        <div style="background:#e3eaff;border-radius:18px;box-shadow:0 2px 12px #2056ae22;padding:24px 18px;flex:1;min-width:180px;max-width:260px;display:flex;flex-direction:column;align-items:center;">
+          <div style="font-size:1.18em;font-weight:700;color:#2056AE;margin-bottom:10px;">⚡ Actions rapides</div>
+          <button onclick="setGptInput('Prendre rendez-vous')" style="background:#2056AE;color:#fff;font-weight:700;border:none;border-radius:18px;padding:10px 0;width:100%;font-size:1.08em;box-shadow:0 2px 8px #2056ae22;cursor:pointer;margin-bottom:10px;transition:background 0.2s;">📅 Prendre RDV</button>
+          <button onclick="setGptInput('Trouver un médecin')" style="background:#2056AE;color:#fff;font-weight:700;border:none;border-radius:18px;padding:10px 0;width:100%;font-size:1.08em;box-shadow:0 2px 8px #2056ae22;cursor:pointer;margin-bottom:10px;transition:background 0.2s;">🩺 Trouver médecin</button>
+          <button onclick="setGptInput('Demander un conseil santé')" style="background:#2056AE;color:#fff;font-weight:700;border:none;border-radius:18px;padding:10px 0;width:100%;font-size:1.08em;box-shadow:0 2px 8px #2056ae22;cursor:pointer;transition:background 0.2s;">💡 Conseil santé</button>
+        </div>
+        <div style="background:#f5f7fa;border-radius:18px;box-shadow:0 2px 12px #2056ae22;padding:24px 18px;flex:1;min-width:180px;max-width:260px;display:flex;flex-direction:column;align-items:center;">
+          <div style="font-size:1.18em;font-weight:700;color:#2056AE;margin-bottom:10px;">📝 Conseils santé</div>
+          <div style="color:#2056AE;font-size:1.05em;font-weight:600;margin-bottom:8px;text-align:center;">🥗 Mangez équilibré</div>
+          <div style="color:#2056AE;font-size:1.05em;font-weight:600;margin-bottom:8px;text-align:center;">🚶‍♂️ Bougez chaque jour</div>
+          <div style="color:#2056AE;font-size:1.05em;font-weight:600;margin-bottom:8px;text-align:center;">💧 Buvez de l’eau</div>
+          <div style="color:#2056AE;font-size:1.05em;font-weight:600;text-align:center;">😴 Dormez suffisamment</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Suggestions cliquables
+    function setGptInput(text) {
+      document.getElementById('gptInput').value = text;
+      document.getElementById('gptInput').focus();
+    }
+    // Historique
+    let gptHistory = [];
+    function renderHistory() {
+      const historyDiv = document.getElementById('gptHistory');
+      historyDiv.innerHTML = '';
+      gptHistory.slice(-6).forEach(item => {
+        historyDiv.innerHTML += `<div><span style='color:#2056AE;font-weight:600;'>Vous :</span> ${item.q}</div>`;
+        historyDiv.innerHTML += `<div><span style='color:#2056AE;font-weight:600;'>GeniDocGPT :</span> ${item.a}</div>`;
+      });
+    }
+    // Loader animé
+    function showLoader(show) {
+      document.getElementById('gptLoader').style.display = show ? 'flex' : 'none';
+    }
+    // Envoi question
+    function genidocGptSend() {
+      var input = document.getElementById('gptInput').value.trim();
+      var responseBox = document.getElementById('gptResponse');
+      if(!input) return;
+      showLoader(true);
+      responseBox.style.display = 'none';
+      setTimeout(function() {
+        showLoader(false);
+        // Simule une réponse IA
+        var answer = getGptAnswer(input);
+        responseBox.style.display = 'block';
+        responseBox.innerHTML = `<span style='color:#2056AE;font-weight:600;'>GeniDocGPT :</span> ${answer}`;
+        gptHistory.push({q:input,a:answer});
+        renderHistory();
+        document.getElementById('gptInput').value = '';
+      }, 1200);
+    }
+    // Réponse simulée intelligente
+    function getGptAnswer(q) {
+      q = q.toLowerCase();
+      if(q.includes('diabète')) return "Les symptômes du diabète incluent soif excessive, urines fréquentes, fatigue, perte de poids. Consultez un médecin pour un diagnostic précis.";
+      if(q.includes('hypertension')) return "Pour prévenir l’hypertension : alimentation équilibrée, activité physique régulière, réduction du sel, gestion du stress et suivi médical.";
+      if(q.includes('vaccin')) return "Les vaccins recommandés pour les enfants sont : DTP, polio, rougeole, coqueluche, hépatite B, etc. Demandez conseil à votre pédiatre.";
+      if(q.includes('effet secondaire')) return "Les effets secondaires varient selon le médicament. Lisez la notice et consultez votre médecin ou pharmacien en cas de doute.";
+      if(q.includes('urgence')) return "En cas d’urgence médicale, contactez immédiatement le 15 ou rendez-vous aux urgences les plus proches.";
+      if(q.length < 10) return "Merci pour votre question ! Veuillez préciser votre demande pour une réponse plus personnalisée.";
+      return "Merci pour votre question ! Un agent IA GeniDoc vous répondra bientôt avec des informations fiables et personnalisées.";
+    }
+  </script>
+</body>
+</html>
