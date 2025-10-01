@@ -1,316 +1,755 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <link rel="icon" type="image/png" href="/static/ong_GeniDoc1preview.png" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GeniDocGPT — Assistant IA Santé</title>
-  <link rel="icon" type="image/png" href="/static/GPT-removebg-preview.png" />
+  <title>Accueil — Carte Vitale GeniDoc</title>
   <style>
+    .profile-dropdown .logout-btn {
+      margin-top: 18px;
+      width: 100%;
+      background: #fff;
+      color: #d32f2f;
+      border: 1.5px solid #d32f2f;
+      border-radius: 8px;
+      padding: 10px 0;
+      font-size: 1em;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .profile-dropdown .logout-btn:hover {
+      background: #d32f2f;
+      color: #fff;
+    }
+    .header-flex {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 24px;
+      margin-bottom: 32px;
+      max-width: 950px;
+      width: 100%;
+    }
+    .profile-menu {
+      position: relative;
+      display: inline-block;
+    }
+    .profile-btn {
+      background: #fff;
+      border: none;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px #2056ae22;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+      margin-left: 18px;
+    }
+    .profile-btn:hover {
+      box-shadow: 0 4px 16px #2056ae44;
+    }
+    .profile-dropdown {
+      display: none;
+      position: fixed;
+      right: 48px;
+      top: 90px;
+      background: #fff;
+      min-width: 260px;
+      box-shadow: 0 8px 32px #2056ae22;
+      border-radius: 16px;
+      z-index: 100;
+      padding: 22px 28px;
+      font-size: 1em;
+      color: #222;
+    }
+    .profile-dropdown.active {
+      display: block;
+    }
+    .profile-dropdown label {
+      font-weight: 600;
+      color: #2056AE;
+      margin-top: 8px;
+      display: block;
+    }
+    .profile-dropdown .profile-value {
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 400;
+      word-break: break-all;
+    }
+    /* CSS Header fidèle à la capture (extrait fourni par l'utilisateur) */
+    .header-panel {
+      width: 100%;
+      padding: 14px 12px;
+      box-sizing: border-box;
+      background: transparent;
+      margin-top: 20px; /* add vertical breathing room at the top */
+    }
+    .header-panel .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: transparent; /* inherit page color */
+      border-radius: 0; /* no rounded panel */
+      padding: 12px 14px; /* slightly reduced padding */
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-sizing: border-box;
+      box-shadow: none; /* remove shadow so it blends */
+      justify-content: center; /* center the whole group (left/logo/right) */
+      position: relative;
+    }
+    .header-panel .col {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+    }
+  /* layout: position left/center/right absolutely around the centered logo */
+  .header-panel .center { position: relative; order: 0; pointer-events: none; z-index: 3; }
+  .header-panel .left { position: relative; order: -1; width: 340px; display: flex; justify-content: flex-end; align-items: center; margin-right: 12px; z-index: 2; }
+  .header-panel .right { position: relative; order: 1; display: flex; align-items: center; margin-left: 12px; z-index: 4; }
+    .header-welcome {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 20px;
+      line-height: 1.18;
+      color: #1f2933;
+      font-weight: 600;
+      text-align: left;
+      max-width: 340px; /* match left column to avoid pushing others away */
+      margin-right: 8px; /* small breathing room next to centered logo */
+    }
+  .genidoc-logo { height: 52px; width: auto; display:block; }
+    .profile-btn {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 12px 32px rgba(16,24,40,0.08);
+      cursor: pointer;
+    }
+    .profile-btn svg {
+      width: 34px;
+      height: 28px;
+      color: #2056AE;
+      stroke: currentColor;
+      fill: none;
+    }
+    .profile-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+    .profile-menu { position: relative; display: inline-block; }
+    /* Chatbot UI (GeniDoc themed) */
+    :root {
+      --gd-bg: #f5f7fa;
+      --gd-white: #fff;
+      --gd-primary: #2056AE;
+      --gd-accent: #317AC1;
+      --gd-green: #226D68;
+      --gd-muted: #555;
+      --gd-radius: 18px;
+      --gd-font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .chat-app {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      gap: 28px;
+      margin: 24px auto 40px auto;
+      align-items: flex-start;
+      padding: 0 12px;
+      box-sizing: border-box;
+      font-family: var(--gd-font);
+    }
+    .chat-sidebar {
+      width: 300px;
+      min-width: 220px;
+      background: var(--gd-white);
+      border-radius: var(--gd-radius);
+      box-shadow: 0 8px 28px #2056ae11;
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      height: 640px;
+      overflow: auto;
+      font-family: var(--gd-font);
+      font-size: 1.08em;
+      color: #222;
+    }
+    .chat-sidebar .side-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .gd-search { display: flex; gap: 8px; align-items: center; background: #f5f7fa; padding: 10px; border-radius: 999px; }
+    .gd-search input { border: none; background: transparent; outline: none; font-size: 1em; width: 100%; font-family: var(--gd-font); }
+    /* Ensure no pseudo-element or background glyph appears before the input placeholder */
+    .gd-search::before, .gd-search input::before, .gd-search input::after,
+    .input-pill::before, .input-pill input::before, .input-pill input::after {
+      content: none !important;
+      display: none !important;
+    }
+    .gd-search input, .input-pill input {
+      background-image: none !important;
+      text-indent: 0 !important;
+      padding-left: 0.2rem; /* keep a little breathing room next to any icon */
+    }
+    .gd-search svg { flex: 0 0 auto; margin-right: 8px; }
+    .history-list { display: flex; flex-direction: column; gap: 8px; }
+    .history-item { padding: 12px; border-radius: 12px; cursor: pointer; display: flex; gap: 10px; align-items: center; font-family: var(--gd-font); font-size: 1em; color: #222; }
+    .history-item:hover { background: #eaf0ff; }
+    .history-item .h-title { font-weight: 700; color: #2056AE; font-size: 1.08em; }
+    .history-item .h-sub { font-size: 0.98em; color: var(--gd-muted); }
+
+    .chat-main { flex: 1; display: flex; flex-direction: column; gap: 18px; min-height: 640px; font-family: var(--gd-font); }
+    .chat-main .chat-header { display: flex; align-items: center; justify-content: space-between; padding: 18px; border-radius: var(--gd-radius); background: #fff; box-shadow: 0 2px 8px #2056ae11; font-size: 1.13em; color: #2056AE; font-family: var(--gd-font); }
+    .chat-window {
+      background: var(--gd-white);
+      border-radius: var(--gd-radius);
+      padding: 24px;
+      box-shadow: 0 8px 36px #2056ae11;
+      flex: 1;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      font-family: var(--gd-font);
+      border: 3px solid #2056AE;
+      animation: chatBorderIn 1.2s cubic-bezier(.4,0,.2,1);
+      position: relative;
+    }
+
+    @keyframes chatBorderIn {
+      0% {
+        border-color: transparent;
+        box-shadow: 0 0 0 #2056ae00;
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      60% {
+        border-color: #317AC1;
+        box-shadow: 0 0 24px #317ac144;
+        opacity: 0.7;
+        transform: scale(1.03);
+      }
+      100% {
+        border-color: #2056AE;
+        box-shadow: 0 8px 36px #2056ae22;
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    /* Apply same animated blue border to sidebar, header, input-bar and footer */
+    .chat-sidebar,
+    .chat-main .chat-header,
+    .chat-input-bar,
+    .chat-footer {
+      border: 3px solid var(--gd-primary);
+      animation: chatBorderIn 1.2s cubic-bezier(.4,0,.2,1);
+      position: relative;
+      background: var(--gd-white);
+    }
+    /* Slightly different shadows for each area to keep visual hierarchy */
+    .chat-sidebar { box-shadow: 0 10px 30px #2056ae11; }
+    .chat-main .chat-header { box-shadow: 0 6px 20px #2056ae11; }
+    .chat-input-bar { box-shadow: 0 6px 20px #2056ae11; }
+    .chat-footer { box-shadow: 0 6px 18px #2056ae0f; padding: 12px 18px; border-radius: 12px; }
+    .messages { display: flex; flex-direction: column; gap: 18px; }
+    .msg { max-width: 78%; padding: 14px 18px; border-radius: 18px; line-height: 1.38; font-size: 1.08em; font-family: var(--gd-font); }
+    .msg.user { align-self: flex-end; background: linear-gradient(90deg, #2056AE 60%, #317AC1 100%); color: #fff; border-bottom-right-radius: 8px; font-weight: 500; }
+    .msg.bot { align-self: flex-start; background: #f5f7fa; color: #2056AE; border-bottom-left-radius: 8px; border: 1.5px solid #e6eefc; font-weight: 500; }
+    .msg .meta { font-size: 0.92em; color: var(--gd-muted); margin-top: 6px; }
+
+    .chat-input-bar { display: flex; gap: 12px; align-items: center; padding: 18px; border-radius: var(--gd-radius); background: transparent; font-family: var(--gd-font); }
+    .input-pill { flex: 1; display: flex; align-items: center; gap: 8px; background: #fff; padding: 10px 16px; border-radius: 999px; box-shadow: 0 4px 18px #2056ae11; font-family: var(--gd-font); }
+    .input-pill input { border: none; outline: none; font-size: 1.08em; width: 100%; font-family: var(--gd-font); color: #2056AE; }
+  .input-pill { position: relative; }
+  .icon-btn { background: transparent; border: none; padding: 6px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: #6b7280; border-radius: 8px; }
+  .icon-btn svg { width: 18px; height: 18px; display: block; }
+  .mic-btn { margin-right: 6px; }
+  .attach-btn { margin-left: 6px; }
+  .input-pill input { padding: 8px 6px; }
+  .send-btn { background: #2056AE; color: #fff; border: none; padding: 12px 18px; border-radius: 999px; cursor: pointer; box-shadow: 0 8px 26px #2056ae22; font-size: 1.08em; font-family: var(--gd-font); font-weight: 700; transition: background 0.2s; }
+  .send-btn:hover { background: #174080; }
+    .primary-action { background: #226D68; color: #fff; padding: 10px 18px; border-radius: 12px; border: none; cursor: pointer; font-weight: 700; font-family: var(--gd-font); }
+
+    .chat-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-family: var(--gd-font); }
+
+    /* responsive */
+    @media (max-width: 900px) {
+      .chat-app { flex-direction: column; align-items: stretch; }
+      .chat-sidebar { width: 100%; height: 220px; order: 2; }
+      .chat-main { order: 1; }
+    }
+    /* Effet glassmorphism pour la carte vitale */
+    .vitale-glass {
+      background: rgba(255,255,255,0.7);
+      border-radius: 22px;
+      box-shadow: 0 8px 32px #4d3aff22, 0 0 0 4px #4d3aff11;
+      backdrop-filter: blur(8px);
+      border: 2px solid #4D3AFF33;
+      padding: 32px 32px 24px 32px;
+      max-width: 400px;
+      margin: 0 auto 32px auto;
+      position: relative;
+      text-align: left;
+      transition: box-shadow 0.2s;
+    }
+    .vitale-glass .badge-secure {
+      position: absolute;
+      top: 18px;
+      right: 24px;
+      background: #4D3AFF;
+      color: #fff;
+      font-size: 0.85em;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 4px 12px;
+      letter-spacing: 0.04em;
+      box-shadow: 0 2px 8px #4d3aff33;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .vitale-glass .badge-secure svg {
+      width: 16px; height: 16px;
+      vertical-align: middle;
+    }
+    .vitale-glass .genidoc-id {
+      color: #3a2aff;
+      font-weight: bold;
+      font-size: 1.1em;
+      margin-bottom: 8px;
+    }
+    .vitale-glass .date-inscription {
+      color: #555;
+      font-size: 0.98em;
+    }
+    .vitale-glass .title {
+      font-size: 1.25em;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #222;
+    }
+    .vitale-btn {
+      background: #2056AE !important;
+      color: #fff;
+      border: none;
+      border-radius: 18px;
+      box-shadow: 0 4px 24px #2056ae22;
+      padding: 18px 0;
+      width: 100%;
+      max-width: 400px;
+      min-height: 60px;
+      font-size: 1.15em;
+      font-weight: 700;
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.2s, background 0.2s;
+      margin: 0 auto 32px auto;
+      display: block;
+    }
+    .vitale-btn:hover {
+      box-shadow: 0 8px 32px #2056ae44;
+      transform: scale(1.03);
+      background: #174080 !important;
+    }
+    /* Grille responsive 2x2 pour les modules */
+    .modules-grid2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(220px, 1fr));
+      gap: 32px;
+      justify-content: center;
+      margin: 40px auto 0 auto;
+      width: 100%;
+      max-width: 800px;
+    }
+    @media (max-width: 700px) {
+      .modules-grid2 { grid-template-columns: 1fr; }
+    }
+    .vitale-btn {
+      background: linear-gradient(90deg,#4D3AFF 60%,#00558C 100%);
+      color: #fff;
+      border: none;
+      border-radius: 18px;
+      box-shadow: 0 4px 24px #4d3aff22;
+      padding: 0;
+      width: 100%;
+      max-width: 350px;
+      min-height: 80px;
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.2s;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .vitale-btn:hover { box-shadow: 0 8px 32px #4d3aff44; transform: scale(1.03); }
+    .vitale-btn .logo img { height: 48px; margin-right: 18px; }
+    .vitale-details {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px #4d3aff22;
+      padding: 24px 18px 18px 18px;
+      margin: 0 auto 24px auto;
+      max-width: 350px;
+      width: 100%;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(-16px) scale(0.98);
+      pointer-events: none;
+      transition: opacity 0.35s cubic-bezier(.4,0,.2,1), transform 0.35s cubic-bezier(.4,0,.2,1);
+      box-shadow: 0 8px 32px #4d3aff22, 0 0 0 4px #4d3aff11;
+    }
+    .vitale-details.active {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+    .modules-vertical {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      margin: 40px 0 0 0;
+      width: 100%;
+    }
+    .module-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px #4d3aff11;
+      padding: 32px 24px;
+      width: 100%;
+      max-width: 350px;
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      margin: 0 auto;
+    }
+    .module-card:hover { transform: translateY(-8px) scale(1.03); box-shadow: 0 8px 32px #4d3aff22; }
+    .module-card.disabled, .module-card[disabled] {
+      opacity: 0.7;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .logo-accueil {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .logo-accueil img {
+      height: 64px;
+      width: auto;
+    }
+    .vitale-details {
+      margin-bottom: 18px;
+    }
+    .module-card .icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 48px;
+      margin-bottom: 12px;
+    }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: #f5f7fa;
       margin: 0;
       min-height: 100vh;
-    }
-    .header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 32px 0 18px 0;
-      background: #fff;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      justify-content: center;
     }
-    .header .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-left: 32px;
-    }
-    .header .logo img {
-      height: 48px;
-    }
-    .header .title {
-      font-size: 2.1em;
-      font-weight: 800;
-      color: #2056AE;
-      letter-spacing: 0.01em;
-    }
-    .header .actions {
-      display: flex;
-      gap: 18px;
-      margin-right: 32px;
-    }
-    .header .actions button {
-      background: #2056AE;
-      color: #fff;
-      font-weight: 700;
-      border: none;
-      border-radius: 24px;
-      padding: 10px 28px;
-      font-size: 1.08em;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .header .actions button:hover {
-      background: #4D3AFF;
-    }
-    .main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 80vh;
-  padding: 0 16px;
-    }
-    .gpt-box {
-    background: #fff;
-    border-radius: 22px;
-    box-shadow: 0 2px 16px #2056ae22;
-    max-width: 600px;
-    width: 100%;
-    margin: 18px auto 0 auto;
-  padding: 1px 24px 18px 24px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    .card-vitale {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+      padding: 32px 28px 24px 28px;
+      max-width: 350px;
+      width: 100%;
+      text-align: center;
       position: relative;
     }
-    .gpt-desc {
-      color: #444;
-      font-size: 1.08em;
+    .card-vitale .logo {
       margin-bottom: 18px;
-      text-align: center;
-      line-height: 1.5;
     }
-    .gpt-suggestions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+    .card-vitale .logo img {
+      height: 60px;
+    }
+    .card-vitale .genidoc-id {
+      font-size: 1.1em;
+      font-weight: bold;
+      color: #4D3AFF;
+      margin-bottom: 8px;
+    }
+    .card-vitale .date-inscription {
+      color: #555;
+      font-size: 0.98em;
       margin-bottom: 18px;
-      justify-content: center;
     }
-    .gpt-suggestions button {
-      background: #e3eaff;
-      color: #2056AE;
+    .card-vitale .btn-rdv {
+      background: #4D3AFF;
+      color: #fff;
       border: none;
-      border-radius: 16px;
-      padding: 7px 18px;
+      border-radius: 8px;
+      padding: 12px 24px;
       font-size: 1em;
+      font-weight: bold;
       cursor: pointer;
       transition: background 0.2s;
+      margin-top: 10px;
     }
-    .gpt-suggestions button:hover {
-      background: #2056AE;
-      color: #fff;
-    }
-    .gpt-history {
-      width: 100%;
-      max-height: 220px;
-      overflow-y: auto;
-      margin-bottom: 12px;
-      background: #f5f7fa;
-      border-radius: 14px;
-      box-shadow: 0 1px 4px #2056ae11;
-      padding: 10px 12px;
-      font-size: 1.04em;
-    }
-    .gpt-history .q {
-      color: #2056AE;
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-    .gpt-history .a {
-      color: #222;
-      margin-bottom: 10px;
-    }
-    .gpt-loader {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      margin: 10px 0;
-    }
-    .gpt-loader span {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      margin: 0 2px;
-      background: #2056AE;
-      border-radius: 50%;
-      animation: gpt-bounce 1s infinite alternate;
-    }
-    .gpt-loader span:nth-child(2) { animation-delay: 0.2s; }
-    .gpt-loader span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes gpt-bounce {
-      to { transform: translateY(-8px); opacity: 0.5; }
-    }
-    .gpt-logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-  margin-bottom: -32px;
-    }
-    .gpt-logo img {
-  height: 230px;
-    }
-    .gpt-title {
-  font-size: 2em;
-  font-weight: 700;
-  color: #2056AE;
-  margin-top: -32px;
-      margin-bottom: 0;
-  text-align: center;
-    }
-    .gpt-input {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 18px;
-    }
-    .gpt-input input {
-      flex: 1 1 auto;
-      padding: 14px 18px;
-      border-radius: 14px;
-      border: 1.5px solid #2056AE33;
-      font-size: 1.13em;
-      outline: none;
-      transition: border-color 0.2s;
-      background: #f5f7fa;
-    }
-    .gpt-input input:focus {
-      border-color: #2056AE;
-    }
-      .gpt-input button {
-        background: #2056AE; /* Changed to match GeniDoc logo */
-        color: #fff;
-        font-weight: 700;
-        border: none;
-        border-radius: 14px;
-        padding: 12px 22px;
-        font-size: 1.08em;
-        cursor: pointer;
-        transition: background 0.2s;
-        /* Arrow color for SVG or icon inside button */
-      }
-      .gpt-input button svg {
-        fill: #2056AE;
-        color: #2056AE;
-    }
-    .gpt-input button:hover {
-      background: #4D3AFF;
-    }
-    .gpt-response {
-      width: 100%;
-      min-height: 60px;
-      background: #e3eaff;
-      border-radius: 14px;
-      padding: 18px 16px;
-      color: #2056AE;
-      font-size: 1.08em;
-      margin-top: 8px;
-      box-shadow: 0 1px 4px #2056ae11;
-      word-break: break-word;
-    }
-    @media (max-width:700px) {
-      .gpt-box { padding: 18px 6px 12px 6px; }
-      .header .logo img { height: 36px; }
-      .header .title { font-size: 1.3em; }
+    .card-vitale .btn-rdv:hover {
+      background: #3729b6;
     }
   </style>
 </head>
 <body>
-  <div class="main" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;">
-  <div class="gpt-box" style="flex:1;max-width:540px;align-self:flex-start;">
-      <div class="gpt-logo">
-  <img src="static/GPT-removebg-preview.png" alt="GeniDocGPT logo" style="height:230px;max-width:98%;width:auto;display:block;margin:auto;" />
-  <!-- Removed duplicate logo -->
-      </div>
-      <div class="gpt-title">Votre assistant IA santé<br><span style="font-size:0.7em;color:#444;font-weight:400;">Confidentiel, rapide, personnalisé</span></div>
-      <div class="gpt-suggestions" aria-label="Suggestions rapides">
-        <button type="button" onclick="setGptInput('Quels sont les symptômes du diabète ?')">Symptômes du diabète</button>
-        <button type="button" onclick="setGptInput('Comment prévenir l’hypertension ?')">Prévention hypertension</button>
-        <button type="button" onclick="setGptInput('Quels vaccins pour enfant ?')">Vaccins enfant</button>
-        <button type="button" onclick="setGptInput('Quels sont les effets secondaires du médicament X ?')">Effets secondaires</button>
-      </div>
-      <form class="gpt-input" onsubmit="event.preventDefault();genidocGptSend();" aria-label="Formulaire question IA">
-        <input id="gptInput" type="text" placeholder="Posez votre question..." required aria-label="Votre question santé" autocomplete="on" />
-        <button type="submit" aria-label="Envoyer la question">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-      </form>
-      <div id="gptLoader" class="gpt-loader" style="display:none;margin-bottom:10px;">
-        <span></span><span></span><span></span>
-      </div>
-      <div id="gptResponse" class="gpt-response" style="display:none;"></div>
-      <div style="margin-top:10px;color:#888;font-size:0.98em;text-align:center;">⚠️ Les réponses sont informatives, pas un avis médical. Consultez un professionnel pour toute urgence.</div>
-
-      <!-- Actions & Conseils section, GeniDoc style -->
-      <div style="display:flex;flex-direction:row;gap:28px;justify-content:center;margin:32px 0 0 0;width:100%;">
-        <div style="background:#e3eaff;border-radius:18px;box-shadow:0 2px 12px #2056ae22;padding:24px 18px;flex:1;min-width:180px;max-width:260px;display:flex;flex-direction:column;align-items:center;">
-          <div style="font-size:1.18em;font-weight:700;color:#2056AE;margin-bottom:10px;">⚡ Actions rapides</div>
-          <button onclick="setGptInput('Prendre rendez-vous')" style="background:#2056AE;color:#fff;font-weight:700;border:none;border-radius:18px;padding:10px 0;width:100%;font-size:1.08em;box-shadow:0 2px 8px #2056ae22;cursor:pointer;margin-bottom:10px;transition:background 0.2s;">📅 Prendre RDV</button>
-          <button onclick="setGptInput('Trouver un médecin')" style="background:#2056AE;color:#fff;font-weight:700;border:none;border-radius:18px;padding:10px 0;width:100%;font-size:1.08em;box-shadow:0 2px 8px #2056ae22;cursor:pointer;margin-bottom:10px;transition:background 0.2s;">🩺 Trouver médecin</button>
-          <button onclick="setGptInput('Demander un conseil santé')" style="background:#2056AE;color:#fff;font-weight:700;border:none;border-radius:18px;padding:10px 0;width:100%;font-size:1.08em;box-shadow:0 2px 8px #2056ae22;cursor:pointer;transition:background 0.2s;">💡 Conseil santé</button>
+  <div class="main-top">
+    <div class="header-panel" role="banner" aria-label="Bandeau accueil GeniDoc">
+      <div class="header-inner">
+        <div class="col left">
+          <div class="header-welcome">Bienvenue à votre espace patient,<br>Ravis de vous revoir !</div>
         </div>
-        <div style="background:#f5f7fa;border-radius:18px;box-shadow:0 2px 12px #2056ae22;padding:24px 18px;flex:1;min-width:180px;max-width:260px;display:flex;flex-direction:column;align-items:center;">
-          <div style="font-size:1.18em;font-weight:700;color:#2056AE;margin-bottom:10px;">📝 Conseils santé</div>
-          <div style="color:#2056AE;font-size:1.05em;font-weight:600;margin-bottom:8px;text-align:center;">🥗 Mangez équilibré</div>
-          <div style="color:#2056AE;font-size:1.05em;font-weight:600;margin-bottom:8px;text-align:center;">🚶‍♂️ Bougez chaque jour</div>
-          <div style="color:#2056AE;font-size:1.05em;font-weight:600;margin-bottom:8px;text-align:center;">💧 Buvez de l’eau</div>
-          <div style="color:#2056AE;font-size:1.05em;font-weight:600;text-align:center;">😴 Dormez suffisamment</div>
+        <div class="col center" aria-hidden="false">
+          <img class="genidoc-logo" src="/static/genidoc-logo.png" alt="GeniDoc" />
+        </div>
+        <div class="col right">
+          <div class="profile-menu">
+            <button class="profile-btn" id="profileBtn" title="Profil patient" aria-haspopup="true" aria-expanded="false">
+              <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="8" r="4"></circle>
+                <path d="M4 20c0-4 4-7 8-7s8 3 8 7"></path>
+              </svg>
+            </button>
+            <div class="profile-dropdown" id="profileDropdown">
+              <button class="logout-btn" id="logoutBtn">Se déconnecter</button>
+              <label>Email (Gmail)</label>
+              <div class="profile-value" id="profile-email">user@gmail.com</div>
+              <label>Mot de passe</label>
+              <div class="profile-value" id="profile-password">••••••••</div>
+              <label>Date de naissance</label>
+              <div class="profile-value" id="profile-birth">1990-01-01</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+
+    
+    <div class="chat-app" role="application">
+      <aside class="chat-sidebar" aria-label="Historique et paramètres">
+        <div class="side-header">
+          <div style="font-weight:800;color:#123">Conversations</div>
+          <button class="primary-action" id="newConv">Nouvelle</button>
+        </div>
+        <div class="gd-search" style="margin-top:6px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M21 21l-4.35-4.35" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <input id="historySearch" placeholder="Rechercher" aria-label="Rechercher l'historique" />
+        </div>
+        <div class="history-list" id="historyList" style="margin-top:8px;"></div>
+        <div style="margin-top:auto;font-size:0.92em;color:var(--gd-muted);padding-top:8px;">Aide • Confidentialité • Contact</div>
+      </aside>
+
+      <main class="chat-main" aria-live="polite">
+        <div class="chat-header">
+          <div style="display:flex;align-items:center;gap:12px;"><h3 style="margin:0;color:#222">Assistant IA GeniDoc</h3><div style="color:var(--gd-muted);font-size:0.95em">Nous sommes là pour vous aider</div></div>
+          <div style="display:flex;gap:8px;align-items:center;"><button class="primary-action" id="quickFAQ">FAQ</button></div>
+        </div>
+
+        <div class="chat-window" id="chatWindow">
+          <div class="messages" id="messages"></div>
+        </div>
+
+        <div class="chat-input-bar">
+          <div class="input-pill">
+            <button class="icon-btn mic-btn" id="micBtn" title="Activer la dictée vocale" aria-label="Activer la dictée vocale">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 1v11" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 11a7 7 0 01-14 0" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 21v-4" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <input id="chatInput" placeholder="Demandez quelque chose à GeniDoc..." aria-label="Message" />
+            <label for="fileUpload" class="icon-btn attach-btn" title="Joindre un fichier" aria-label="Joindre un fichier">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21.44 11.05l-8.49 8.49a5.5 5.5 0 01-7.78-7.78l8.49-8.49a4.2 4.2 0 015.94 0 4.2 4.2 0 010 5.94l-8.49 8.49a2.9 2.9 0 01-4.1-4.1l7.01-7.01" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <input id="fileUpload" type="file" style="display:none" />
+            </label>
+          </div>
+          <button class="send-btn" id="sendBtn">Envoyer</button>
+        </div>
+
+    </main>
+    </div>
+    
+
+    <script>
+      // Profile dropdown toggle (ne disparait pas au clic extérieur)
+      (function(){
+        const profileBtn = document.getElementById('profileBtn');
+        const profileDropdown = document.getElementById('profileDropdown');
+        profileBtn.addEventListener('click', ()=> profileDropdown.classList.toggle('active'));
+      })();
+
+      // Chat logic
+      (function(){
+        const messagesEl = document.getElementById('messages');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const historyList = document.getElementById('historyList');
+        const historySearch = document.getElementById('historySearch');
+        const newConv = document.getElementById('newConv');
+        const quickFAQ = document.getElementById('quickFAQ');
+
+        let history = [];
+
+        function renderMessage(text, who='bot'){
+          const wrap = document.createElement('div');
+          wrap.className = 'msg ' + (who==='user' ? 'user' : 'bot');
+          wrap.innerHTML = `<div class='text'>${escapeHtml(text)}</div>`;
+          messagesEl.appendChild(wrap);
+          messagesEl.parentElement.scrollTop = messagesEl.parentElement.scrollHeight;
+        }
+
+        function escapeHtml(unsafe) { return (unsafe||'').replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#039;"})[m]; }); }
+
+        async function sendMessage(){
+          const txt = chatInput.value.trim();
+          if(!txt) return;
+          renderMessage(txt,'user');
+          chatInput.value='';
+          // optimistic bot response
+          renderMessage('Réponse en cours...','bot');
+          // simulate async call to server GPT endpoint
+          try{
+            const resp = await fakeGptReply(txt);
+            // replace last bot 'loading' message
+            const botMsgs = messagesEl.querySelectorAll('.msg.bot');
+            const lastBot = botMsgs[botMsgs.length-1];
+            if(lastBot) lastBot.innerHTML = `<div class='text'>${escapeHtml(resp)}</div>`;
+            // update history
+            history.unshift({id:Date.now(), title: txt.slice(0,40), text: txt, reply: resp});
+            renderHistoryList();
+          }catch(e){ console.error(e); }
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendMessage(); } });
+
+        function renderHistoryList(){
+          historyList.innerHTML = '';
+          history.forEach(h=>{
+            const el = document.createElement('div'); el.className='history-item';
+            el.innerHTML = `<div style='flex:1'><div class='h-title'>${escapeHtml(h.title)}</div><div class='h-sub'>${escapeHtml(h.text.slice(0,80))}</div></div>`;
+            el.addEventListener('click', ()=>{ messagesEl.innerHTML = ''; renderMessage(h.text,'user'); renderMessage(h.reply,'bot'); });
+            historyList.appendChild(el);
+          });
+        }
+
+        historySearch.addEventListener('input', ()=>{
+          const q = historySearch.value.trim().toLowerCase();
+          const filtered = history.filter(h => h.title.toLowerCase().includes(q) || h.text.toLowerCase().includes(q));
+          historyList.innerHTML = '';
+          filtered.forEach(h=>{
+            const el = document.createElement('div'); el.className='history-item';
+            el.innerHTML = `<div style='flex:1'><div class='h-title'>${escapeHtml(h.title)}</div><div class='h-sub'>${escapeHtml(h.text.slice(0,80))}</div></div>`;
+            el.addEventListener('click', ()=>{ messagesEl.innerHTML = ''; renderMessage(h.text,'user'); renderMessage(h.reply,'bot'); });
+            historyList.appendChild(el);
+          });
+        });
+
+        newConv.addEventListener('click', ()=>{ messagesEl.innerHTML = ''; historySearch.value=''; chatInput.value=''; chatInput.focus(); });
+
+        quickFAQ.addEventListener('click', ()=>{ chatInput.value='Quelles sont les démarches pour obtenir une ordonnance ?'; chatInput.focus(); });
+
+        // simple fake GPT - replace with real endpoint later
+        function fakeGptReply(q){ return new Promise(resolve=> setTimeout(()=> resolve('Voici une réponse synthétique et professionnelle à : "'+q+'"'), 900)); }
+
+        // seed sample messages
+        renderMessage('Bonjour, comment puis-je vous aider aujourd\'hui ?');
+      })();
+      // Attach / mic handlers: Web Speech API for dictation + automatic upload to backend
+      (function(){
+        const fileInput = document.getElementById('fileUpload');
+        const micBtn = document.getElementById('micBtn');
+        const chatInput = document.getElementById('chatInput');
+        // file upload: automatic POST to /api/upload
+        if(fileInput){
+          fileInput.addEventListener('change', async (e)=>{
+            const f = e.target.files && e.target.files[0];
+            if(!f) return;
+            console.log('Uploading file:', f.name);
+            const fd = new FormData(); fd.append('file', f);
+            try{
+              const res = await fetch('/api/upload', { method: 'POST', body: fd });
+              const json = await res.json();
+              if(json && json.success){
+                console.log('Upload success', json.data);
+                // optional: insert a short note in chat
+                const note = `Fichier importé: ${f.name}`;
+                const evt = new Event('input'); chatInput.value = note; chatInput.dispatchEvent(evt);
+              } else {
+                console.error('Upload failed', json);
+              }
+            }catch(err){ console.error('Upload error', err); }
+          });
+        }
+
+        // Web Speech API dictation
+        let recognizing = false;
+        let recognition = null;
+        if('webkitSpeechRecognition' in window || 'SpeechRecognition' in window){
+          const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+          recognition = new SR();
+          recognition.lang = 'fr-FR';
+          recognition.interimResults = true;
+          recognition.continuous = false;
+          recognition.maxAlternatives = 1;
+
+          recognition.onstart = ()=>{ recognizing = true; micBtn.style.color = '#2056AE'; micBtn.setAttribute('aria-pressed','true'); micBtn.title = 'Dictée active'; };
+          recognition.onend = ()=>{ recognizing = false; micBtn.style.color = '#6b7280'; micBtn.setAttribute('aria-pressed','false'); micBtn.title = 'Activer la dictée vocale'; };
+          recognition.onerror = (e)=>{ console.warn('Speech error', e); };
+          recognition.onresult = (ev)=>{
+            let interim = '';
+            let final = '';
+            for(let i=ev.resultIndex;i<ev.results.length;i++){
+              const r = ev.results[i];
+              if(r.isFinal) final += r[0].transcript;
+              else interim += r[0].transcript;
+            }
+            chatInput.value = (final || interim) ? (final || interim) : chatInput.value;
+          };
+        }
+
+        if(micBtn){
+          micBtn.addEventListener('click', ()=>{
+            if(!recognition){ alert('Reconnaissance vocale non supportée dans ce navigateur'); return; }
+            if(recognizing){ recognition.stop(); }
+            else { try{ recognition.start(); }catch(e){ console.warn(e); } }
+          });
+        }
+      })();
+    </script>
+
+    <script>
+      // Runtime cleanup: remove any leading stray glyphs from placeholders/values
+      (function(){
+        const clean = s => (s||'').replace(/^[^\p{L}\p{N}]+/u, '');
+        const inputs = document.querySelectorAll('input[placeholder], textarea[placeholder]');
+        inputs.forEach(i=>{
+          const p = i.getAttribute('placeholder');
+          const newp = clean(p);
+          if(newp !== p) i.setAttribute('placeholder', newp);
+          // also clean current value if empty or starting with stray glyph
+          if(i.value && clean(i.value) !== i.value) i.value = clean(i.value);
+        });
+      })();
+    </script>
+
   </div>
-  <script>
-    // Suggestions cliquables
-    function setGptInput(text) {
-      document.getElementById('gptInput').value = text;
-      document.getElementById('gptInput').focus();
-    }
-    // Historique
-    let gptHistory = [];
-    function renderHistory() {
-      const historyDiv = document.getElementById('gptHistory');
-      historyDiv.innerHTML = '';
-      gptHistory.slice(-6).forEach(item => {
-        historyDiv.innerHTML += `<div><span style='color:#2056AE;font-weight:600;'>Vous :</span> ${item.q}</div>`;
-        historyDiv.innerHTML += `<div><span style='color:#2056AE;font-weight:600;'>GeniDocGPT :</span> ${item.a}</div>`;
-      });
-    }
-    // Loader animé
-    function showLoader(show) {
-      document.getElementById('gptLoader').style.display = show ? 'flex' : 'none';
-    }
-    // Envoi question
-    function genidocGptSend() {
-      var input = document.getElementById('gptInput').value.trim();
-      var responseBox = document.getElementById('gptResponse');
-      if(!input) return;
-      showLoader(true);
-      responseBox.style.display = 'none';
-      setTimeout(function() {
-        showLoader(false);
-        // Simule une réponse IA
-        var answer = getGptAnswer(input);
-        responseBox.style.display = 'block';
-        responseBox.innerHTML = `<span style='color:#2056AE;font-weight:600;'>GeniDocGPT :</span> ${answer}`;
-        gptHistory.push({q:input,a:answer});
-        renderHistory();
-        document.getElementById('gptInput').value = '';
-      }, 1200);
-    }
-    // Réponse simulée intelligente
-    function getGptAnswer(q) {
-      q = q.toLowerCase();
-      if(q.includes('diabète')) return "Les symptômes du diabète incluent soif excessive, urines fréquentes, fatigue, perte de poids. Consultez un médecin pour un diagnostic précis.";
-      if(q.includes('hypertension')) return "Pour prévenir l’hypertension : alimentation équilibrée, activité physique régulière, réduction du sel, gestion du stress et suivi médical.";
-      if(q.includes('vaccin')) return "Les vaccins recommandés pour les enfants sont : DTP, polio, rougeole, coqueluche, hépatite B, etc. Demandez conseil à votre pédiatre.";
-      if(q.includes('effet secondaire')) return "Les effets secondaires varient selon le médicament. Lisez la notice et consultez votre médecin ou pharmacien en cas de doute.";
-      if(q.includes('urgence')) return "En cas d’urgence médicale, contactez immédiatement le 15 ou rendez-vous aux urgences les plus proches.";
-      if(q.length < 10) return "Merci pour votre question ! Veuillez préciser votre demande pour une réponse plus personnalisée.";
-      return "Merci pour votre question ! Un agent IA GeniDoc vous répondra bientôt avec des informations fiables et personnalisées.";
-    }
-  </script>
-</body>
-</html>
+  </body>
+  </html>
