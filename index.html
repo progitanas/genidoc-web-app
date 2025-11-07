@@ -3217,32 +3217,11 @@
         <!-- Logo -->
         <div class="brand">
           <a href="#home" class="logo" aria-label="GeniDoc - Accueil">
-            <svg
-              class="logo-icon"
-              width="32"
-              height="32"
-              viewBox="0 0 24 24"
-              fill="none"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <rect
-                x="2"
-                y="2"
-                width="20"
-                height="20"
-                rx="4"
-                stroke="currentColor"
-                stroke-width="1.5"
-              />
-              <path
-                d="M7 12h10"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-              />
-            </svg>
-            <span class="logo-text">GeniDoc</span>
+            <img 
+              src="/static/GeniDoc_IeHF2025.png" 
+              alt="GeniDoc" 
+              style="height: 60px; width: auto; object-fit: contain;"
+            />
           </a>
         </div>
 
@@ -3323,14 +3302,15 @@
           >
             Connexion
           </button>
-          <button
+          <a
+            href="auth.html"
             class="btn btn-primary"
             id="signupBtn"
             data-i18n="btn-signup"
             aria-label="S'inscrire"
           >
             Inscription
-          </button>
+          </a>
           <!-- Mobile menu toggle -->
           <button
             class="menu-toggle"
@@ -3397,8 +3377,8 @@
             </li>
           </ul>
           <div class="drawer-ctas">
-            <button class="btn btn-ghost">Connexion</button>
-            <button class="btn btn-primary">Inscription</button>
+            <a href="auth.html" class="btn btn-ghost" style="text-decoration: none; display: inline-block;">Connexion</a>
+            <a href="auth.html" class="btn btn-primary" style="text-decoration: none; display: inline-block;">Inscription</a>
           </div>
         </div>
       </div>
@@ -3423,13 +3403,15 @@
 
             <!-- CTA Buttons -->
             <div class="hero-ctas">
-              <button
+              <a
+                href="auth.html"
                 class="btn btn-cta"
                 id="cta-primary"
                 data-i18n="btn-start"
+                style="text-decoration: none; display: inline-flex;"
               >
                 Prendre Rendez-vous
-              </button>
+              </a>
               <button class="btn btn-outline" data-i18n="btn-demo">
                 Voir Comment ça Marche
               </button>
@@ -3453,7 +3435,7 @@
                 class="app-button app-button-google"
                 aria-label="Télécharger sur Google Play"
               >
-                <img src="play-store.png" alt="Google Play" class="app-logo" />
+                <img src="static/play-store.png" alt="Google Play" class="app-logo" />
                 <div class="app-button-text">
                   <span class="app-button-label">Disponible sur</span>
                   <span class="app-button-store">Google Play</span>
@@ -4257,7 +4239,7 @@
                         CARTE VITALE NUMÉRIQUE
                       </div>
                       <div style="color: rgba(255,255,255,0.8); font-size: 0.75rem; margin-top: 4px;">
-                        République du Maroc
+                        Royaume du Maroc
                       </div>
                     </div>
                     <!-- Logo GeniDoc -->
@@ -4289,10 +4271,10 @@
                   <!-- Infos patient -->
                   <div>
                     <div style="color: white; font-size: 1.1rem; font-weight: 700; margin-bottom: 4px;">
-                      PATIENT 123456789
+                      PATIENT GD 000001
                     </div>
                     <div style="color: rgba(255,255,255,0.9); font-size: 0.85rem; margin-bottom: 2px;">
-                      Nom: EXEMPLE PATIENT
+                      Nom: SENHAJI Anas
                     </div>
                     <div style="color: rgba(255,255,255,0.8); font-size: 0.75rem;">
                       Validité: 12/2030 | CNSS: 123456789
@@ -4878,9 +4860,9 @@
               Rejoignez les milliers de patients qui gèrent leur santé plus facilement 
               avec GeniDoc.
             </p>
-            <button class="btn btn-cta-inverted" id="cta-final">
+            <a href="auth.html" class="btn btn-cta-inverted" id="cta-final" style="text-decoration: none; display: inline-flex;">
               Créer Mon Compte Gratuit
-            </button>
+            </a>
             <p class="cta-note">
               Sans carte bancaire • 30 jours d'essai • Annulation à tout moment
             </p>
@@ -5356,16 +5338,12 @@
       `;
         document.head.appendChild(workflowStyle);
 
-        // ============================================================
-        // CTA BUTTON HANDLERS (Placeholder)
-        // ============================================================
         const ctaButtons = document.querySelectorAll(
           "#cta-primary, #cta-final, #loginBtn, #signupBtn"
         );
 
         ctaButtons.forEach(function (btn) {
           btn.addEventListener("click", function () {
-            // Placeholder - Add your own logic here
             alert("Cette fonctionnalité sera bientôt disponible!");
           });
         });
@@ -5420,12 +5398,8 @@
           initChatbot();
         }
 
-        // ============================================================
-        // DUAL SEARCH BAR - TAB SWITCHING
-        // ============================================================
         document.querySelectorAll(".search-tab").forEach((tab) => {
           tab.addEventListener("click", function () {
-            // Remove active class from all tabs and contents
             document
               .querySelectorAll(".search-tab")
               .forEach((t) => t.classList.remove("active"));
@@ -5445,26 +5419,21 @@
         // ============================================================
         const translations = {
           fr: {
-            // Navigation
             "nav-home": "Accueil",
             "nav-features": "Fonctionnalités",
             "nav-services": "Services",
             "nav-pricing": "Tarifs",
             "nav-faq": "FAQ",
             "nav-testimonials": "Témoignages",
-            // Header buttons
             "btn-login": "Connexion",
             "btn-signup": "Inscription",
-            // Hero section
-            "hero-title": "Recrutement Intelligent avec IA",
+            "hero-title": "Votre Santé Intelligente avec GeniDoc",
             "hero-subtitle":
-              "Trouvez les meilleurs talents 10x plus vite grâce à notre algorithme IA",
+              "Trouvez les meilleurs médecins 10x plus vite grâce à notre plateforme IA",
             "btn-start": "Commencer Gratuitement",
             "btn-demo": "Demander une Démo",
-            // Search bar
             "search-talent": "Rechercher un talent",
             "search-job": "Parcourir les emplois",
-            // Features section
             "features-title": "Pourquoi choisir RecruitAI?",
             "features-subtitle":
               "Des outils puissants pour transformer votre recrutement",
@@ -5482,7 +5451,6 @@
             "feature-5-desc": "Interface simple et intuitive pour tous",
             "feature-6": "Support 24/7",
             "feature-6-desc": "Équipe d'experts toujours disponible",
-            // Services section
             "services-title": "Nos Services",
             "cat-programming": "Médecine Générale",
             "cat-design": "Cardiologie",
@@ -5493,12 +5461,10 @@
             "cat-ai": "Psychiatrie",
             "cat-music": "ORL",
             "cat-consulting": "Radiologie",
-            // Testimonials section
             "testimonials-title":
               "Découvrez comment nos clients recrutent mieux",
             "testimonials-subtitle":
               "Des recruteurs de startups à des grands groupes, tous font confiance à RecruitAI.",
-            // FAQ section
             "faq-title": "Questions fréquemment posées",
             "faq-1": "Comment fonctionne l'algorithme de matching IA ?",
             "faq-1-answer":
@@ -5516,7 +5482,6 @@
               "Nous utilisons le chiffrement de bout en bout et respectons les normes RGPD. Vos données sont stockées dans des serveurs sécurisés et vous gardez le contrôle total de vos informations.",
           },
           en: {
-            // Navigation
             "nav-home": "Home",
             "nav-features": "Features",
             "nav-services": "Services",
@@ -5526,16 +5491,13 @@
             // Header buttons
             "btn-login": "Login",
             "btn-signup": "Sign Up",
-            // Hero section
             "hero-title": "Intelligent Recruitment with AI",
             "hero-subtitle":
               "Find the best talents 10x faster with our AI algorithm",
             "btn-start": "Start Free",
             "btn-demo": "Request Demo",
-            // Search bar
             "search-talent": "Search for talent",
             "search-job": "Browse jobs",
-            // Features section
             "features-title": "Why Choose RecruitAI?",
             "features-subtitle": "Powerful tools to transform your recruitment",
             "feature-1": "Advanced AI Matching",
@@ -5551,7 +5513,6 @@
             "feature-5-desc": "Simple and intuitive interface for everyone",
             "feature-6": "Support 24/7",
             "feature-6-desc": "Expert team always available",
-            // Services section
             "services-title": "Our Services",
             "cat-programming": "General Medicine",
             "cat-design": "Cardiology",
@@ -5562,11 +5523,9 @@
             "cat-ai": "Psychiatry",
             "cat-music": "ENT",
             "cat-consulting": "Radiology",
-            // Testimonials section
             "testimonials-title": "See how our customers recruit better",
             "testimonials-subtitle":
               "From startup recruiters to large groups, everyone trusts RecruitAI.",
-            // FAQ section
             "faq-title": "Frequently Asked Questions",
             "faq-1": "How does the AI matching algorithm work?",
             "faq-1-answer":
@@ -5582,26 +5541,21 @@
               "We use end-to-end encryption and comply with GDPR standards. Your data is stored on secure servers and you have full control of your information.",
           },
           es: {
-            // Navigation
             "nav-home": "Inicio",
             "nav-features": "Características",
             "nav-services": "Servicios",
             "nav-pricing": "Precios",
             "nav-faq": "Preguntas",
             "nav-testimonials": "Testimonios",
-            // Header buttons
             "btn-login": "Iniciar Sesión",
             "btn-signup": "Registrarse",
-            // Hero section
             "hero-title": "Reclutamiento Inteligente con IA",
             "hero-subtitle":
               "Encuentra los mejores talentos 10x más rápido con nuestro algoritmo IA",
             "btn-start": "Comenzar Gratis",
             "btn-demo": "Solicitar Demo",
-            // Search bar
             "search-talent": "Buscar talento",
             "search-job": "Explorar empleos",
-            // Features section
             "features-title": "¿Por qué elegir RecruitAI?",
             "features-subtitle":
               "Herramientas poderosas para transformar tu reclutamiento",
@@ -5619,7 +5573,6 @@
             "feature-5-desc": "Interfaz simple e intuitiva para todos",
             "feature-6": "Soporte 24/7",
             "feature-6-desc": "Equipo de expertos siempre disponible",
-            // Services section
             "services-title": "Nuestros Servicios",
             "cat-programming": "Medicina General",
             "cat-design": "Cardiología",
@@ -5630,12 +5583,10 @@
             "cat-ai": "Psiquiatría",
             "cat-music": "Otorrinolaringología",
             "cat-consulting": "Radiología",
-            // Testimonials section
             "testimonials-title":
               "Descubre cómo nuestros clientes contratan mejor",
             "testimonials-subtitle":
               "Desde reclutadores de startups hasta grandes grupos, todos confían en RecruitAI.",
-            // FAQ section
             "faq-title": "Preguntas Frecuentes",
             "faq-1": "¿Cómo funciona el algoritmo de emparejamiento IA?",
             "faq-1-answer":
@@ -5652,26 +5603,21 @@
               "Usamos encriptación de extremo a extremo y cumplimos con estándares GDPR. Tus datos se almacenan en servidores seguros y tienes control total.",
           },
           de: {
-            // Navigation
             "nav-home": "Startseite",
             "nav-features": "Funktionen",
             "nav-services": "Dienstleistungen",
             "nav-pricing": "Preise",
             "nav-faq": "FAQ",
             "nav-testimonials": "Testimonials",
-            // Header buttons
             "btn-login": "Anmelden",
             "btn-signup": "Registrieren",
-            // Hero section
             "hero-title": "Intelligente Rekrutierung mit KI",
             "hero-subtitle":
               "Finden Sie die besten Talente 10x schneller mit unserem KI-Algorithmus",
             "btn-start": "Kostenlos Starten",
             "btn-demo": "Demo Anfordern",
-            // Search bar
             "search-talent": "Talent suchen",
             "search-job": "Jobs durchsuchen",
-            // Features section
             "features-title": "Warum RecruitAI wählen?",
             "features-subtitle":
               "Mächtige Tools um Ihre Rekrutierung zu transformieren",
@@ -5689,7 +5635,6 @@
             "feature-5-desc": "Einfache und intuitive Benutzeroberfläche",
             "feature-6": "Support 24/7",
             "feature-6-desc": "Expertenteam immer verfügbar",
-            // Services section
             "services-title": "Unsere Dienstleistungen",
             "cat-programming": "Allgemeinmedizin",
             "cat-design": "Kardiologie",
@@ -5700,12 +5645,10 @@
             "cat-ai": "Psychiatrie",
             "cat-music": "HNO",
             "cat-consulting": "Radiologie",
-            // Testimonials section
             "testimonials-title":
               "Sehen Sie wie unsere Kunden besser rekrutieren",
             "testimonials-subtitle":
               "Von Startup-Recruitern bis zu großen Unternehmen vertrauen alle auf RecruitAI.",
-            // FAQ section
             "faq-title": "Häufig Gestellte Fragen",
             "faq-1": "Wie funktioniert der KI-Matching-Algorithmus?",
             "faq-1-answer":
@@ -5721,26 +5664,21 @@
               "Wir verwenden End-zu-End-Verschlüsselung und entsprechen GDPR-Standards. Ihre Daten werden auf sicheren Servern gespeichert.",
           },
           ar: {
-            // Navigation
             "nav-home": "الرئيسية",
             "nav-features": "المميزات",
             "nav-services": "الخدمات",
             "nav-pricing": "الأسعار",
             "nav-faq": "الأسئلة",
             "nav-testimonials": "الآراء",
-            // Header buttons
             "btn-login": "دخول",
             "btn-signup": "تسجيل",
-            // Hero section
             "hero-title": "التوظيف الذكي بالذكاء الاصطناعي",
             "hero-subtitle":
               "ابحث عن أفضل المواهب 10 مرات أسرع باستخدام خوارزمية الذكاء الاصطناعي",
             "btn-start": "ابدأ مجانًا",
             "btn-demo": "اطلب عرضًا توضيحيًا",
-            // Search bar
             "search-talent": "ابحث عن موهبة",
             "search-job": "استعرض الوظائف",
-            // Features section
             "features-title": "لماذا تختار RecruitAI؟",
             "features-subtitle": "أدوات قوية لتحويل التوظيف الخاص بك",
             "feature-1": "مطابقة ذكية متقدمة",
@@ -5756,7 +5694,6 @@
             "feature-5-desc": "واجهة بسيطة وسهلة الاستخدام",
             "feature-6": "الدعم 24/7",
             "feature-6-desc": "فريق الخبراء متاح دائمًا",
-            // Services section
             "services-title": "خدماتنا",
             "cat-programming": "الطب العام",
             "cat-design": "أمراض القلب",
@@ -5767,11 +5704,9 @@
             "cat-ai": "الطب النفسي",
             "cat-music": "أنف وأذن وحنجرة",
             "cat-consulting": "الأشعة",
-            // Testimonials section
             "testimonials-title": "انظر كيف يوظف عملاؤنا بشكل أفضل",
             "testimonials-subtitle":
               "من معيدي التوظيف في الشركات الناشئة إلى الشركات الكبرى، الجميع يثق في RecruitAI.",
-            // FAQ section
             "faq-title": "الأسئلة الشائعة",
             "faq-1": "كيف تعمل خوارزمية المطابقة الذكية؟",
             "faq-1-answer":
