@@ -2923,6 +2923,81 @@
         }
       }
 
+      /* GeniDoc FAQ Grid Styles */
+      .faq-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+      }
+
+      .faq-item {
+        background: white;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        transition: all var(--transition-base);
+      }
+
+      .faq-item:hover {
+        border-color: var(--color-primary);
+        box-shadow: var(--shadow-md);
+      }
+
+      .faq-question {
+        width: 100%;
+        padding: 1.5rem;
+        background: white;
+        border: none;
+        font-size: var(--font-size-base);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-text-primary);
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        transition: all var(--transition-base);
+      }
+
+      .faq-question:hover {
+        background-color: var(--color-bg-secondary);
+      }
+
+      .faq-question:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+      }
+
+      .faq-icon {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        transition: transform var(--transition-base);
+      }
+
+      .faq-item.active .faq-icon {
+        transform: rotate(180deg);
+      }
+
+      .faq-answer {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height var(--transition-base), padding var(--transition-base);
+      }
+
+      .faq-item.active .faq-answer {
+        max-height: 500px;
+        padding: 0 1.5rem 1.5rem;
+      }
+
+      .faq-answer p {
+        margin: 0;
+        font-size: var(--font-size-base);
+        line-height: var(--line-height-relaxed);
+        color: var(--color-text-secondary);
+      }
+
       /* Final CTA Section */
       .cta-final {
         background-color: var(--color-primary);
@@ -4397,953 +4472,90 @@
       <section class="faq-section" aria-labelledby="faq-title">
         <div class="container">
           <div class="faq-header">
-            <h2 id="faq-title" class="faq-title">Questions Fréquentes sur GeniDoc</h2>
-            <p class="faq-subtitle">Trouvez les réponses aux questions les plus posées sur notre plateforme</p>
+            <h2 id="faq-title" class="faq-title"><span data-i18n="faq-genidoc-title">Questions Fréquentes sur GeniDoc</span></h2>
+            <p class="faq-subtitle"><span data-i18n="faq-genidoc-subtitle">Trouvez les réponses aux questions les plus posées sur notre plateforme</span></p>
           </div>
 
           <div class="faq-grid">
             <!-- FAQ Item 1 -->
             <div class="faq-item">
               <button class="faq-question" onclick="toggleFAQ(this)">
-                <span>Comment puis-je prendre un rendez-vous en ligne avec GeniDoc?</span>
+                <span data-i18n="faq-q1">Comment puis-je prendre un rendez-vous en ligne avec GeniDoc?</span>
                 <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                   <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
               </button>
               <div class="faq-answer">
-                <p>Vous pouvez prendre un rendez-vous en ligne en quelques étapes simples: 1) Recherchez votre médecin ou spécialité, 2) Consultez les créneaux disponibles, 3) Sélectionnez la date et l'heure préférées, 4) Confirmez votre rendez-vous. Vous recevrez une confirmation par email avec tous les détails.</p>
+                <p data-i18n="faq-a1">Vous pouvez prendre un rendez-vous en ligne en quelques étapes simples: 1) Recherchez votre médecin ou spécialité, 2) Consultez les créneaux disponibles, 3) Sélectionnez la date et l'heure préférées, 4) Confirmez votre rendez-vous. Vous recevrez une confirmation par email avec tous les détails.</p>
               </div>
             </div>
 
-            <!-- Cardiologie -->
-            <div class="service-category">
-              <div class="category-icon">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  aria-hidden="true"
-                >
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            <!-- FAQ Item 2 -->
+            <div class="faq-item">
+              <button class="faq-question" onclick="toggleFAQ(this)">
+                <span data-i18n="faq-q2">Mes données médicales sont-elles sécurisées?</span>
+                <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
-              </div>
-              <span class="category-label" data-i18n="cat-design"
-                >Cardiologie</span
-              >
-            </div>
-
-            <!-- Pédiatrie -->
-            <div class="service-category">
-              <div class="category-icon">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  aria-hidden="true"
-                >
-                  <circle cx="12" cy="8" r="7"></circle>
-                  <path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.11"></path>
-                </svg>
-              </div>
-              <span class="category-label" data-i18n="cat-marketing"
-                >Pédiatrie</span
-              >
-            </div>
-
-            <!-- Dermatologie -->
-            <div class="service-category">
-              <div class="category-icon">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  aria-hidden="true"
-                >
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <circle cx="12" cy="12" r="6"></circle>
-                  <circle cx="12" cy="12" r="2"></circle>
-                </svg>
-              </div>
-              <span class="category-label" data-i18n="cat-writing"
-                >Dermatologie</span
-              >
-            </div>
-
-            <!-- Gynécologie -->
-            <div class="service-category">
-              <div class="category-icon">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  aria-hidden="true"
-                >
-                  <path d="M12 2a3 3 0 0 0-3 3v4a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
-                  <path d="M12 9v13"></path>
-                  <path d="M8 19h8"></path>
-                </svg>
-              </div>
-              <span class="category-label" data-i18n="cat-video"
-                >Gynécologie</span
-              >
-            </div>
-
-            <!-- Ophtalmologie -->
-            <div class="service-category">
-              <div class="category-icon">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  aria-hidden="true"
-                >
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                  <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-              </div>
-              <span class="category-label" data-i18n="cat-business"
-                >Ophtalmologie</span
-              >
-            </div>
-
-            <!-- Dentisterie -->
-            <div class="service-category">
-              <div class="category-icon">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  aria-hidden="true"
-                >
-                  <path d="M12 2C8 2 5 5 5 8c0 3 0 7 2 10 1 2 2 3 3 3s2-1 2-3c0-2 0-4 0-5 0-1 0-3 0-5 0 2 0 4 0 5 0 1 0 3 0 5 0 2 1 3 2 3s2-1 3-3c2-3 2-7 2-10 0-3-3-6-7-6z"></path>
-                </svg>
-              </div>
-              <span class="category-label" data-i18n="cat-ai">Dentisterie</span>
-            </div>
-
-            <!-- ORL (Oto-Rhino-Laryngologie) -->
-            <div class="service-category">
-              <div class="category-icon">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  aria-hidden="true"
-                >
-                  <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
-                  <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
-                </svg>
-              </div>
-              <span class="category-label" data-i18n="cat-music"
-                >ORL</span
-              >
-            </div>
-
-            <!-- Radiologie -->
-            <div class="service-category">
-              <div class="category-icon">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  aria-hidden="true"
-                >
-                  <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                  <path d="m21 15-5-5L5 21"></path>
-                </svg>
-              </div>
-              <span class="category-label" data-i18n="cat-consulting"
-                >Radiologie</span
-              >
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                </svg>
-              </div>
-              <span class="category-label" data-i18n="cat-consulting"
-                >Consulting</span
-              >
-            </div>
-          </div>
-
-          <h3 class="popular-title">Popular services</h3>
-
-          <!-- POPULAR SERVICES GRID -->
-          <div class="popular-services-grid">
-            <div class="service-card">
-              <div
-                class="service-card-header"
-                style="
-                  background: linear-gradient(135deg, #1a4d2e 0%, #0f3a20 100%);
-                "
-              >
-                <h4>Website Development</h4>
-              </div>
-              <div class="service-card-accent"></div>
-            </div>
-
-            <div class="service-card">
-              <div
-                class="service-card-header"
-                style="
-                  background: linear-gradient(135deg, #2a3a4d 0%, #1f2a39 100%);
-                "
-              >
-                <h4>Video Editing</h4>
-              </div>
-              <div
-                class="service-card-accent"
-                style="background: #ff9a76"
-              ></div>
-            </div>
-
-            <div class="service-card">
-              <div
-                class="service-card-header"
-                style="
-                  background: linear-gradient(135deg, #3a4a2e 0%, #2a3a1f 100%);
-                "
-              >
-                <h4>Software Development</h4>
-              </div>
-              <div
-                class="service-card-accent"
-                style="background: #b4a574"
-              ></div>
-            </div>
-
-            <div class="service-card">
-              <div
-                class="service-card-header"
-                style="
-                  background: linear-gradient(135deg, #1a4d4d 0%, #0f3a3a 100%);
-                "
-              >
-                <h4>SEO</h4>
-              </div>
-              <div
-                class="service-card-accent"
-                style="background: #7acaa8"
-              ></div>
-            </div>
-
-            <div class="service-card">
-              <div
-                class="service-card-header"
-                style="
-                  background: linear-gradient(135deg, #4a3a2e 0%, #3a2a1f 100%);
-                "
-              >
-                <h4>Architecture & Interior Design</h4>
-              </div>
-              <div
-                class="service-card-accent"
-                style="background: #d4a574"
-              ></div>
-            </div>
-
-            <div class="service-card">
-              <div
-                class="service-card-header"
-                style="
-                  background: linear-gradient(135deg, #4a1a3a 0%, #3a0f2a 100%);
-                "
-              >
-                <h4>Book Design</h4>
-              </div>
-              <div
-                class="service-card-accent"
-                style="background: #e8a8c8"
-              ></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============================================================
-         CARTE VITALE DEMO SECTION - Carte Vitale Numérique
-         ============================================================ -->
-      <section
-        id="video-demo"
-        class="video-demo-section"
-        style="
-          padding: 80px 0;
-          background: #fafafa;
-        "
-      >
-        <div class="container">
-          <div
-            style="
-              display: grid;
-              grid-template-columns: 1fr 1fr;
-              gap: 60px;
-              align-items: center;
-            "
-          >
-            <!-- Carte Vitale Numérique -->
-            <div style="display: flex; justify-content: center">
-              <div
-                style="
-                  position: relative;
-                  width: 400px;
-                  height: 250px;
-                  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-                  border-radius: 20px;
-                  padding: 24px;
-                  box-shadow: 0 20px 60px rgba(37, 99, 235, 0.3);
-                  overflow: hidden;
-                "
-              >
-                <!-- Motif de fond -->
-                <div
-                  style="
-                    position: absolute;
-                    top: -50px;
-                    right: -50px;
-                    width: 200px;
-                    height: 200px;
-                    background: rgba(255, 255, 255, 0.1);
-                    border-radius: 50%;
-                  "
-                ></div>
-                <div
-                  style="
-                    position: absolute;
-                    bottom: -30px;
-                    left: -30px;
-                    width: 150px;
-                    height: 150px;
-                    background: rgba(255, 255, 255, 0.08);
-                    border-radius: 50%;
-                  "
-                ></div>
-
-                <!-- Contenu de la carte -->
-                <div style="position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
-                  <!-- Header -->
-                  <div style="display: flex; justify-content: space-between; align-items: start;">
-                    <div>
-                      <div style="color: white; font-size: 0.9rem; font-weight: 600; opacity: 0.9;">
-                        CARTE VITALE NUMÉRIQUE
-                      </div>
-                      <div style="color: rgba(255,255,255,0.8); font-size: 0.75rem; margin-top: 4px;">
-                        Royaume du Maroc
-                      </div>
-                    </div>
-                    <!-- Logo GeniDoc -->
-                    <div style="
-                      background: white;
-                      width: 48px;
-                      height: 48px;
-                      border-radius: 12px;
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      font-weight: 800;
-                      color: #2563eb;
-                      font-size: 1.25rem;
-                    ">G</div>
-                  </div>
-
-                  <!-- Puce NFC -->
-                  <div style="margin: 20px 0;">
-                    <div style="
-                      width: 50px;
-                      height: 40px;
-                      background: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
-                      border-radius: 8px;
-                      border: 1px solid rgba(255,255,255,0.2);
-                    "></div>
-                  </div>
-
-                  <!-- Infos patient -->
-                  <div>
-                    <div style="color: white; font-size: 1.1rem; font-weight: 700; margin-bottom: 4px;">
-                      PATIENT GD 000001
-                    </div>
-                    <div style="color: rgba(255,255,255,0.9); font-size: 0.85rem; margin-bottom: 2px;">
-                      Nom: SENHAJI Anas
-                    </div>
-                    <div style="color: rgba(255,255,255,0.8); font-size: 0.75rem;">
-                      Validité: 12/2030 | CNSS: 123456789
-                    </div>
-                  </div>
-
-                  <!-- Footer avec code barre -->
-                  <div style="
-                    margin-top: 8px;
-                    padding-top: 8px;
-                    border-top: 1px solid rgba(255,255,255,0.2);
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                  ">
-                    <div style="
-                      display: flex;
-                      gap: 2px;
-                    ">
-                      <div style="width: 2px; height: 20px; background: rgba(255,255,255,0.6);"></div>
-                      <div style="width: 3px; height: 20px; background: rgba(255,255,255,0.8);"></div>
-                      <div style="width: 2px; height: 20px; background: rgba(255,255,255,0.6);"></div>
-                      <div style="width: 4px; height: 20px; background: rgba(255,255,255,0.7);"></div>
-                      <div style="width: 2px; height: 20px; background: rgba(255,255,255,0.6);"></div>
-                      <div style="width: 3px; height: 20px; background: rgba(255,255,255,0.8);"></div>
-                      <div style="width: 2px; height: 20px; background: rgba(255,255,255,0.6);"></div>
-                    </div>
-                    <div style="color: rgba(255,255,255,0.7); font-size: 0.7rem; font-weight: 500;">
-                      genidoc.ma
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Text Content -->
-            <div>
-              <h2
-                style="
-                  font-size: 2rem;
-                  font-weight: 700;
-                  color: #1a1410;
-                  margin-bottom: 24px;
-                "
-              >
-                Votre Carte Vitale, toujours avec vous
-              </h2>
-              <p style="font-size: 1.05rem; line-height: 1.7; color: #6b6560; margin-bottom: 16px;">
-                Accédez à votre dossier médical complet, vos ordonnances et votre historique 
-                de santé depuis n'importe où.
-              </p>
-              <ul style="list-style: none; padding: 0;">
-                <li style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; color: #6b6560;">
-                  <span style="color: #10b981; font-size: 1.25rem;">✓</span>
-                  <span>Historique médical sécurisé et centralisé</span>
-                </li>
-                <li style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; color: #6b6560;">
-                  <span style="color: #10b981; font-size: 1.25rem;">✓</span>
-                  <span>Ordonnances numériques renouvelables</span>
-                </li>
-                <li style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; color: #6b6560;">
-                  <span style="color: #10b981; font-size: 1.25rem;">✓</span>
-                  <span>Compatible avec toutes les assurances marocaines</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============================================================
-         TESTIMONIALS SECTION (3 columns desktop, 1 mobile)
-         ============================================================ -->
-      <section id="testimonials" class="testimonials-section">
-        <div class="container">
-          <!-- Section Header -->
-          <div class="section-header">
-            <span class="badge badge-accent">Témoignages</span>
-            <h2 class="section-title" data-i18n="testimonials-title">
-              Ce que disent nos patients
-            </h2>
-            <p class="section-subtitle" data-i18n="testimonials-subtitle">
-              Des milliers de patients au Maroc font déjà confiance à GeniDoc pour 
-              gérer leur santé au quotidien.
-            </p>
-          </div>
-
-          <!-- Testimonials Grid -->
-          <div class="testimonials-grid">
-            <!-- Testimonial 1 -->
-            <article class="testimonial-card">
-              <svg
-                class="quote-icon"
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  d="M3 21c0 0 7-1 11-8s1-6 1-6-4-1-7 8-5 6-5 6zm14-10c0 0 7-1 11-8s1-6 1-6-4-1-7 8-5 6-5 6z"
-                  opacity="0.1"
-                />
-              </svg>
-              <p class="testimonial-text">
-                "GeniDoc a complètement changé ma façon de gérer ma santé. J'ai pu consulter 
-                un cardiologue en téléconsultation en moins de 24h. Plus besoin d'attendre 
-                des semaines pour un rendez-vous !"
-              </p>
-              <div class="testimonial-author">
-                <div class="author-avatar">YB</div>
-                <div>
-                  <div class="author-name">Youssef BENALI</div>
-                  <div class="author-role">Patient Premium, Casablanca</div>
-                </div>
-              </div>
-            </article>
-
-            <!-- Testimonial 2 -->
-            <article class="testimonial-card">
-              <svg
-                class="quote-icon"
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  d="M3 21c0 0 7-1 11-8s1-6 1-6-4-1-7 8-5 6-5 6zm14-10c0 0 7-1 11-8s1-6 1-6-4-1-7 8-5 6-5 6z"
-                  opacity="0.1"
-                />
-              </svg>
-              <p class="testimonial-text">
-                "Avec le plan Famille, toute ma famille a accès aux meilleurs 
-                médecins. Les téléconsultations nous font gagner énormément de temps, 
-                surtout avec les enfants !"
-              </p>
-              <div class="testimonial-author">
-                <div class="author-avatar">SK</div>
-                <div>
-                  <div class="author-name">Sanaa KHALIL</div>
-                  <div class="author-role">Patiente Famille, Rabat</div>
-                </div>
-              </div>
-            </article>
-
-            <!-- Testimonial 3 -->
-            <article class="testimonial-card">
-              <svg
-                class="quote-icon"
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  d="M3 21c0 0 7-1 11-8s1-6 1-6-4-1-7 8-5 6-5 6zm14-10c0 0 7-1 11-8s1-6 1-6-4-1-7 8-5 6-5 6z"
-                  opacity="0.1"
-                />
-              </svg>
-              <p class="testimonial-text">
-                "L'historique médical centralisé est génial ! Plus besoin de chercher 
-                mes anciennes ordonnances. Tout est accessible en un clic, et je peux 
-                les partager facilement avec mon médecin."
-              </p>
-              <div class="testimonial-author">
-                <div class="author-avatar">MR</div>
-                <div>
-                  <div class="author-name">Mehdi RAMDANI</div>
-                  <div class="author-role">Patient Premium, Marrakech</div>
-                </div>
-              </div>
-            </article>
-
-            <!-- Testimonial 4 -->
-            <article class="testimonial-card">
-              <svg
-                class="quote-icon"
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  d="M3 21c0 0 7-1 11-8s1-6 1-6-4-1-7 8-5 6-5 6zm14-10c0 0 7-1 11-8s1-6 1-6-4-1-7 8-5 6-5 6z"
-                  opacity="0.1"
-                />
-              </svg>
-              <p class="testimonial-text">
-                "L'interface est intuitive et les résultats sont
-                impressionnants. Nos entretiens vidéo asynchrones ont réduit
-                notre délai d'embauche de façon significative."
-              </p>
-              <div class="testimonial-author">
-                <div class="author-avatar">SA</div>
-                <div>
-                  <div class="author-name">Samira Aziz</div>
-                  <div class="author-role">
-                    Recrutrice Senior, FinTech Solutions
-                  </div>
-                </div>
-              </div>
-            </article>
-
-            <!-- Testimonial 5 -->
-            <article class="testimonial-card">
-              <svg
-                class="quote-icon"
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  d="M3 21c0 0 7-1 11-8s1-6 1-6-4-1-7 8-5 6-5 6zm14-10c0 0 7-1 11-8s1-6 1-6-4-1-7 8-5 6-5 6z"
-                  opacity="0.1"
-                />
-              </svg>
-              <p class="testimonial-text">
-                "En tant que médecin, GeniDoc m'a permis de mieux organiser mes 
-                consultations et d'offrir la téléconsultation à mes patients. 
-                Un vrai gain de temps pour tout le monde !"
-              </p>
-              <div class="testimonial-author">
-                <div class="author-avatar">DZ</div>
-                <div>
-                  <div class="author-name">Dr. Zineb ALAMI</div>
-                  <div class="author-role">Médecin Généraliste, Fès</div>
-                </div>
-              </div>
-            </article>
-
-            <!-- Testimonial 6 -->
-            <article class="testimonial-card">
-              <svg
-                class="quote-icon"
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  d="M3 21c0 0 7-1 11-8s1-6 1-6-4-1-7 8-5 6-5 6zm14-10c0 0 7-1 11-8s1-6 1-6-4-1-7 8-5 6-5 6z"
-                  opacity="0.1"
-                />
-              </svg>
-              <p class="testimonial-text">
-                "La prise en charge par ma mutuelle est automatique avec GeniDoc. 
-                Plus besoin de gérer les remboursements manuellement. C'est vraiment 
-                pratique !"
-              </p>
-              <div class="testimonial-author">
-                <div class="author-avatar">LB</div>
-                <div>
-                  <div class="author-name">Laila BENJELLOUN</div>
-                  <div class="author-role">
-                    Patiente Premium, Tanger
-                  </div>
-                </div>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============================================================
-         PRICING SECTION - TARIFS GENIDOC
-         ============================================================ -->
-      <section
-        id="pricing"
-        class="pricing-section bg-alt"
-      >
-        <div class="container">
-          <!-- Section Header -->
-          <div class="section-header">
-            <span class="badge badge-accent">Tarifs</span>
-            <h2 class="section-title">Plans Transparents pour Tous</h2>
-            <p class="section-subtitle">
-              Choisissez le plan qui correspond à vos besoins de santé
-            </p>
-          </div>
-
-          <!-- Pricing Grid - Design Professionnel -->
-          <div class="pricing-grid" style="max-width: 1100px; margin: 0 auto;">
-            
-            <!-- Plan Essentiel -->
-            <div class="pricing-card" style="background: white; border: 2px solid #e2e8f0; border-radius: 16px; padding: 40px 32px; position: relative; transition: all 0.3s ease;">
-              <div style="margin-bottom: 24px;">
-                <h3 style="font-size: 1.5rem; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Essentiel</h3>
-                <p style="font-size: 0.95rem; color: #64748b; line-height: 1.6;">Pour découvrir GeniDoc et gérer vos consultations occasionnelles</p>
-              </div>
-              
-              <div style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #f1f5f9;">
-                <div style="display: flex; align-items: baseline; gap: 4px; margin-bottom: 12px;">
-                  <span style="font-size: 3rem; font-weight: 700; color: #0f172a; line-height: 1;">0</span>
-                  <span style="font-size: 1.125rem; color: #475569; font-weight: 600;">DH/mois</span>
-                </div>
-                <p style="font-size: 0.875rem; color: #64748b;">Gratuit à vie, sans carte bancaire</p>
-              </div>
-              
-              <ul style="list-style: none; padding: 0; margin: 0 0 32px 0; display: flex; flex-direction: column; gap: 16px;">
-                <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #334155;">
-                  <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Recherche illimitée de médecins et établissements</span>
-                </li>
-                <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #334155;">
-                  <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Prise de rendez-vous en ligne</span>
-                </li>
-                <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #334155;">
-                  <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Rappels automatiques par email</span>
-                </li>
-                <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #334155;">
-                  <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Avis et notes vérifiés</span>
-                </li>
-                <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #94a3b8;">
-                  <svg style="width: 20px; height: 20px; color: #cbd5e1; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                  <span>Téléconsultations</span>
-                </li>
-                <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #94a3b8;">
-                  <svg style="width: 20px; height: 20px; color: #cbd5e1; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                  <span>Dossier médical numérique</span>
-                </li>
-              </ul>
-              
-              <button style="width: 100%; padding: 14px 24px; background: white; border: 2px solid #2563eb; color: #2563eb; border-radius: 12px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.2s ease;">
-                Commencer gratuitement
               </button>
+              <div class="faq-answer">
+                <p data-i18n="faq-a2">Oui, la sécurité de vos données est notre priorité absolue. GeniDoc utilise le chiffrement SSL/TLS, le stockage crypté et respecte les normes de conformité HIPAA et RGPD. Vos informations médicales ne sont jamais partagées sans votre consentement explicite.</p>
+              </div>
             </div>
 
-            <!-- Plan Premium (Mise en avant) -->
-            <div class="pricing-card pricing-card-featured" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: none; border-radius: 16px; padding: 40px 32px; position: relative; box-shadow: 0 20px 60px rgba(37, 99, 235, 0.25); transform: scale(1.05);">
-              <div style="position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 6px 20px; border-radius: 20px; font-size: 0.8125rem; font-weight: 600; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
-                Le plus choisi
-              </div>
-              
-              <div style="margin-bottom: 24px;">
-                <h3 style="font-size: 1.5rem; font-weight: 700; color: white; margin-bottom: 8px;">Premium</h3>
-                <p style="font-size: 0.95rem; color: rgba(255,255,255,0.9); line-height: 1.6;">Santé connectée complète avec téléconsultations illimitées</p>
-              </div>
-              
-              <div style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid rgba(255,255,255,0.2);">
-                <div style="display: flex; align-items: baseline; gap: 4px; margin-bottom: 12px;">
-                  <span style="font-size: 3rem; font-weight: 700; color: white; line-height: 1;">99</span>
-                  <span style="font-size: 1.125rem; color: rgba(255,255,255,0.9); font-weight: 600;">DH/mois</span>
-                </div>
-                <p style="font-size: 0.875rem; color: rgba(255,255,255,0.85);">Essai gratuit 30 jours • Résiliable à tout moment</p>
-              </div>
-              
-              <ul style="list-style: none; padding: 0; margin: 0 0 32px 0; display: flex; flex-direction: column; gap: 16px;">
-                <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: white;">
-                  <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span><strong>Tout du plan Essentiel</strong></span>
-                </li>
-                <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: white;">
-                  <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span><strong>5 téléconsultations/mois incluses</strong></span>
-                </li>
-                <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: white;">
-                  <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Dossier médical numérique sécurisé</span>
-                </li>
-                <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: white;">
-                  <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Ordonnances numériques renouvelables</span>
-                </li>
-                <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: white;">
-                  <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Rappels SMS + Push</span>
-                </li>
-                <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: white;">
-                  <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Support prioritaire 7j/7</span>
-                </li>
-              </ul>
-              
-              <button style="width: 100%; padding: 14px 24px; background: white; border: none; color: #2563eb; border-radius: 12px; font-weight: 600; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.2s ease;">
-                Essayer 30 jours gratuits
+            <!-- FAQ Item 3 -->
+            <div class="faq-item">
+              <button class="faq-question" onclick="toggleFAQ(this)">
+                <span data-i18n="faq-q3">Puis-je consulter un médecin par téléconsultation?</span>
+                <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
               </button>
+              <div class="faq-answer">
+                <p data-i18n="faq-a3">Oui! GeniDoc propose des consultations à distance par vidéo pour de nombreuses spécialités. Vous pouvez choisir la téléconsultation lors de la réservation de votre rendez-vous. Il suffit d'avoir une connexion Internet et une caméra web.</p>
+              </div>
             </div>
 
-            <!-- Plan Famille -->
-            <div class="pricing-card" style="background: white; border: 2px solid #e2e8f0; border-radius: 16px; padding: 40px 32px; position: relative; transition: all 0.3s ease;">
-              <div style="margin-bottom: 24px;">
-                <h3 style="font-size: 1.5rem; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Famille</h3>
-                <p style="font-size: 0.95rem; color: #64748b; line-height: 1.6;">Protection santé complète pour toute votre famille</p>
-              </div>
-              
-              <div style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #f1f5f9;">
-                <div style="display: flex; align-items: baseline; gap: 4px; margin-bottom: 12px;">
-                  <span style="font-size: 3rem; font-weight: 700; color: #0f172a; line-height: 1;">249</span>
-                  <span style="font-size: 1.125rem; color: #475569; font-weight: 600;">DH/mois</span>
-                </div>
-                <p style="font-size: 0.875rem; color: #64748b;">Jusqu'à 5 membres • Économisez 50%</p>
-              </div>
-              
-              <ul style="list-style: none; padding: 0; margin: 0 0 32px 0; display: flex; flex-direction: column; gap: 16px;">
-                <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #334155;">
-                  <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span><strong>Tout du plan Premium × 5 membres</strong></span>
-                </li>
-                <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #334155;">
-                  <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span><strong>15 téléconsultations/mois partagées</strong></span>
-                </li>
-                <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #334155;">
-                  <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Carnet de vaccination familial</span>
-                </li>
-                <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #334155;">
-                  <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Suivi pédiatrique et croissance</span>
-                </li>
-                <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #334155;">
-                  <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Coordination automatique entre médecins</span>
-                </li>
-                <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #334155;">
-                  <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Réduction sur assurances partenaires</span>
-                </li>
-              </ul>
-              
-              <button style="width: 100%; padding: 14px 24px; background: #2563eb; border: none; color: white; border-radius: 12px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.2s ease;">
-                Protéger ma famille
+            <!-- FAQ Item 4 -->
+            <div class="faq-item">
+              <button class="faq-question" onclick="toggleFAQ(this)">
+                <span data-i18n="faq-q4">Comment puis-je accéder à mon dossier médical électronique?</span>
+                <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
               </button>
+              <div class="faq-answer">
+                <p data-i18n="faq-a4">Vous pouvez accéder à votre dossier médical électronique en vous connectant à votre compte GeniDoc. Vous y trouverez tous vos rapports médicaux, résultats d'analyse, historique des rendez-vous et ordonnances en un seul endroit, organisé et facile à consulter.</p>
+              </div>
             </div>
-            
-          </div>
-          
-          <!-- Note professionnelle -->
-          <div style="max-width: 800px; margin: 48px auto 0; text-align: center; padding: 24px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
-            <p style="font-size: 0.9375rem; color: #475569; line-height: 1.7; margin: 0;">
-              <strong style="color: #0f172a;">Tous les plans incluent</strong> : Chiffrement bancaire AES-256, conformité RGPD, hébergement au Maroc, support client en français et arabe. 
-              <span style="color: #2563eb; font-weight: 600;">Annulation possible à tout moment, sans engagement.</span>
-            </p>
+
+            <!-- FAQ Item 5 -->
+            <div class="faq-item">
+              <button class="faq-question" onclick="toggleFAQ(this)">
+                <span data-i18n="faq-q5">Quels sont les modes de paiement acceptés?</span>
+                <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+              <div class="faq-answer">
+                <p data-i18n="faq-a5">GeniDoc accepte plusieurs modes de paiement: cartes bancaires (Visa, Mastercard, American Express), virements bancaires, portefeuilles numériques (Apple Pay, Google Pay) et paiements à la clinique. Les consultations sont remboursables par les assurances maladie partenaires.</p>
+              </div>
+            </div>
+
+            <!-- FAQ Item 6 -->
+            <div class="faq-item">
+              <button class="faq-question" onclick="toggleFAQ(this)">
+                <span data-i18n="faq-q6">Comment puis-je contacter le support GeniDoc?</span>
+                <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+              <div class="faq-answer">
+                <p data-i18n="faq-a6">Notre équipe support est disponible 24/7 via plusieurs canaux: chat en direct sur notre plateforme, email (support@genidoc.ma), téléphone (+212 5XX XXX XXX) et réseaux sociaux. Nous nous engageons à répondre à vos questions dans les 2 heures.</p>
+              </div>
+            </div>
           </div>
         </div>
-      </section>
-
-        <!-- ============================================================
-         FAQ SECTION (Accordion)
-         ============================================================ -->
-        <section id="faq" class="faq-section">
-          <div class="container faq-container">
-            <!-- Section Header -->
-            <div class="section-header">
-              <span class="badge badge-accent">FAQ</span>
-              <h2 class="section-title" data-i18n="faq-title">
-                Questions fréquemment posées
-              </h2>
-            </div>
-
-            <!-- Accordion -->
-            <div class="accordion">
-              <details class="accordion-item">
-                <summary class="accordion-trigger" data-i18n="faq-1">
-                  Comment fonctionne la prise de rendez-vous en ligne ?
-                </summary>
-                <div class="accordion-content">
-                  <p data-i18n="faq-1-answer">
-                    Recherchez votre médecin ou spécialité, consultez les disponibilités en temps réel, 
-                    choisissez un créneau et confirmez. Vous recevez une confirmation instantanée par 
-                    email et SMS avec tous les détails (adresse, instructions, documents à apporter).
-                  </p>
-                </div>
-              </details>
-
-              <details class="accordion-item">
-                <summary class="accordion-trigger" data-i18n="faq-2">
-                  Les téléconsultations sont-elles aussi efficaces qu'un rendez-vous physique ?
-                </summary>
-                <div class="accordion-content">
-                  <p data-i18n="faq-2-answer">
-                    Pour de nombreux cas (renouvellement d'ordonnance, consultation de suivi, conseils médicaux), 
-                    la téléconsultation est parfaitement adaptée. Le médecin peut évaluer vos symptômes, 
-                    prescrire des médicaments et vous orienter si un examen physique est nécessaire.
-                  </p>
-                </div>
-              </details>
-
-              <details class="accordion-item">
-                <summary class="accordion-trigger" data-i18n="faq-3">
-                  Comment mes données médicales sont-elles protégées ?
-                </summary>
-                <div class="accordion-content">
-                  <p data-i18n="faq-3-answer">
-                    Nous appliquons un chiffrement de niveau bancaire (AES-256) pour toutes vos données. 
-                    Conformité RGPD stricte, serveurs hébergés au Maroc avec certification ISO 27001. 
-                    Seuls vous et les professionnels que vous autorisez peuvent accéder à votre dossier médical.
-                  </p>
-                </div>
-              </details>
-
-              <details class="accordion-item">
-                <summary class="accordion-trigger" data-i18n="faq-4">
-                  Puis-je utiliser GeniDoc avec mon assurance santé ?
-                </summary>
-                <div class="accordion-content">
-                  <p data-i18n="faq-4-answer">
-                    Oui ! Nous sommes partenaires de nombreuses mutuelles marocaines (CNSS, CNOPS, mutuelles privées). 
-                    Les remboursements peuvent être traités directement via l'app. Consultez la liste des assurances 
-                    partenaires dans votre profil.
-                  </p>
-                </div>
-              </details>
-
-              <details class="accordion-item">
-                <summary class="accordion-trigger">
-                  Que faire en cas d'urgence médicale ?
-                </summary>
-                <div class="accordion-content">
-                  <p>
-                    En cas d'urgence vitale (douleur thoracique, difficulté respiratoire, hémorragie), 
-                    appelez le 141 (SAMU) immédiatement. GeniDoc propose un service d'urgence non-vitale 
-                    24/7 pour les situations nécessitant une consultation rapide mais non critique.
-                  </p>
-                </div>
-              </details>
-
-              <details class="accordion-item">
-                <summary class="accordion-trigger">
-                  Puis-je consulter mon historique médical complet ?
-                </summary>
-                <div class="accordion-content">
-                  <p>
-                    Avec un compte Premium ou Famille, votre historique médical est centralisé et accessible 24/7 : 
-                    consultations passées, ordonnances, résultats d'analyses, vaccinations, allergies. 
-                    Vous pouvez le partager avec n'importe quel professionnel de santé en un clic.
-                  </p>
-                </div>
-              </details>
-                    le matching IA automatique. Nos clients rapportent un ROI de
-                    300% en 6 mois.
-                  </p>
-                </div>
-              </details>
-
-              <details class="accordion-item">
-                <summary class="accordion-trigger">
-                  Offrez-vous un support client ?
-                </summary>
-                <div class="accordion-content">
-                  <p>
-                    Oui. Tous les plans incluent un support par email et chatbot
-                    24/7. Les plans Pro et Enterprise ont accès à un support
-                    prioritaire par téléphone et video-chat. Les clients
-                    Enterprise bénéficient d'un account manager dédié.
-                  </p>
-                </div>
-              </details>
-
-              <details class="accordion-item">
-                <summary class="accordion-trigger">
-                  Quelle est la période d'essai gratuit ?
-                </summary>
-                <div class="accordion-content">
-                  <p>
-                    Les clients Pro et Enterprise bénéficient de 14 jours
-                    d'essai gratuit sans carte bancaire. Le plan Starter est
-                    gratuit indéfiniment avec 5 offres/mois.
-                  </p>
-                </div>
-              </details>
-            </div>
-          </div>
-        </section>
 
         <!-- ============================================================
          FINAL CTA SECTION (Full-width, accent background)
@@ -5472,6 +4684,31 @@
        ============================================================ */
       (function () {
         "use strict";
+
+        // ============================================================
+        // FAQ TOGGLE FUNCTION (for GeniDoc FAQ)
+        // ============================================================
+        window.toggleFAQ = function(button) {
+          const faqItem = button.closest(".faq-item");
+          if (!faqItem) return;
+          
+          // Close all other FAQ items
+          document.querySelectorAll(".faq-item").forEach(item => {
+            if (item !== faqItem) {
+              item.classList.remove("active");
+            }
+          });
+          
+          // Toggle current FAQ item
+          faqItem.classList.toggle("active");
+          
+          // Smooth scroll to the answer if opening
+          if (faqItem.classList.contains("active")) {
+            setTimeout(() => {
+              button.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            }, 100);
+          }
+        };
 
         // ============================================================
         // MOBILE MENU TOGGLE
