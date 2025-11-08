@@ -10,6 +10,30 @@
       name="description"
       content="Trouvez un médecin, CHU ou clinique au Maroc en quelques secondes. Prenez rendez-vous en ligne facilement."
     />
+    
+    <!-- Open Graph (Social Media Preview) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://genidoc.ma" />
+    <meta property="og:title" content="GeniDoc — Votre santé mérite mieux qu'une salle d'attente" />
+    <meta property="og:description" content="Trouvez un médecin, CHU ou clinique au Maroc en quelques secondes. Prenez rendez-vous en ligne facilement." />
+    <meta property="og:image" content="https://genidoc.ma/og-image.png" />
+    <meta property="og:site_name" content="GeniDoc" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://genidoc.ma" />
+    <meta name="twitter:title" content="GeniDoc — Votre santé mérite mieux" />
+    <meta name="twitter:description" content="Trouvez un médecin et prenez rendez-vous en ligne au Maroc" />
+    <meta name="twitter:image" content="https://genidoc.ma/og-image.png" />
+
+    <!-- PWA & Mobile -->
+    <meta name="theme-color" content="#c71f37" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
+    <!-- Canonical URL (SEO) -->
+    <link rel="canonical" href="https://genidoc.ma" />
+    
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -133,6 +157,34 @@
         }
         100% {
           background-position: 1000px 0;
+        }
+      }
+
+      /* ========================================================================
+         ♿ ACCESSIBILITY - FOCUS VISIBLE PATTERN
+         ======================================================================== */
+      :focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+        border-radius: var(--radius-lg);
+      }
+
+      button:focus-visible,
+      a:focus-visible,
+      input:focus-visible,
+      textarea:focus-visible,
+      select:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
         }
       }
 
@@ -2344,7 +2396,16 @@
         overflow: hidden;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         transition: all var(--transition-base);
+        animation: fadeInUp 0.7s ease-out forwards;
+        opacity: 0;
       }
+
+      .service-card:nth-child(1) { animation-delay: 0.1s; }
+      .service-card:nth-child(2) { animation-delay: 0.2s; }
+      .service-card:nth-child(3) { animation-delay: 0.3s; }
+      .service-card:nth-child(4) { animation-delay: 0.4s; }
+      .service-card:nth-child(5) { animation-delay: 0.5s; }
+      .service-card:nth-child(6) { animation-delay: 0.6s; }
 
       .service-card:hover {
         transform: translateY(-8px);
@@ -3926,13 +3987,11 @@
             </div>
           </div>
 
-          <!-- Hero Visual (Right Column - Desktop Only) -->
           <div class="hero-visual" aria-hidden="true">
-            <!-- Professional Image with Frame -->
             <div class="hero-image-container">
               <img
-                src="professional-hero.png"
-                alt="Professionnel utilisant RecruitAI"
+                src="/static/professional-hero.png"
+                alt="Professionnel utilisant GeniDoc"
                 class="hero-image"
               />
               <div class="hero-image-frame"></div>
@@ -3944,9 +4003,9 @@
 
       <!-- Medical Specialties Section (matching provided image style) -->
 
-      <section class="specialties-section">
+      <section class="specialties-section" aria-labelledby="specialties-title">
         <div class="specialties-container">
-          <h2 class="specialties-title">Key Features</h2>
+          <h2 class="specialties-title" id="specialties-title">Key Features</h2>
           <p class="specialties-subtitle">Discover what makes GeniDoc the healthcare platform of the future</p>
           <div class="specialties-grid">
             <div class="specialty-card">
@@ -4335,9 +4394,10 @@
       <!-- ============================================================
          SERVICES SECTION - CATEGORIES & POPULAR SERVICES
          ============================================================ -->
-      <section id="services" class="services-section">
+      <section id="services" class="services-section" aria-labelledby="services-title">
         <div class="container">
           <!-- CATEGORIES GRID - Spécialités Médicales -->
+          <h2 id="services-title" style="display: none;">Medical Services</h2>
           <div class="services-categories-grid">
             <!-- Médecine Générale -->
             <div class="service-category">
