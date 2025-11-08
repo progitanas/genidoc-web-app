@@ -6067,28 +6067,41 @@
             // Hide original menu
             menu.style.display = 'none';
             
+            let hideTimeout;
+            
             function positionMenu() {
               const btnRect = btn.getBoundingClientRect();
               clonedMenu.style.top = (btnRect.bottom + 8) + 'px';
               clonedMenu.style.left = (btnRect.right - 150) + 'px';
             }
             
-            // Show menu on hover
-            dropdown.addEventListener('mouseenter', function() {
+            function showMenu() {
+              clearTimeout(hideTimeout);
               positionMenu();
               clonedMenu.style.opacity = '1';
               clonedMenu.style.visibility = 'visible';
               clonedMenu.style.transform = 'translateY(0)';
               clonedMenu.style.pointerEvents = 'auto';
-            });
+            }
             
-            // Hide menu on leave
-            dropdown.addEventListener('mouseleave', function() {
-              clonedMenu.style.opacity = '0';
-              clonedMenu.style.visibility = 'hidden';
-              clonedMenu.style.transform = 'translateY(-10px)';
-              clonedMenu.style.pointerEvents = 'none';
-            });
+            function hideMenu() {
+              hideTimeout = setTimeout(() => {
+                clonedMenu.style.opacity = '0';
+                clonedMenu.style.visibility = 'hidden';
+                clonedMenu.style.transform = 'translateY(-10px)';
+                clonedMenu.style.pointerEvents = 'none';
+              }, 200);
+            }
+            
+            // Show menu on hover over button
+            dropdown.addEventListener('mouseenter', showMenu);
+            
+            // Keep menu open if hovering over menu
+            clonedMenu.addEventListener('mouseenter', showMenu);
+            clonedMenu.addEventListener('mouseleave', hideMenu);
+            
+            // Hide menu when leaving button (with delay for smooth transition)
+            dropdown.addEventListener('mouseleave', hideMenu);
           }
         });
 
