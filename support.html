@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>GeniDoc — Support et Aide</title>
+    <meta name="description" content="Centre d'aide et support pour GeniDoc - vos réponses et assistance techniques." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Space Grotesk", sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        header {
+            background: #1f1f1f;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        .support-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .support-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        .support-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .support-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: #c71f37;
+        }
+        .support-description {
+            font-size: 0.95rem;
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        .btn {
+            display: inline-block;
+            background: #c71f37;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #a01829;
+        }
+        .faq-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .faq-section h2 {
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            color: #1f1f1f;
+        }
+        .faq-item {
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 1.5rem;
+        }
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+        .faq-question {
+            font-weight: 600;
+            color: #c71f37;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+        }
+        .faq-answer {
+            color: #666;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Centre d'Aide GeniDoc</h1>
+        <p>Nous sommes là pour vous aider 24/7</p>
+    </header>
+
+    <div class="container">
+        <div class="support-grid">
+            <div class="support-card">
+                <div class="support-icon">💬</div>
+                <div class="support-title">Chat en Direct</div>
+                <div class="support-description">Discutez avec nos agents de support en temps réel.</div>
+                <button class="btn">Démarrer un chat</button>
+            </div>
+
+            <div class="support-card">
+                <div class="support-icon">📧</div>
+                <div class="support-title">Email</div>
+                <div class="support-description">Envoyez-nous vos questions et nous répondrons dans les 24h.</div>
+                <a href="mailto:support@genidoc.com" class="btn">Envoyer un email</a>
+            </div>
+
+            <div class="support-card">
+                <div class="support-icon">📞</div>
+                <div class="support-title">Téléphone</div>
+                <div class="support-description">Appelez notre équipe de support disponible 7j/7.</div>
+                <a href="tel:+212612345678" class="btn">Appeler</a>
+            </div>
+        </div>
+
+        <div class="faq-section">
+            <h2>Questions Fréquemment Posées</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question">❓ Comment créer un compte GeniDoc?</div>
+                <div class="faq-answer">Pour créer un compte, visitez notre page d'inscription et remplissez le formulaire avec vos informations personnelles et professionnelles. Vous recevrez un email de confirmation.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">❓ Comment réserver une consultation?</div>
+                <div class="faq-answer">Une fois connecté, accédez à la section "Rendez-vous" et sélectionnez le type de consultation, la date et l'heure qui vous conviennent.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">❓ Pouvez-vous annuler une consultation?</div>
+                <div class="faq-answer">Oui, vous pouvez annuler jusqu'à 24 heures avant votre consultation sans frais supplémentaires.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">❓ Mes données sont-elles sécurisées?</div>
+                <div class="faq-answer">Absolument! GeniDoc utilise le chiffrement de niveau médical pour protéger vos informations personnelles et sanitaires.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">❓ Puis-je accéder à mes dossiers médicaux?</div>
+                <div class="faq-answer">Oui, tous vos dossiers médicaux électroniques sont accessible depuis votre tableau de bord personnel.</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
