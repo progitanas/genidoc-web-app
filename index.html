@@ -449,7 +449,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 10000;
+        z-index: 999;
         font-size: 12px;
         font-weight: var(--font-weight-semibold);
         color: white;
@@ -526,14 +526,15 @@
         top: 28px;
         left: 0;
         right: 0;
-        height: 40px;
+        min-height: 40px;
         background: #1f1f1f;
         border-bottom: 1px solid #333;
-        z-index: 999;
+        z-index: 10000;
         display: flex;
         align-items: center;
         padding: 0 1rem;
         font-size: 0.85rem;
+        overflow: visible;
       }
 
       .top-bar-container {
@@ -542,6 +543,7 @@
         align-items: center;
         width: 100%;
         max-width: 100%;
+        overflow: visible;
       }
 
       .top-bar-left {
@@ -562,6 +564,7 @@
         align-items: center;
         gap: 1rem;
         align-items: center;
+        overflow: visible;
       }
 
       .top-bar-link {
@@ -590,6 +593,8 @@
       .top-bar-dropdown {
         position: relative;
         display: inline-block;
+        overflow: visible;
+        z-index: 999999;
       }
 
       .top-bar-dropdown-btn {
@@ -599,9 +604,10 @@
       }
 
       .top-bar-dropdown-menu {
-        position: absolute;
-        top: 100%;
-        right: 0;
+        position: fixed;
+        top: auto;
+        right: auto;
+        left: auto;
         background: #1f1f1f;
         border: 1px solid #333;
         border-top: none;
@@ -609,17 +615,19 @@
         opacity: 0;
         visibility: hidden;
         transform: translateY(-10px);
-        transition: all 0.2s;
-        margin-top: 8px;
+        transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
         display: flex;
         flex-direction: column;
-        z-index: 1001;
+        z-index: 999999;
+        pointer-events: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       }
 
       .top-bar-dropdown:hover .top-bar-dropdown-menu {
         opacity: 1;
         visibility: visible;
         transform: translateY(0);
+        pointer-events: auto;
       }
 
       .top-bar-dropdown-menu a {
@@ -838,7 +846,7 @@
       .site-header {
         position: sticky;
         top: 28px;
-        z-index: 1000;
+        z-index: 10000;
         background-color: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(10px);
         border-bottom: 1px solid transparent;
@@ -875,6 +883,7 @@
         align-items: center;
         justify-content: space-between;
         height: var(--header-height);
+        overflow: visible;
       }
 
       .brand .logo {
@@ -1622,6 +1631,7 @@
         padding: 2.5rem 0;
         margin-top: -1rem;
         position: relative;
+        z-index: 1;
       }
 
       .search-bar-wrapper::before {
@@ -1646,7 +1656,7 @@
 
       .search-bar-wrapper .container {
         position: relative;
-        z-index: 1;
+        z-index: auto;
       }
 
       /* ============================================================
@@ -3302,7 +3312,7 @@
 
           <div class="top-bar-dropdown">
             <button class="top-bar-link top-bar-dropdown-btn">
-              RecruitAI Offres d'Emploi
+              GeniDoc Offres d'Emploi
               <svg
                 width="12"
                 height="8"
@@ -6037,6 +6047,50 @@
 
         // Initialize language on page load
         changeLanguage(currentLanguage);
+
+        // ============================================================
+        // TOP BAR DROPDOWN MENU HANDLER - Move to body for visibility
+        // ============================================================
+        const topBarDropdowns = document.querySelectorAll('.top-bar-dropdown');
+        
+        topBarDropdowns.forEach(dropdown => {
+          const btn = dropdown.querySelector('.top-bar-dropdown-btn');
+          const menu = dropdown.querySelector('.top-bar-dropdown-menu');
+          
+          if (btn && menu) {
+            // Clone menu and move to body
+            const clonedMenu = menu.cloneNode(true);
+            clonedMenu.style.position = 'fixed';
+            clonedMenu.style.zIndex = '999999';
+            document.body.appendChild(clonedMenu);
+            
+            // Hide original menu
+            menu.style.display = 'none';
+            
+            function positionMenu() {
+              const btnRect = btn.getBoundingClientRect();
+              clonedMenu.style.top = (btnRect.bottom + 8) + 'px';
+              clonedMenu.style.left = (btnRect.right - 150) + 'px';
+            }
+            
+            // Show menu on hover
+            dropdown.addEventListener('mouseenter', function() {
+              positionMenu();
+              clonedMenu.style.opacity = '1';
+              clonedMenu.style.visibility = 'visible';
+              clonedMenu.style.transform = 'translateY(0)';
+              clonedMenu.style.pointerEvents = 'auto';
+            });
+            
+            // Hide menu on leave
+            dropdown.addEventListener('mouseleave', function() {
+              clonedMenu.style.opacity = '0';
+              clonedMenu.style.visibility = 'hidden';
+              clonedMenu.style.transform = 'translateY(-10px)';
+              clonedMenu.style.pointerEvents = 'none';
+            });
+          }
+        });
 
         // ============================================================
       })();
