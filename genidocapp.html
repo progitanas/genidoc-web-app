@@ -1,0 +1,39 @@
+
+      <!DOCTYPE html>
+      <html lang="fr">
+      <head>
+        <link rel="icon" type="image/png" href="/static/ong_GeniDoc1preview.png" />
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>GeniDoc — Plateforme Santé</title>
+        <style>
+          body { background: linear-gradient(120deg,#4D3AFF 0%,#2056AE 100%); min-height:100vh; margin:0; font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; display:flex; flex-direction:column; }
+          .container { max-width: 480px; margin: 64px auto 0 auto; background: #fff; border-radius: 22px; box-shadow: 0 8px 32px #4d3aff33; padding: 48px 36px 36px 36px; text-align: center; }
+          .logo { margin-bottom: 24px; }
+          .logo img { height: 72px; }
+          h1 { color: #2056AE; font-size: 2em; margin-bottom: 10px; }
+          .subtitle { color: #4D3AFF; font-size: 1.15em; margin-bottom: 24px; }
+          .cta-btn { background: #2056AE; color: #fff; border: none; border-radius: 14px; padding: 18px 0; width: 100%; font-size: 1.15em; font-weight: 700; cursor: pointer; margin-bottom: 18px; box-shadow: 0 4px 16px #2056ae22; transition: background 0.2s; }
+          .cta-btn:hover { background: #174080; }
+          .features { margin: 36px 0 0 0; text-align: left; }
+          .features h2 { color: #2056AE; font-size: 1.15em; margin-bottom: 12px; }
+          .features ul { padding-left: 18px; color: #333; }
+          .features li { margin-bottom: 10px; font-size: 1.05em; }
+          .lang-select { margin-top: 18px; width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; }
+          .footer { margin: 48px auto 0 auto; color: #fff; text-align: center; font-size: 0.98em; }
+          @media (max-width:600px) { .container { padding: 24px 8px; } }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="logo" style="margin-bottom:0;text-align:left;">
+            <img src="static\genidoc-logo.png" alt="GeniDoc logo" style="height:54px;display:inline-block;vertical-align:middle;" />
+          </div>
+          <h1>Bienvenue sur l'application GeniDoc</h1>
+          <div class="subtitle">Accédez à tous vos services santé, mobilité, pharmacie, alertes et plus encore depuis une seule interface.</div>
+          <button class="cta-btn" onclick="window.location.href='auth.html'">Espace patient</button>
+          <button class="cta-btn" style="background:#4D3AFF;" onclick="window.location.href='genidoc.html'">Retour à la page d'accueil</button>
+        </div>
+        <div class="footer">&copy; 2025 GeniDoc — Plateforme santé intelligente pour tous</div>
+      </body>
+      </html>

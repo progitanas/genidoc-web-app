@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestion des Établissements — GeniDoc</title>
+  <style>
+    :root {
+        --primary: #4D3AFF;
+        --secondary: #00558C;
+        --light-bg: #f5f7fa;
+        --dark-text: #2d3748;
+        --border-radius: 8px;
+        --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--light-bg);
+        color: var(--dark-text);
+        line-height: 1.6;
+        margin: 0;
+    }
+    .container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+    .logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+    }
+    .logo img {
+        height: 50px;
+        margin-right: 15px;
+    }
+    .logo h1 {
+        font-size: 24px;
+        color: var(--dark-text);
+    }
+    .card {
+        background: white;
+        padding: 25px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        margin-bottom: 20px;
+    }
+    .card h2 {
+        color: var(--secondary);
+        margin-bottom: 20px;
+        font-size: 18px;
+        border-bottom: 2px solid var(--primary);
+        padding-bottom: 10px;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 12px;}
+    @media (min-width: 720px) { .form-row { grid-template-columns: 1fr 1fr; } }
+    label { font-weight: 600; display:block; margin-bottom: 6px; }
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #ccc;
+      border-radius: var(--border-radius);
+      background: #fff;
+      color: var(--dark-text);
+      outline: none;
+      transition: box-shadow .15s ease, border-color .15s ease;
+      box-sizing: border-box;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+    }
+    textarea { min-height: 120px; resize: vertical; }
+
+    .upload-btn {
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        transition: var(--transition);
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .upload-btn:hover {
+        background-color: #3c2acc;
+    }
+    .btn-muted { background: #ccc; color: #222; }
+    .btn-danger { background-color: #e74c3c; }
+    .btn-danger:hover { background-color: #c0392b; }
+
+    .consultation-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 16px;
+        margin-top: 20px;
+    }
+    .consultation-card {
+        background: #f9f9f9;
+        border: 1px solid #eee;
+        border-radius: var(--border-radius);
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: var(--transition);
+        text-decoration: none;
+        color: var(--dark-text);
+    }
+    .consultation-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        background-color: var(--primary);
+    }
+    .consultation-card:hover h4, .consultation-card:hover p {
+        color: white;
+    }
+    .consultation-card h4 { margin: 0 0 10px 0; color: var(--secondary); }
+    .consultation-card p { margin: 0; font-size: 0.9em; }
+
+    #toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; }
+    .toast {
+      background: #fff;
+      border: 1px solid #eee;
+      padding: 12px 14px; border-radius: 8px;
+      box-shadow: 0 10px 24px rgba(0,0,0,.12);
+      margin-top: 8px; min-width: 260px;
+    }
+    .toast.success { border-left: 4px solid #27ae60; }
+    .toast.error { border-left: 4px solid #e74c3c; }
+    .toast.info { border-left: 4px solid #3498db; }
+
+    .item-list {
+        background: white;
+        border: 1px solid #eee;
+        border-radius: var(--border-radius);
+        padding: 15px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: var(--transition);
+    }
+    .item-list:hover {
+        box-shadow: var(--box-shadow);
+        transform: translateX(5px);
+    }
+    .item-info h4 {
+        margin: 0 0 5px 0;
+        color: var(--secondary);
+    }
+    .item-info p {
+        margin: 0;
+        color: #666;
+        font-size: 0.9em;
+    }
+    #image-preview {
+        max-width: 100%;
+        margin-top: 15px;
+        border-radius: var(--border-radius);
+        display: none;
+    }
+  </style>
+</head>
+<body>
+    <div id="toast-container"></div>
+
+    <div class="container">
+        <div class="logo">
+            <img src="/static/genidoc-logo.png" alt="GeniDoc logo">
+            <h1>Gestion des Établissements</h1>
+        </div>
+
+        <div class="card">
+            <h2>Navigation</h2>
+            <div class="consultation-grid">
+                <a href="/" class="consultation-card">
+                    <h4>Accueil</h4>
+                    <p>Retour à la page principale</p>
+                </a>
+                <a href="/admin" class="consultation-card">
+                    <h4>Administration</h4>
+                    <p>Voir les statistiques et rendez-vous</p>
+                </a>
+                <a href="/doctors" class="consultation-card">
+                    <h4>Médecins</h4>
+                    <p>Gérer les médecins du système</p>
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Actions</h2>
+            <div class="consultation-grid">
+                <div class="consultation-card" onclick="showAddForm()">
+                    <h4>Ajouter un établissement</h4>
+                    <p>Enregistrer un nouvel hôpital ou cabinet</p>
+                </div>
+                <div class="consultation-card" onclick="showList()">
+                    <h4>Liste des établissements</h4>
+                    <p>Consulter et gérer les établissements</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="add-form" class="card" style="display: none;">
+            <h2 id="form-title">Ajouter un établissement</h2>
+            <form id="establishment-form">
+                <input type="hidden" id="est-id" name="id">
+                <p>Téléchargez une photo de l'établissement et notre IA tentera de remplir les informations automatiquement.</p>
+                <input type="file" id="image-upload" accept="image/*" class="upload-btn btn-muted" style="width: 100%; text-align: center;">
+                <img id="image-preview" src="" alt="Aperçu de l'image">
+
+                <div class="form-row">
+                    <div>
+                        <label for="est-name">Nom</label>
+                        <input type="text" id="est-name" name="name" required>
+                    </div>
+                    <div>
+                        <label for="est-type">Type</label>
+                        <select id="est-type" name="type" required>
+                            <option value="Hôpital">Hôpital</option>
+                            <option value="Cabinet médical">Cabinet médical</option>
+                            <option value="Clinique">Clinique</option>
+                            <option value="Laboratoire">Laboratoire</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label for="est-address">Adresse</label>
+                        <input type="text" id="est-address" name="address">
+                    </div>
+                    <div>
+                        <label for="est-city">Ville</label>
+                        <input type="text" id="est-city" name="city">
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button type="submit" class="upload-btn">Enregistrer</button>
+                    <button type="button" class="upload-btn btn-muted" onclick="hideForms()">Annuler</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="list-view" class="card" style="display: none;">
+            <h2>Liste des établissements</h2>
+            <div id="list-container"></div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button type="button" class="upload-btn btn-muted" onclick="hideForms()">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let establishments = [];
+
+        // UI Toggles
+        function hideForms() {
+            document.getElementById('add-form').style.display = 'none';
+            document.getElementById('list-view').style.display = 'none';
+        }
+
+        function showAddForm(est = null) {
+            hideForms();
+            const form = document.getElementById('establishment-form');
+            form.reset();
+            document.getElementById('est-id').value = '';
+            document.getElementById('image-preview').style.display = 'none';
+
+            if (est) {
+                document.getElementById('form-title').textContent = 'Modifier l\'établissement';
+                document.getElementById('est-id').value = est.id;
+                document.getElementById('est-name').value = est.name;
+                document.getElementById('est-type').value = est.type;
+                document.getElementById('est-address').value = est.address;
+                document.getElementById('est-city').value = est.city;
+            } else {
+                document.getElementById('form-title').textContent = 'Ajouter un établissement';
+            }
+            
+            document.getElementById('add-form').style.display = 'block';
+        }
+
+        function showList() {
+            hideForms();
+            document.getElementById('list-view').style.display = 'block';
+            loadEstablishments();
+        }
+
+        // Image Analysis
+        document.getElementById('image-upload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('image-preview').src = e.target.result;
+                    document.getElementById('image-preview').style.display = 'block';
+                    analyzeImage(file);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function analyzeImage(file) {
+            showToast('Analyse de l\'image par l\'IA...', 'info');
+            // Simulation de l'analyse IA
+            setTimeout(() => {
+                showToast('Analyse terminée !', 'success');
+                document.getElementById('est-name').value = "Hôpital Central (détecté)";
+                document.getElementById('est-address').value = "123 Rue de la Santé (détecté)";
+                document.getElementById('est-city').value = "Ville Lumière (détecté)";
+                document.getElementById('est-type').value = "Hôpital";
+            }, 2000);
+        }
+
+        // API Calls
+        async function loadEstablishments() {
+            const container = document.getElementById('list-container');
+            container.innerHTML = '<p style="text-align:center;">Chargement...</p>';
+            try {
+                // Mock data for demonstration
+                establishments = [
+                    { id: 1, name: 'Hôpital Central', type: 'Hôpital', address: '1 Rue de la Paix', city: 'Paris' },
+                    { id: 2, name: 'Cabinet du Dr. Martin', type: 'Cabinet médical', address: '10 Avenue des Champs', city: 'Lyon' },
+                ];
+                renderEstablishments(establishments);
+            } catch (error) {
+                container.innerHTML = `<p style="text-align:center; color: #e74c3c;">Erreur: ${error.message}</p>`;
+            }
+        }
+
+        function renderEstablishments(estList) {
+            const container = document.getElementById('list-container');
+            if (estList.length === 0) {
+                container.innerHTML = '<p style="text-align:center;">Aucun établissement trouvé.</p>';
+                return;
+            }
+            container.innerHTML = estList.map(est => `
+                <div class="item-list">
+                    <div class="item-info">
+                        <h4>${est.name}</h4>
+                        <p>${est.type} - ${est.address}, ${est.city}</p>
+                    </div>
+                    <div>
+                        <button class="upload-btn" onclick='editEstablishment(${JSON.stringify(est)})'>Modifier</button>
+                        <button class="upload-btn btn-danger" onclick="deleteEstablishment('${est.id}')">Supprimer</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Form Handlers
+        document.getElementById('establishment-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            const id = data.id;
+
+            try {
+                // Simulation
+                showToast(`Établissement ${id ? 'modifié' : 'ajouté'} (simulation).`, 'success');
+                hideForms();
+                showList();
+            } catch (error) {
+                showToast(`Erreur: ${error.message}`, 'error');
+            }
+        });
+
+        function editEstablishment(est) {
+            showAddForm(est);
+        }
+
+        function deleteEstablishment(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cet établissement ?')) {
+                // Simulation
+                showToast('Établissement supprimé (simulation).', 'success');
+                loadEstablishments();
+            }
+        }
+
+        // Toast utility
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>

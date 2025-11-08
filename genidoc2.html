@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <link rel="icon" type="image/png" href="/static/ong_GeniDoc1preview.png" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeniDoc — Plateforme Santé</title>
+  <meta property="og:title" content="GeniDoc - Plateforme Médicale Complète">
+  <meta property="og:description" content="GeniDoc Agent AI. Gratuit 30 jours. Intelligence artificielle, analyse prédictive, recommandations automatiques.">
+  <meta property="og:image" content="https://genidoc.ma/static/ong_GeniDoc1preview.png">
+  <meta property="og:url" content="https://genidoc.ma">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="GeniDoc - Plateforme Médicale Complète">
+  <meta name="twitter:description" content="GeniDoc Agent AI. Gratuit 30 jours. Intelligence artificielle, analyse prédictive, recommandations automatiques.">
+  <meta name="twitter:image" content="https://genidoc.ma/static/ong_GeniDoc1preview.png">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "GeniDoc",
+      "url": "https://genidoc.ma",
+      "logo": "https://genidoc.ma/static/ong_GeniDoc1preview.png",
+      "description": "Plateforme Médicale Complète avec Intelligence Artificielle et Analyse Prédictive."
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      min-height: 100vh;
+    }
+    .header {
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 18px 0 12px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100vw;
+      min-width: 100vw;
+      margin: 0;
+      position: relative;
+      left: 50%;
+      right: 50%;
+      transform: translateX(-50%);
+    }
+    .header .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: 24px;
+    }
+    .header .logo img {
+      height: 55px;
+    }
+    .header .menu {
+      display: flex;
+      gap: 32px;
+      font-size: 1.08em;
+      margin-right: 24px;
+    }
+    .header .menu a {
+      color: #222;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .header .menu a:hover {
+      color: #4D3AFF;
+    }
+    .main {
+      max-width: 900px;
+      margin: 48px auto 0 auto;
+      padding: 0 16px;
+      text-align: center;
+    }
+    .main h1 {
+      font-size: 2.2em;
+      color: #222;
+      margin-bottom: 18px;
+      font-weight: 700;
+    }
+    .main .search-bar {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 24px 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 32px;
+    }
+    .main .search-bar input, .main .search-bar select {
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1em;
+      min-width: 220px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .main .search-bar input:focus, .main .search-bar select:focus {
+      border-color: #4D3AFF;
+    }
+    .main .search-bar button {
+      background: #4D3AFF;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 28px;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .main .search-bar button:hover {
+      background: #3729b6;
+    }
+    .main .suggestions {
+      margin-top: 40px;
+      text-align: left;
+    }
+    .main .suggestions h2 {
+      font-size: 1.3em;
+      color: #222;
+      margin-bottom: 18px;
+      font-weight: 600;
+    }
+    .main .suggestion-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 22px;
+    }
+    .main .suggestion-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 18px 16px;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .main .suggestion-card strong {
+      color: #4D3AFF;
+      font-size: 1.08em;
+      margin-bottom: 6px;
+    }
+    .main .suggestion-card p {
+      color: #444;
+      font-size: 0.98em;
+      margin: 0;
+    }
+  </style>
+  <style>
+    /* Back to Top button GeniDoc style */
+    #backToTopBtn {
+      display: none;
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      z-index: 9999;
+      background: linear-gradient(90deg,#2056AE 60%,#4D3AFF 100%);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 54px;
+      height: 54px;
+      box-shadow: 0 4px 18px #2056ae33;
+      font-size: 2em;
+      cursor: pointer;
+      transition: opacity 0.2s, background 0.2s, box-shadow 0.2s;
+      opacity: 0.88;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #backToTopBtn:hover {
+      opacity: 1;
+      background: linear-gradient(90deg,#4D3AFF 60%,#2056AE 100%);
+      box-shadow: 0 8px 32px #4d3aff44;
+    }
+    #backToTopBtn svg {
+      display: block;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <img src="/static/genidoc-logo.png" alt="GeniDoc logo" />
+    </div>
+    <div class="menu">
+    <a href="#accueil" class="menu-link">Accueil</a>
+    <a href="#services" class="menu-link">Services</a>
+    <a href="#tarifs" class="menu-link">Tarifs</a>
+    <a href="#about" class="menu-link">À propos</a>
+    <a href="#contact" class="menu-link">Contact</a>
+    <a href="genidocapp.html" class="menu-link">App</a>
+    </div>
+  </div>
+  <div class="main" id="accueil">
+    <h1>Bienvenue sur GeniDoc, réservez vos services santé au meilleur prix</h1>
+    <div class="search-bar">
+      <input type="text" placeholder="Type de service, médecin, établissement"/>
+      <input type="date" />
+      <select>
+        <option>1 patient</option>
+        <option>2 patients</option>
+        <option value="3">3 patients</option>
+        <option>Famille</option>
+      </select>
+      <button>Rechercher</button>
+    </div>
+    <!-- Section Partenaires déplacée en bas -->
+  <button id="backToTopBtn" title="Retour en haut" aria-label="Retour en haut">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  </div>
+  <div class="main" id="services">
+    <h2 style="margin-bottom:28px;">Les services GeniDoc</h2>
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;max-width:700px;width:100%;">
+        <div style="background:#e3eaff;border-radius:18px;padding:28px 18px;text-align:center;box-shadow:0 2px 12px #4d3aff22;display:flex;flex-direction:column;align-items:center;">
+          <svg width="54" height="54" viewBox="0 0 54 54" fill="none" style="margin-bottom:10px;"><circle cx="27" cy="27" r="27" fill="#e3eaff"/><path d="M27 16v22" stroke="#4D3AFF" stroke-width="2.5"/><path d="M16 27h22" stroke="#4D3AFF" stroke-width="2.5"/></svg>
+          <div style="font-size:1.18em;font-weight:700;color:#2056AE;margin-bottom:6px;">Consultation médicale</div>
+          <div style="color:#444;">Réservez une consultation avec un médecin généraliste ou spécialiste.</div>
+        </div>
+        <div style="background:#e8fff3;border-radius:18px;padding:28px 18px;text-align:center;box-shadow:0 2px 12px #00b89422;display:flex;flex-direction:column;align-items:center;">
+          <svg width="54" height="54" viewBox="0 0 54 54" fill="none" style="margin-bottom:10px;"><circle cx="27" cy="27" r="27" fill="#e8fff3"/><rect x="18" y="18" width="18" height="18" rx="6" fill="#00B894"/><rect x="24" y="24" width="6" height="6" rx="2" fill="#fff"/></svg>
+          <div style="font-size:1.18em;font-weight:700;color:#00B894;margin-bottom:6px;">Prise de rendez-vous laboratoire</div>
+          <div style="color:#444;">Analyses, prélèvements et bilans médicaux.</div>
+        </div>
+        <div style="background:#fff0f6;border-radius:18px;padding:28px 18px;text-align:center;box-shadow:0 2px 12px #e91e6333;display:flex;flex-direction:column;align-items:center;">
+          <svg width="54" height="54" viewBox="0 0 54 54" fill="none" style="margin-bottom:10px;"><circle cx="27" cy="27" r="27" fill="#fff0f6"/><rect x="22" y="14" width="10" height="26" rx="5" fill="#E91E63"/><rect x="25" y="34" width="4" height="8" rx="2" fill="#fff"/></svg>
+          <div style="font-size:1.18em;font-weight:700;color:#E91E63;margin-bottom:6px;">Vaccination</div>
+          <div style="color:#444;">Planifiez votre vaccination en toute simplicité.</div>
+        </div>
+        <div style="background:#f5f7fa;border-radius:18px;padding:28px 18px;text-align:center;box-shadow:0 2px 12px #2056ae22;display:flex;flex-direction:column;align-items:center;">
+          <svg width="54" height="54" viewBox="0 0 54 54" fill="none" style="margin-bottom:10px;"><circle cx="27" cy="27" r="27" fill="#f5f7fa"/><rect x="18" y="24" width="18" height="8" rx="4" fill="#2056AE"/><rect x="24" y="34" width="6" height="6" rx="3" fill="#fff"/></svg>
+          <div style="font-size:1.18em;font-weight:700;color:#2056AE;margin-bottom:6px;">Suivi de traitement</div>
+          <div style="color:#444;">Organisez vos suivis et renouvellements de prescription.</div>
+        </div>
+      </div>
+      <div style="margin-top:36px;width:100%;text-align:center;color:#2056AE;font-size:1.08em;font-weight:600;">GeniDoc, la santé intelligente et accessible pour tous.<br><span style="font-size:.98em;color:#444;font-weight:400;">Par SENHAJI Anas, Fondateur</span></div>
+    </div>
+  </div>
+  <div class="main" id="tarifs">
+    <h2>Tarifs</h2>
+    <div style="display:flex;flex-wrap:wrap;gap:32px;justify-content:center;margin-top:32px;">
+      <div style="background:#f5f7fa;border-radius:18px;box-shadow:0 4px 24px #2056ae22;padding:36px 32px;min-width:260px;max-width:320px;flex:1 1 260px;display:flex;flex-direction:column;align-items:center;">
+        <div style="color:#2056AE;font-size:1.3em;font-weight:800;margin-bottom:6px;">Licence & Contrat Hôpital</div>
+        <div style="color:#444;margin-bottom:18px;">Accès plateforme, support, intégration établissement</div>
+        <div style="font-size:2.1em;font-weight:900;color:#2A1AFF;margin-bottom:10px;">Sur devis</div>
+        <button style="background:#2056AE;color:#fff;border:none;border-radius:8px;padding:12px 0;width:90%;font-size:1.08em;font-weight:700;cursor:pointer;margin-bottom:18px;">Demander un devis</button>
+        <ul style="text-align:left;color:#2056AE;font-size:1em;line-height:1.6;margin:0 0 0 0;padding:0 0 0 18px;">
+          <li>Accès illimité à GeniDoc</li>
+          <li>Support dédié établissement</li>
+          <li>Contrat annuel ou pluriannuel</li>
+        </ul>
+      </div>
+      <div style="background:#e3eaff;border-radius:18px;box-shadow:0 4px 24px #4d3aff22;padding:36px 32px;min-width:260px;max-width:320px;flex:1 1 260px;display:flex;flex-direction:column;align-items:center;">
+        <div style="color:#4D3AFF;font-size:1.3em;font-weight:800;margin-bottom:6px;">Affectations gratuites</div>
+        <div style="color:#444;margin-bottom:18px;">10 affectations gratuites/mois puis</div>
+        <div style="font-size:2.1em;font-weight:900;color:#4D3AFF;margin-bottom:10px;">2,99 MAD</div>
+        <button style="background:#4D3AFF;color:#fff;border:none;border-radius:8px;padding:12px 0;width:90%;font-size:1.08em;font-weight:700;cursor:pointer;margin-bottom:18px;">Commencer</button>
+        <ul style="text-align:left;color:#4D3AFF;font-size:1em;line-height:1.6;margin:0 0 0 0;padding:0 0 0 18px;">
+          <li>10 affectations gratuites chaque mois</li>
+          <li>2,99 MAD / affectation supplémentaire</li>
+          <li>Sans engagement</li>
+        </ul>
+      </div>
+      <div style="background:#fff0f6;border-radius:18px;box-shadow:0 4px 24px #e91e6333;padding:36px 32px;min-width:260px;max-width:320px;flex:1 1 260px;display:flex;flex-direction:column;align-items:center;">
+  <div style="color:#E91E63;font-size:1.3em;font-weight:800;margin-bottom:6px;">GeniDoc Agent AI</div>
+  <div style="color:#444;margin-bottom:18px;">30 jours gratuits puis</div>
+  <div style="font-size:2.1em;font-weight:900;color:#E91E63;margin-bottom:10px;">48,99 MAD/mois</div>
+  <button style="background:#E91E63;color:#fff;border:none;border-radius:8px;padding:12px 0;width:90%;font-size:1.08em;font-weight:700;cursor:pointer;margin-bottom:18px;">Activer l'AI</button>
+        <ul style="text-align:left;color:#E91E63;font-size:1em;line-height:1.6;margin:0 0 0 0;padding:0 0 0 18px;">
+          <li>GeniDoc Agent AI inclus</li>
+          <li>Option AI+ : 99 MAD/mois</li>
+          <li>Support prioritaire</li>
+        </ul>
+      </div>
+      <div style="background:#e8fff3;border-radius:18px;box-shadow:0 4px 24px #00b89422;padding:36px 32px;min-width:260px;max-width:320px;flex:1 1 260px;display:flex;flex-direction:column;align-items:center;">
+        <div style="color:#00B894;font-size:1.3em;font-weight:800;margin-bottom:6px;">Monitoring & IoT</div>
+        <div style="color:#444;margin-bottom:18px;">Base patients connectée, monitoring à distance</div>
+        <div style="font-size:2.1em;font-weight:900;color:#00B894;margin-bottom:10px;">399 MAD/an</div>
+        <button style="background:#00B894;color:#fff;border:none;border-radius:8px;padding:12px 0;width:90%;font-size:1.08em;font-weight:700;cursor:pointer;margin-bottom:18px;">Souscrire</button>
+        <ul style="text-align:left;color:#00B894;font-size:1em;line-height:1.6;margin:0 0 0 0;padding:0 0 0 18px;">
+          <li>1 spécialité généraliste gratuite/mois</li>
+          <li>2 spécialités : 38,99 MAD/mois</li>
+          <li>Base patients IoT sécurisée</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="main" id="about">
+    <h2 style="font-size:2.1em;color:#2056AE;margin-bottom:18px;letter-spacing:0.01em;">À propos</h2>
+    <div style="max-width:900px;margin:0 auto;text-align:left;font-size:1.13em;color:#222;line-height:1.7;display:flex;flex-wrap:wrap;gap:36px;align-items:center;justify-content:center;">
+      <div style="flex:1 1 320px;min-width:320px;max-width:420px;">
+        <svg width="100%" height="120" viewBox="0 0 320 120" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:18px;">
+          <ellipse cx="60" cy="60" rx="60" ry="60" fill="#4D3AFF22"/>
+          <ellipse cx="260" cy="60" rx="48" ry="48" fill="#2056AE22"/>
+          <rect x="110" y="30" width="100" height="60" rx="18" fill="#fff" stroke="#4D3AFF" stroke-width="3"/>
+          <circle cx="160" cy="60" r="18" fill="#4D3AFF" stroke="#fff" stroke-width="4"/>
+          <rect x="140" y="50" width="40" height="20" rx="8" fill="#fff"/>
+        </svg>
+        <p style="font-size:1.18em;font-weight:600;color:#2056AE;">GeniDoc, la santé intelligente et accessible</p>
+        <p><strong>GeniDoc</strong> révolutionne l’accès aux soins : prise de rendez-vous, carte vitale numérique, confidentialité, IA santé, tout est pensé pour vous.</p>
+      </div>
+      <div style="flex:2 1 380px;min-width:320px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+          <div style="background:#f5f7fa;border-radius:14px;padding:18px 16px;box-shadow:0 2px 8px #4d3aff11;display:flex;align-items:center;gap:12px;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2056AE" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="4"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <div><strong>Rendez-vous en ligne</strong><br><span style="font-size:.98em;color:#444;">Simple, rapide, partout</span></div>
+          </div>
+          <div style="background:#e3eaff;border-radius:14px;padding:18px 16px;box-shadow:0 2px 8px #4d3aff22;display:flex;align-items:center;gap:12px;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4D3AFF" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+            <div><strong>Carte Vitale numérique</strong><br><span style="font-size:.98em;color:#444;">Sécurité & accès instantané</span></div>
+          </div>
+          <div style="background:#fff0f6;border-radius:14px;padding:18px 16px;box-shadow:0 2px 8px #e91e6333;display:flex;align-items:center;gap:12px;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#E91E63" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/><path d="M8 16a4 4 0 0 1 8 0"/></svg>
+            <div><strong>Accessibilité totale</strong><br><span style="font-size:.98em;color:#444;">Langues, audio, visuel, vidéos</span></div>
+          </div>
+          <div style="background:#e8fff3;border-radius:14px;padding:18px 16px;box-shadow:0 2px 8px #00b89422;display:flex;align-items:center;gap:12px;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00B894" stroke-width="2.2"><rect x="2" y="7" width="20" height="10" rx="3"/><circle cx="7" cy="19" r="2"/><circle cx="17" cy="19" r="2"/></svg>
+            <div><strong>Monitoring & IoT</strong><br><span style="font-size:.98em;color:#444;">Suivi à distance, objets connectés</span></div>
+          </div>
+        </div>
+        <ul style="margin:28px 0 0 0;padding:0 0 0 18px;color:#2056AE;font-size:1.08em;">
+          <li><strong>Confidentialité</strong> : données chiffrées, hébergement local</li>
+          <li><strong>GeniDoc Agent AI</strong> : assistant santé intelligent, alertes, rappels</li>
+          <li><strong>Gestion des urgences</strong> : alertes locales, numéros d’urgence</li>
+          <li><strong>Interopérabilité</strong> : connexion IoT, dossiers médicaux existants</li>
+        </ul>
+        <div style="margin-top:18px;color:#2056AE;font-weight:600;">GeniDoc, c’est la santé de demain, accessible aujourd’hui.</div>
+      </div>
+    </div>
+  </div>
+  <div class="main" id="contact">
+    
+      <h2 style="font-size:2.1em;color:#2056AE;margin-bottom:28px;letter-spacing:0.01em;">Contact & Normes</h2>
+      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:32px;max-width:980px;margin:0 auto;">
+        <!-- Bloc Contact -->
+        <div style="flex:1 1 320px;min-width:300px;max-width:440px;background:rgba(240,245,255,0.85);border-radius:18px;box-shadow:0 2px 16px #2056ae22;padding:36px 24px 36px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;">
+          <svg width="54" height="54" viewBox="0 0 48 48" fill="none" style="margin-bottom:12px;">
+            <rect x="4" y="8" width="40" height="32" rx="8" fill="#2056AE"/>
+            <rect x="8" y="12" width="32" height="24" rx="5" fill="#fff"/>
+            <path d="M12 16l12 10 12-10" stroke="#2056AE" stroke-width="2.2" fill="none"/>
+          </svg>
+          <div style="font-size:1.18em;font-weight:600;color:#2056AE;margin-bottom:8px;">Pour toute question, suggestion ou assistance</div>
+          <div style="font-size:1.08em;color:#222;margin-bottom:18px;">Contactez l’équipe GeniDoc à&nbsp;:</div>
+          <a href="mailto:senhaji.anas@genidoc.ma" style="display:inline-block;font-size:1.13em;color:#fff;background:#2056AE;padding:10px 26px;border-radius:8px;text-decoration:none;box-shadow:0 2px 8px #2056ae33;transition:background 0.2s;letter-spacing:0.01em;" onmouseover="this.style.background='#4D3AFF'" onmouseout="this.style.background='#2056AE'">
+            senhaji.anas@genidoc.ma
+          </a>
+          <div style="margin-top:22px;font-size:.98em;color:#2056AE99;">Réponse sous 24h ouvrées</div>
+        </div>
+        <!-- Bloc Normes -->
+        <div style="flex:1 1 320px;min-width:300px;max-width:440px;background:rgba(240,245,255,0.85);border-radius:18px;box-shadow:0 2px 16px #2056ae22;padding:36px 24px 36px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;">
+          <svg width="54" height="54" viewBox="0 0 48 48" fill="none" style="margin-bottom:12px;"><rect x="8" y="8" width="32" height="32" rx="8" fill="#4D3AFF22"/><path d="M16 24h16M16 30h16M16 18h16" stroke="#2056AE" stroke-width="2.2"/></svg>
+          <div style="font-size:1.18em;font-weight:600;color:#2056AE;margin-bottom:8px;">Normes santé digitale</div>
+          <ul style="list-style:none;padding:0;margin:0 0 10px 0;text-align:left;max-width:320px;">
+            <li style="margin-bottom:8px;"><span style="color:#4D3AFF;font-weight:600;">HL7</span> — Interopérabilité des données médicales</li>
+            <li style="margin-bottom:8px;"><span style="color:#2056AE;font-weight:600;">DMP</span> — Dossier Médical Partagé</li>
+            <li style="margin-bottom:8px;"><span style="color:#00B894;font-weight:600;">RGPD</span> — Protection des données patients</li>
+            <li style="margin-bottom:8px;"><span style="color:#E91E63;font-weight:600;">Hébergeur HDS</span> — Données de santé sécurisées</li>
+            <li style="margin-bottom:8px;"><span style="color:#2A1AFF;font-weight:600;">CNDP Maroc</span> — Conformité locale</li>
+          </ul>
+          <div style="margin-top:10px;font-size:.98em;color:#2056AE99;">Respect des standards internationaux et marocains</div>
+        </div>
+      </div>
+      <style>
+        @media (max-width:900px) {
+          #contact > div[style*='display:flex'] { flex-direction:column; gap:18px!important; }
+          #contact > div[style*='display:flex'] > div { max-width:100%!important; }
+        }
+      </style>
+  </div>
+  <script>
+    // Scroll fluide pour la navigation interne
+    document.querySelectorAll('.menu-link').forEach(link => {
+      link.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if(href && href.startsWith('#')) {
+          e.preventDefault();
+          const target = document.querySelector(href);
+          if(target) target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+  </script>
+
+  <footer style="background:#f5f7fa;padding:48px 0 0 0;margin-top:64px;">
+
+  <!-- Section Partenaires & Réseau GeniDoc déplacée ici -->
+  <div style="margin:54px 0 36px 0;text-align:center;">
+    <div style="font-size:1.35em;font-weight:700;color:#2056AE;margin-bottom:18px;">Partenaires & Réseau GeniDoc</div>
+    <div style="color:#2056AE99;font-size:1.08em;margin-bottom:28px;">GeniDoc s’intègre avec les principaux acteurs de la santé au Maroc, en Afrique et à l’international</div>
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:38px 48px;max-width:1100px;margin:0 auto;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <img src="/static/chu-casablanca.png" alt="CHU Casablanca" style="height:38px;filter:grayscale(0.2);" />
+        <span style="font-size:.98em;color:#222;">CHU Casablanca</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <img src="/static/msante-maroc.png" alt="Ministère Santé Maroc" style="height:38px;filter:grayscale(0.2);" />
+        <span style="font-size:.98em;color:#222;">Ministère Santé Maroc</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <img src="/static/africa-health.png" alt="Africa Health" style="height:38px;filter:grayscale(0.2);" />
+        <span style="font-size:.98em;color:#222;">Africa Health</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <img src="/static/who.png" alt="OMS" style="height:38px;filter:grayscale(0.2);" />
+        <span style="font-size:.98em;color:#222;">OMS</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <img src="/static/onu-sante.png" alt="ONU Santé" style="height:38px;filter:grayscale(0.2);" />
+        <span style="font-size:.98em;color:#222;">ONU Santé</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <img src="/static/african-union.png" alt="Union Africaine" style="height:38px;filter:grayscale(0.2);" />
+        <span style="font-size:.98em;color:#222;">Union Africaine</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <img src="/static/pharmacie-maroc.png" alt="Pharmacie Maroc" style="height:38px;filter:grayscale(0.2);" />
+        <span style="font-size:.98em;color:#222;">Pharmacie Maroc</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <img src="/static/telemed-africa.png" alt="Telemed Africa" style="height:38px;filter:grayscale(0.2);" />
+        <span style="font-size:.98em;color:#222;">Telemed Africa</span>
+      </div>
+    </div>
+  </div>
+    <div style="max-width:1200px;margin:0 auto 36px auto;padding:0 24px 0 24px;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:32px 18px;">
+      <div style="flex:2 1 320px;min-width:220px;max-width:340px;display:flex;flex-direction:column;gap:18px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <img src="/static/genidoc-logo.png" alt="GeniDoc logo" style="height:44px;" />
+          <span style="font-size:1.35em;font-weight:800;color:#2056AE;letter-spacing:0.01em;">GeniDoc</span>
+        </div>
+        <div style="color:#2056AE;font-size:1.08em;">La plateforme qui connecte patients, médecins et établissements pour une santé intelligente et accessible.</div>
+      </div>
+      <div style="flex:1 1 120px;min-width:120px;max-width:180px;">
+        <div style="font-weight:700;color:#222;margin-bottom:10px;">Produit</div>
+        <div><a href="#accueil" style="color:#4D3AFF;text-decoration:none;">Accueil</a></div>
+        <div><a href="#tarifs" style="color:#4D3AFF;text-decoration:none;">Tarifs</a></div>
+        <div><a href="#services" style="color:#4D3AFF;text-decoration:none;">Services</a></div>
+        <div><a href="#about" style="color:#4D3AFF;text-decoration:none;">À propos</a></div>
+      </div>
+      <div style="flex:1 1 120px;min-width:120px;max-width:180px;">
+        <div style="font-weight:700;color:#222;margin-bottom:10px;">Réseaux</div>
+        <div><a href="#" style="color:#2056AE;text-decoration:none;">LinkedIn</a></div>
+        <div><a href="#" style="color:#2056AE;text-decoration:none;">Youtube</a></div>
+        <div><a href="#newsletter" style="color:#2056AE;text-decoration:none;">Newsletter</a></div>
+      </div>
+      <div style="flex:1 1 120px;min-width:120px;max-width:180px;">
+        <div style="font-weight:700;color:#222;margin-bottom:10px;">Légal</div>
+        <div><a href="#" style="color:#2056AE;text-decoration:none;">Conditions</a></div>
+        <div><a href="#" style="color:#2056AE;text-decoration:none;">Confidentialité</a></div>
+        <div><a href="#" style="color:#2056AE;text-decoration:none;">Mentions légales</a></div>
+      </div>
+      <div style="flex:1 1 180px;min-width:120px;max-width:220px;display:flex;align-items:center;justify-content:center;">
+        <svg width="100" height="100" viewBox="0 0 100 100" fill="none" style="margin-top:8px;">
+          <ellipse cx="50" cy="90" rx="38" ry="10" fill="#e3eaff"/>
+          <circle cx="50" cy="50" r="32" fill="#fff" stroke="#2056AE" stroke-width="3"/>
+          <ellipse cx="50" cy="50" rx="22" ry="28" fill="#e3eaff"/>
+          <circle cx="50" cy="44" r="14" fill="#fff" stroke="#2056AE" stroke-width="2"/>
+          <rect x="38" y="60" width="24" height="18" rx="7" fill="#2056AE"/>
+          <rect x="44" y="66" width="12" height="6" rx="3" fill="#fff"/>
+          <circle cx="50" cy="44" r="5" fill="#2056AE"/>
+          <ellipse cx="60" cy="40" rx="2.5" ry="4" fill="#fff"/>
+        </svg>
+      </div>
+    </div>
+    <div style="max-width:1100px;margin:0 auto;padding:0 24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:32px 18px;">
+      <div style="flex:2 1 340px;min-width:260px;">
+        <div style="font-size:1.13em;font-weight:700;color:#222;margin-bottom:8px;">Abonnez-vous à la newsletter</div>
+        <div style="color:#2056AE;font-size:1.05em;margin-bottom:18px;">Recevez les dernières actualités et innovations santé GeniDoc.</div>
+        <form onsubmit="event.preventDefault();document.getElementById('newsletterMsg').style.display='block';setTimeout(()=>{document.getElementById('newsletterMsg').style.display='none';},6000);" style="display:flex;gap:12px;align-items:center;max-width:420px;">
+          <input type="email" required placeholder="Votre email" style="flex:1 1 160px;padding:14px 16px;border-radius:12px;border:1.5px solid #2056AE33;font-size:1.08em;outline:none;transition:border-color 0.2s;" />
+          <button type="submit" style="background:#2056AE;color:#fff;font-weight:700;font-size:1.08em;padding:13px 32px;border:none;border-radius:24px;cursor:pointer;transition:background 0.2s;">S'abonner</button>
+        </form>
+        <div id="newsletterMsg" style="display:none;margin-top:10px;color:#00B894;font-weight:600;">Merci pour votre inscription !</div>
+      </div>
+      <div style="flex:1 1 220px;min-width:180px;text-align:right;">
+        <a href="#contact" style="display:inline-block;background:#4D3AFF;color:#fff;font-weight:700;font-size:1.08em;padding:15px 36px 15px 28px;border-radius:32px;text-decoration:none;box-shadow:0 2px 12px #4d3aff22;transition:background 0.2s;position:relative;">
+          <span style="margin-right:12px;">Prendre RDV démo</span>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+    <div style="max-width:1100px;margin:36px auto 0 auto;padding:0 24px 24px 24px;border-top:1px solid #2056ae22;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <div style="color:#2056AE99;font-size:1.03em;">© 2025 GeniDoc. Tous droits réservés.</div>
+      <div style="color:#2056AE99;font-size:.98em;">Plateforme fondée par SENHAJI Anas</div>
+    </div>
+  </footer>
+</footer>
+
+<!-- Widget Chat GeniDoc -->
+<div id="genidoc-chat-widget" style="position:fixed;bottom:28px;right:28px;z-index:9999;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;">
+  <div id="chat-bubble" onclick="document.getElementById('chat-panel').style.display='block';this.style.display='none';" style="width:58px;height:58px;background:#2056AE;box-shadow:0 2px 12px #2056ae44;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.2s;">
+    <span style='display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#fff;'>
+      <svg width="28" height="28" viewBox="0 0 512 512" fill="none"><path d="M256 32a32 32 0 1 1 0 64a32 32 0 0 1 0-64Zm-80 80h160a80 80 0 0 1 80 80v96a80 80 0 0 1-80 80h-16v32h40a24 24 0 1 1 0 48H152a24 24 0 1 1 0-48h40v-32h-16a80 80 0 0 1-80-80v-96a80 80 0 0 1 80-80Zm0 32a48 48 0 0 0-48 48v96a48 48 0 0 0 48 48h160a48 48 0 0 0 48-48v-96a48 48 0 0 0-48-48H176Zm80 208a32 32 0 1 1 0 64a32 32 0 0 1 0-64Z" fill="#2056AE"/></svg>
+    </span>
+  </div>
+  <div id="chat-panel" style="display:none;width:410px;max-width:98vw;background:#fff;border-radius:18px;box-shadow:0 8px 32px #2056ae33;overflow:hidden;">
+    <div style="background:#2056AE;padding:16px 18px;display:flex;align-items:center;gap:12px;border-radius:18px 18px 0 0;">
+      <span style='display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:#fff;'>
+        <svg width="32" height="32" viewBox="0 0 512 512" fill="none"><path d="M256 32a32 32 0 1 1 0 64a32 32 0 0 1 0-64Zm-80 80h160a80 80 0 0 1 80 80v96a80 80 0 0 1-80 80h-16v32h40a24 24 0 1 1 0 48H152a24 24 0 1 1 0-48h40v-32h-16a80 80 0 0 1-80-80v-96a80 80 0 0 1 80-80Zm0 32a48 48 0 0 0-48 48v96a48 48 0 0 0 48 48h160a48 48 0 0 0 48-48v-96a48 48 0 0 0-48-48H176Zm80 208a32 32 0 1 1 0 64a32 32 0 0 1 0-64Z" fill="#2056AE"/></svg>
+      </span>
+      <div style="color:#fff;font-weight:700;font-size:1.18em;">GeniDoc Bot</div>
+      <div style="margin-left:auto;cursor:pointer;color:#fff;font-size:1.5em;" onclick="document.getElementById('chat-panel').style.display='none';document.getElementById('chat-bubble').style.display='flex';">&times;</div>
+    </div>
+    <div style="padding:18px 16px 12px 16px;background:#f5f7fa;">
+      <div style="background:#fff;border-radius:14px;padding:14px 12px 12px 12px;margin-bottom:12px;box-shadow:0 1px 4px #2056ae11;display:flex;align-items:flex-start;gap:10px;">
+        <span style='display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#e3eaff;'>
+          <svg width="22" height="22" viewBox="0 0 512 512" fill="none"><path d="M256 32a32 32 0 1 1 0 64a32 32 0 0 1 0-64Zm-80 80h160a80 80 0 0 1 80 80v96a80 80 0 0 1-80 80h-16v32h40a24 24 0 1 1 0 48H152a24 24 0 1 1 0-48h40v-32h-16a80 80 0 0 1-80-80v-96a80 80 0 0 1 80-80Zm0 32a48 48 0 0 0-48 48v96a48 48 0 0 0 48 48h160a48 48 0 0 0 48-48v-96a48 48 0 0 0-48-48H176Zm80 208a32 32 0 1 1 0 64a32 32 0 0 1 0-64Z" fill="#2056AE"/></svg>
+        </span>
+        <div style="flex:1 1 auto;">
+          <div style="font-weight:700;color:#2056AE;margin-bottom:2px;">GeniDoc Bot</div>
+          <div style="color:#222;">Bonjour 👋 Je suis GeniDoc Bot, assistant IA GeniDoc. Posez-moi vos questions sur la plateforme, les services ou la santé digitale !</div>
+        </div>
+      </div>
+      <div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;">
+        <button onclick="insertQuick('Comment réserver un rendez-vous ?')" style="background:#e3eaff;color:#2056AE;font-weight:700;border:none;border-radius:18px;padding:7px 18px;cursor:pointer;box-shadow:0 1px 4px #2056ae11;">Comment réserver un rendez-vous ?</button>
+        <button onclick="insertQuick('Quelles normes santé respectez-vous ?')" style="background:#e3eaff;color:#2056AE;font-weight:700;border:none;border-radius:18px;padding:7px 18px;cursor:pointer;box-shadow:0 1px 4px #2056ae11;">Quelles normes santé respectez-vous ?</button>
+      </div>
+      <form onsubmit="event.preventDefault();addChatMsg();" style="display:flex;gap:8px;align-items:center;margin-top:6px;">
+        <input id="chatInput" type="text" placeholder="Posez votre question..." style="flex:1 1 auto;padding:12px 14px;border-radius:12px;border:1.5px solid #2056AE33;font-size:1.07em;outline:none;" required />
+        <button type="submit" style="background:#2056AE;color:#fff;font-weight:700;font-size:1.08em;padding:10px 18px;border:none;border-radius:12px;cursor:pointer;transition:background 0.2s;">Envoyer</button>
+      </form>
+      <div id="chatHistory" style="margin-top:12px;font-size:.98em;color:#2056AE;"></div>
+    </div>
+    <div style="padding:10px 0 10px 0;text-align:center;color:#2056AE99;font-size:.97em;">Propulsé par GeniDoc</div>
+  </div>
+</div>
+<script>
+  function insertQuick(txt) {
+    document.getElementById('chatInput').value = txt;
+    document.getElementById('chatInput').focus();
+  }
+  function addChatMsg() {
+    const input = document.getElementById('chatInput');
+    const val = input.value.trim();
+    if(!val) return;
+    const hist = document.getElementById('chatHistory');
+    const msg = document.createElement('div');
+    msg.style.margin = '8px 0';
+    msg.innerHTML = '<span style="color:#2056AE;font-weight:600;">Vous :</span> ' + val;
+    hist.appendChild(msg);
+    input.value = '';
+    setTimeout(()=>{
+      const rep = document.createElement('div');
+      rep.style.margin = '8px 0 0 0';
+      rep.innerHTML = '<span style="color:#2056AE;font-weight:600;">GeniDoc Bot :</span> Merci pour votre question ! Un agent GeniDoc vous répondra rapidement.';
+      hist.appendChild(rep);
+      hist.scrollTop = hist.scrollHeight;
+    }, 900);
+    hist.scrollTop = hist.scrollHeight;
+  }
+</script>
+</body>
+  <script>
+    const backToTopBtn = document.getElementById('backToTopBtn');
+    window.addEventListener('scroll', function() {
+      if(window.scrollY > 300) {
+        backToTopBtn.style.display = 'flex';
+      } else {
+        backToTopBtn.style.display = 'none';
+      }
+    });
+    backToTopBtn.onclick = function() {
+      window.scrollTo({top:0, behavior:'smooth'});
+    };
+  </script>

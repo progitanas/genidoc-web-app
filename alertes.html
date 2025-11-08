@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeniDoc Alertes Locales</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; margin: 0; }
+    .container { max-width: 480px; margin: 32px auto; background: #fff; border-radius: 16px; box-shadow: 0 4px 16px #2056ae22; padding: 32px 24px; }
+    h2 { color: #2056AE; text-align: center; }
+    .alert-list { margin-top: 18px; }
+    .alert { background: #fffbe6; border-left: 4px solid #ffb300; padding: 12px 16px; border-radius: 8px; margin-bottom: 10px; color: #7a5a00; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>GeniDoc Alertes Locales</h2>
+    <div class="alert-list" id="alert-list">
+      <!-- Alertes dynamiques -->
+    </div>
+    <button class="btn" onclick="chargerAlertes()" style="width:100%;background:#2056AE;color:#fff;border:none;border-radius:8px;padding:14px 0;font-size:1.08em;font-weight:bold;margin-top:18px;cursor:pointer;">Voir les alertes locales</button>
+  </div>
+  <script>
+    function chargerAlertes() {
+      const alertes = [
+        { titre: 'Vaccination grippe', texte: 'Campagne de vaccination du 1 au 15 octobre dans tous les centres de Casablanca.' },
+        { titre: 'Alerte canicule', texte: 'Températures élevées prévues cette semaine. Hydratez-vous et évitez les sorties aux heures chaudes.' },
+        { titre: 'Nouvelle réglementation', texte: 'Le port du masque redevient obligatoire dans les établissements de santé.' }
+      ];
+      const list = document.getElementById('alert-list');
+      list.innerHTML = alertes.map(a => `<div class='alert'><b>${a.titre}</b><br>${a.texte}</div>`).join('');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestion des urgences — GeniDoc</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; margin: 0; }
+    .container { max-width: 420px; margin: 48px auto; background: #fff; border-radius: 18px; box-shadow: 0 8px 32px #4d3aff22; padding: 36px 28px; }
+    h1 { color: #2056AE; font-size: 1.5em; margin-bottom: 18px; }
+    .desc { color: #444; margin-bottom: 24px; }
+    .btn { background: #2056AE; color: #fff; border: none; border-radius: 12px; padding: 14px 0; width: 100%; font-size: 1.1em; font-weight: 700; cursor: pointer; margin-top: 18px; }
+    .btn:hover { background: #174080; }
+    .urg-list { margin: 18px 0 0 0; color: #2056AE; font-weight: 600; }
+    .urg-list li { margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Gestion des urgences & catastrophes</h1>
+    <div class="desc">Consignes, numéros d'urgence, carte des points d'urgence et de rassemblement en cas de catastrophe.</div>
+    <ul class="urg-list">
+      <li>15 — SAMU (Urgence médicale)</li>
+      <li>18 — Pompiers</li>
+      <li>17 — Police</li>
+      <li>112 — Numéro d'urgence européen</li>
+    </ul>
+    <button class="btn" onclick="alert('Carte des points d\'urgence à venir !')">Voir la carte des points d'urgence</button>
+    <button class="btn" style="background:#4D3AFF;margin-top:12px;" onclick="alert('Consignes à venir !')">Consignes & points de rassemblement</button>
+    <div style="margin-top:28px;text-align:center;"><a href="index.html" style="color:#2056AE;text-decoration:underline;">&larr; Retour à l'accueil</a></div>
+  </div>
+</body>
+</html>

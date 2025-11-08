@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Connexion — GeniDoc (Mobile)</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .auth-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+      padding: 24px 8px 18px 8px;
+      max-width: 98vw;
+      width: 100%;
+      text-align: center;
+      margin: 0 1vw;
+    }
+    .auth-card .logo {
+      margin-bottom: 14px;
+    }
+    .auth-card .logo img {
+      height: 48px;
+    }
+    .auth-card h2 {
+      color: #4D3AFF;
+      margin-bottom: 14px;
+      font-size: 1.1em;
+    }
+    .auth-card input {
+      max-width: 96vw;
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+      display: block;
+      padding: 12px 12px;
+      border-radius: 10px;
+      border: 1.5px solid #d6d6f7;
+      margin-bottom: 14px;
+      font-size: 1em;
+      outline: none;
+      background: #eaf1ff;
+      box-sizing: border-box;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .auth-card input:focus {
+      border-color: #4D3AFF;
+    }
+    .auth-card button {
+      background: #1d06ea !important;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 0;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 8px;
+      width: 100%;
+    }
+    .auth-card .btn-google {
+      background: #fff !important;
+      color: #222 !important;
+      border: 1.5px solid #ea4335;
+      font-weight: 700;
+      position: relative;
+      margin-bottom: 8px;
+      transition: box-shadow 0.2s, border 0.2s;
+      width: 100%;
+    }
+    .auth-card .btn-google::before {
+      content: '';
+      display: inline-block;
+      vertical-align: middle;
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+      background: url('https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg') no-repeat center/contain;
+    }
+    .auth-card .btn-google:hover {
+      box-shadow: 0 2px 8px #ea433522;
+      border-color: #c5221f;
+    }
+    .auth-card .btn-outlook {
+      background: #0072c6 !important;
+      color: #fff !important;
+      font-weight: 700;
+      border: none;
+      margin-bottom: 0;
+      transition: background 0.2s, box-shadow 0.2s;
+      width: 100%;
+    }
+    .auth-card .btn-outlook:hover {
+      background: #005999 !important;
+      box-shadow: 0 2px 8px #0072c633;
+    }
+    .auth-card button:hover {
+      background: #3729b6;
+    }
+    @media (max-width: 600px) {
+      .auth-card {
+        padding: 12px 2vw 10px 2vw;
+        max-width: 100vw;
+      }
+      .auth-card input {
+        font-size: 1em;
+        padding: 10px 8px;
+      }
+      .auth-card h2 {
+        font-size: 1em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="toast" style="display:none;position:fixed;top:18px;left:50%;transform:translateX(-50%);background:#2056AE;color:#fff;padding:12px 18px;border-radius:10px;box-shadow:0 4px 24px #2056ae33;font-size:1em;z-index:9999;transition:opacity 0.3s;"></div>
+  <div class="auth-card">
+    <div class="logo">
+      <img src="/static/genidoc-logo.png" alt="GeniDoc logo" />
+    </div>
+    <h2>Connexion à votre espace patient</h2>
+    <form id="login-form">
+      <input type="text" id="username" placeholder="Identifiant patient" required />
+      <input type="password" id="password" placeholder="Mot de passe" required />
+      <button type="submit">Se connecter</button>
+    </form>
+    <div style="margin:14px 0 6px 0; font-size:0.98em; color:#444;">Pas encore de compte ? <a href="#" id="show-register" style="color:#4D3AFF; text-decoration:underline;">Créer un compte</a></div>
+    <div style="margin:14px 0 6px 0;">
+      <button id="google-login" class="btn-google" type="button">Se connecter avec Google</button><br>
+      <button id="outlook-login" class="btn-outlook" type="button">Se connecter avec Outlook</button>
+    </div>
+  </div>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const emailOrId = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      let loginPayload = { password };
+      if (/^GD-\d{5,}$/.test(emailOrId)) {
+        // Si GeniDoc ID, on va chercher l'email associé
+        try {
+          const res = await fetch('/api/patient/' + emailOrId);
+          const result = await res.json();
+          if (result.success && result.data) {
+            loginPayload.email = result.data.email;
+          } else {
+            alert('Identifiant patient inconnu');
+            return;
+          }
+        } catch {
+          alert('Erreur réseau');
+          return;
+        }
+      } else if (emailOrId.includes('@')) {
+        loginPayload.email = emailOrId;
+      } else {
+        loginPayload.username = emailOrId;
+      }
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(loginPayload)
+        });
+        const result = await res.json();
+        if (result.success) {
+          window.location.href = 'index.html?genidocId=' + result.genidocId;
+        } else {
+          alert(result.message || 'Identifiants invalides');
+        }
+      } catch {
+        alert('Erreur réseau');
+      }
+    });
+    document.getElementById('show-register').onclick = function(e) {
+      e.preventDefault();
+      document.querySelector('.auth-card').innerHTML = `
+        <div class='logo'>
+          <img src='/static/genidoc-logo.png' alt='GeniDoc logo' />
+        </div>
+        <h2>Créer un compte patient</h2>
+        <form id='register-form'>
+          <input type='text' id='new-username' placeholder='Identifiant patient' required />
+          <input type='email' id='new-email' placeholder='Email' required />
+          <input type='date' id='new-birthdate' placeholder='Date de naissance' required />
+          <input type='password' id='new-password' placeholder='Mot de passe' required />
+          <button type='submit'>Créer le compte</button>
+        </form>
+        <div style='margin:14px 0 6px 0; font-size:0.98em; color:#444;'>Déjà inscrit ? <a href='auth.html' style='color:#4D3AFF; text-decoration:underline;'>Se connecter</a></div>
+        <div style='margin:14px 0 6px 0;'>
+          <button id='google-login' class='btn-google' type='button'>Créer avec Google</button><br>
+          <button id='outlook-login' class='btn-outlook' type='button'>Créer avec Outlook</button>
+        </div>
+      `;
+      document.getElementById('register-form').onsubmit = async function(e) {
+        e.preventDefault();
+        const data = {
+          username: document.getElementById('new-username').value,
+          email: document.getElementById('new-email').value,
+          birthdate: document.getElementById('new-birthdate').value,
+          password: document.getElementById('new-password').value
+        };
+        try {
+          const res = await fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          const result = await res.json();
+          if (result.success) {
+            if (result.alreadyExists) {
+              showToast('Un compte existe déjà avec cet email. Redirection vers votre espace patient...');
+              setTimeout(() => {
+                window.location.href = 'index.html?genidocId=' + result.genidocId;
+              }, 2000);
+            } else {
+              window.location.href = 'index.html?genidocId=' + result.genidocId;
+            }
+          } else {
+            alert(result.message || 'Erreur lors de la création du compte');
+          }
+        } catch (err) {
+          alert('Erreur réseau');
+        }
+        function showToast(msg) {
+          const toast = document.getElementById('toast');
+          toast.textContent = msg;
+          toast.style.display = 'block';
+          toast.style.opacity = '1';
+          setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => { toast.style.display = 'none'; }, 400);
+          }, 1800);
+        }
+      };
+      document.getElementById('google-login').onclick = function() {
+        const genidocId = 'GD-' + Math.floor(100000 + Math.random() * 900000);
+        window.location.href = 'index.html?genidocId=' + genidocId;
+      };
+      document.getElementById('outlook-login').onclick = function() {
+        const genidocId = 'GD-' + Math.floor(100000 + Math.random() * 900000);
+        window.location.href = 'index.html?genidocId=' + genidocId;
+      };
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestion des Médecins — GeniDoc</title>
+  <style>
+    :root {
+        --primary: #4D3AFF;
+        --secondary: #00558C;
+        --light-bg: #f5f7fa;
+        --dark-text: #2d3748;
+        --border-radius: 8px;
+        --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--light-bg);
+        color: var(--dark-text);
+        line-height: 1.6;
+        margin: 0;
+    }
+    .container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+    .logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+    }
+    .logo img {
+        height: 50px;
+        margin-right: 15px;
+    }
+    .logo h1 {
+        font-size: 24px;
+        color: var(--dark-text);
+    }
+    .card {
+        background: white;
+        padding: 25px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        margin-bottom: 20px;
+    }
+    .card h2 {
+        color: var(--secondary);
+        margin-bottom: 20px;
+        font-size: 18px;
+        border-bottom: 2px solid var(--primary);
+        padding-bottom: 10px;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 12px;}
+    @media (min-width: 720px) { .form-row { grid-template-columns: 1fr 1fr; } }
+    label { font-weight: 600; display:block; margin-bottom: 6px; }
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #ccc;
+      border-radius: var(--border-radius);
+      background: #fff;
+      color: var(--dark-text);
+      outline: none;
+      transition: box-shadow .15s ease, border-color .15s ease;
+      box-sizing: border-box;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+    }
+    textarea { min-height: 120px; resize: vertical; }
+
+    .upload-btn {
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        transition: var(--transition);
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .upload-btn:hover {
+        background-color: #3c2acc;
+    }
+    .btn-muted { background: #ccc; color: #222; }
+    .btn-danger { background-color: #e74c3c; }
+    .btn-danger:hover { background-color: #c0392b; }
+
+    .consultation-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 16px;
+        margin-top: 20px;
+    }
+    .consultation-card {
+        background: #f9f9f9;
+        border: 1px solid #eee;
+        border-radius: var(--border-radius);
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: var(--transition);
+        text-decoration: none;
+        color: var(--dark-text);
+    }
+    .consultation-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        background-color: var(--primary);
+    }
+    .consultation-card:hover h4, .consultation-card:hover p {
+        color: white;
+    }
+    .consultation-card h4 { margin: 0 0 10px 0; color: var(--secondary); }
+    .consultation-card p { margin: 0; font-size: 0.9em; }
+
+    #toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; }
+    .toast {
+      background: #fff;
+      border: 1px solid #eee;
+      padding: 12px 14px; border-radius: 8px;
+      box-shadow: 0 10px 24px rgba(0,0,0,.12);
+      margin-top: 8px; min-width: 260px;
+    }
+    .toast.success { border-left: 4px solid #27ae60; }
+    .toast.error { border-left: 4px solid #e74c3c; }
+    .toast.info { border-left: 4px solid #3498db; }
+
+    .item-list {
+        background: white;
+        border: 1px solid #eee;
+        border-radius: var(--border-radius);
+        padding: 15px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: var(--transition);
+    }
+    .item-list:hover {
+        box-shadow: var(--box-shadow);
+        transform: translateX(5px);
+    }
+    .item-info h4 {
+        margin: 0 0 5px 0;
+        color: var(--secondary);
+    }
+    .item-info p {
+        margin: 0;
+        color: #666;
+        font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+    <div id="toast-container"></div>
+
+    <div class="container">
+        <div class="logo">
+            <img src="/static/genidoc-logo.png" alt="GeniDoc logo">
+            <h1>Gestion des Médecins</h1>
+        </div>
+
+        <div class="card">
+            <h2>Navigation</h2>
+            <div class="consultation-grid">
+                <a href="/" class="consultation-card">
+                    <h4>Accueil</h4>
+                    <p>Retour à la page principale</p>
+                </a>
+                <a href="/admin" class="consultation-card">
+                    <h4>Administration</h4>
+                    <p>Voir les statistiques et rendez-vous</p>
+                </a>
+                <a href="/establishments" class="consultation-card">
+                    <h4>Établissements</h4>
+                    <p>Gérer les hôpitaux et cabinets</p>
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Actions</h2>
+            <div class="consultation-grid">
+                <div class="consultation-card" onclick="showAddDoctorForm()">
+                    <h4>Ajouter un médecin</h4>
+                    <p>Enregistrer un nouveau praticien</p>
+                </div>
+                <div class="consultation-card" onclick="showDoctorsList()">
+                    <h4>Liste des médecins</h4>
+                    <p>Consulter et gérer les praticiens</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="add-doctor-form" class="card" style="display: none;">
+            <h2 id="form-title">Ajouter un nouveau médecin</h2>
+            <form id="doctor-form">
+                <input type="hidden" id="doctor-id" name="id">
+                <div class="form-row">
+                    <div>
+                        <label for="doctor-firstName">Prénom</label>
+                        <input type="text" id="doctor-firstName" name="firstName" required>
+                    </div>
+                    <div>
+                        <label for="doctor-lastName">Nom</label>
+                        <input type="text" id="doctor-lastName" name="lastName" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label for="doctor-specialty">Spécialité</label>
+                        <input type="text" id="doctor-specialty" name="specialty" required>
+                    </div>
+                    <div>
+                        <label for="doctor-email">Email</label>
+                        <input type="email" id="doctor-email" name="email" required>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button type="submit" class="upload-btn">Enregistrer</button>
+                    <button type="button" class="upload-btn btn-muted" onclick="hideForms()">Annuler</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="doctors-list" class="card" style="display: none;">
+            <h2>Liste des médecins</h2>
+            <div id="doctors-container"></div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button type="button" class="upload-btn btn-muted" onclick="hideForms()">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let doctors = [];
+
+        // UI Toggles
+        function hideForms() {
+            document.getElementById('add-doctor-form').style.display = 'none';
+            document.getElementById('doctors-list').style.display = 'none';
+        }
+
+        function showAddDoctorForm(doctor = null) {
+            hideForms();
+            const form = document.getElementById('doctor-form');
+            form.reset();
+            document.getElementById('doctor-id').value = '';
+            
+            if (doctor) {
+                document.getElementById('form-title').textContent = 'Modifier le médecin';
+                document.getElementById('doctor-id').value = doctor.id;
+                document.getElementById('doctor-firstName').value = doctor.firstName;
+                document.getElementById('doctor-lastName').value = doctor.lastName;
+                document.getElementById('doctor-specialty').value = doctor.specialty;
+                document.getElementById('doctor-email').value = doctor.email;
+            } else {
+                document.getElementById('form-title').textContent = 'Ajouter un nouveau médecin';
+            }
+            
+            document.getElementById('add-doctor-form').style.display = 'block';
+        }
+
+        function showDoctorsList() {
+            hideForms();
+            document.getElementById('doctors-list').style.display = 'block';
+            loadDoctors();
+        }
+
+        // API Calls
+        async function loadDoctors() {
+            const container = document.getElementById('doctors-container');
+            container.innerHTML = '<p style="text-align:center;">Chargement...</p>';
+            try {
+                // This is a simulation. Replace with a real API call.
+                // const response = await fetch('/api/doctors');
+                // const result = await response.json();
+                // if (!result.success) throw new Error(result.message);
+                // doctors = result.data;
+                
+                // Mock data for demonstration
+                doctors = [
+                    { id: 1, firstName: 'Jean', lastName: 'Dupont', specialty: 'Cardiologie', email: 'jean.dupont@host.com' },
+                    { id: 2, firstName: 'Marie', lastName: 'Curie', specialty: 'Radiologie', email: 'marie.curie@host.com' },
+                    { id: 3, firstName: 'Louis', lastName: 'Pasteur', specialty: 'Microbiologie', email: 'louis.pasteur@host.com' },
+                ];
+
+                renderDoctors(doctors);
+            } catch (error) {
+                container.innerHTML = `<p style="text-align:center; color: #e74c3c;">Erreur: ${error.message}</p>`;
+            }
+        }
+
+        function renderDoctors(doctorList) {
+            const container = document.getElementById('doctors-container');
+            if (doctorList.length === 0) {
+                container.innerHTML = '<p style="text-align:center;">Aucun médecin trouvé.</p>';
+                return;
+            }
+            container.innerHTML = doctorList.map(doc => `
+                <div class="item-list">
+                    <div class="item-info">
+                        <h4>Dr. ${doc.firstName} ${doc.lastName}</h4>
+                        <p>${doc.specialty} - ${doc.email}</p>
+                    </div>
+                    <div>
+                        <button class="upload-btn" onclick='editDoctor(${JSON.stringify(doc)})'>Modifier</button>
+                        <button class="upload-btn btn-danger" onclick="deleteDoctor('${doc.id}')">Supprimer</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Form Handlers
+        document.getElementById('doctor-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            const id = data.id;
+
+            try {
+                const url = id ? `/api/doctors/${id}` : '/api/doctors';
+                const method = id ? 'PUT' : 'POST';
+                
+                // Simulation
+                console.log(`Simulating ${method} to ${url}`, data);
+                showToast(`Médecin ${id ? 'modifié' : 'ajouté'} (simulation).`, 'success');
+                
+                hideForms();
+                showDoctorsList();
+
+            } catch (error) {
+                showToast(`Erreur: ${error.message}`, 'error');
+            }
+        });
+
+        function editDoctor(doctor) {
+            showAddDoctorForm(doctor);
+        }
+
+        function deleteDoctor(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce médecin ?')) {
+                // Simulation
+                console.log(`Simulating DELETE for doctor ID: ${id}`);
+                showToast('Médecin supprimé (simulation).', 'success');
+                loadDoctors(); // Reload to reflect changes
+            }
+        }
+
+        // Toast utility
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>

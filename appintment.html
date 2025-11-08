@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <link rel="icon" type="image/png" href="/static/genidoc-logo.png" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prise de rendez-vous — GeniDoc</title>
+  <style>
+  :root {
+        --primary: #4D3AFF;
+        --secondary: #00558C;
+        --light-bg: #f5f7fa;
+        --dark-text: #2d3748;
+        --border-radius: 8px;
+        --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+  --bg-image: url('/static/bggenidoc.png');
+    }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--light-bg);
+    color: var(--dark-text);
+    line-height: 1.6;
+    margin: 0;
+    position: relative;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: 0;
+  background: url('/static/bggenidoc.png') center center / cover no-repeat;
+    opacity: 0.18;
+    pointer-events: none;
+  }
+  .container, .card, .logo, .top-left-controls, #toast-container {
+    position: relative;
+    z-index: 1;
+  }
+    .container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+    .logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+    }
+    .logo img {
+        height: 50px;
+        margin-right: 15px;
+    }
+    .logo h1 {
+        font-size: 24px;
+        color: var(--dark-text);
+    }
+    .card {
+        background: white;
+        padding: 25px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        margin-bottom: 20px;
+    }
+    .card h2 {
+        color: var(--secondary);
+        margin-bottom: 20px;
+        font-size: 18px;
+        border-bottom: 2px solid var(--primary);
+        padding-bottom: 10px;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 12px;}
+    @media (min-width: 720px) { .form-row { grid-template-columns: 1fr 1fr; } }
+    label { font-weight: 600; display:block; margin-bottom: 6px; }
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #ccc;
+      border-radius: var(--border-radius);
+      background: #fff;
+      color: var(--dark-text);
+      outline: none;
+      transition: box-shadow .15s ease, border-color .15s ease;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+    }
+    textarea { min-height: 120px; resize: vertical; }
+
+    .upload-btn {
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        transition: var(--transition);
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+    }
+    .upload-btn:hover {
+        background-color: #3c2acc;
+    }
+    .btn-muted { background: #ccc; color: #222; }
+
+    .hint { color: #555; font-size: .9rem; }
+    .summary {
+      border-top: 1px dashed #eee;
+      padding-top: 12px; margin-top: 12px;
+      font-size: 0.95rem;
+    }
+    .footer-note { text-align: center; color: #777; margin-top: 20px; font-size: .92rem; }
+
+    .top-left-controls {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .language-switcher select {
+        background: #fff;
+        border: 1px solid #ccc;
+        border-radius: var(--border-radius);
+        padding: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+        background-repeat: no-repeat;
+        background-position: right 8px top 50%;
+        background-size: .65em auto;
+        padding-right: 25px;
+    }
+
+    #dark-mode-toggle {
+      position: static; /* Remove fixed positioning to sit inside the container */
+      width:40px; height:40px; font-size:1.3em; cursor:pointer;
+      border-radius: 50%;
+      border: none;
+    }
+    #toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; }
+    .toast {
+      background: #fff;
+      border: 1px solid #eee;
+      padding: 12px 14px; border-radius: 8px;
+      box-shadow: 0 10px 24px rgba(0,0,0,.12);
+      margin-top: 8px; min-width: 260px;
+    }
+    .toast.success { border-left: 4px solid #27ae60; }
+    .toast.error { border-left: 4px solid #e74c3c; }
+    .toast.info { border-left: 4px solid #3498db; }
+
+    body.dark-mode { background: #222 !important; color: #eee !important; }
+    body.dark-mode .container { background: #222 !important; }
+    body.dark-mode .card { background: #333 !important; color: #eee !important; }
+    body.dark-mode .logo h1 { color: #eee !important; }
+    body.dark-mode h2 { color: #bfcaff !important; }
+    body.dark-mode p { color: #ccc !important; }
+    body.dark-mode .upload-btn { background: #444 !important; color: #eee !important; }
+    body.dark-mode .upload-btn:hover { background: #555 !important; }
+    body.dark-mode input, body.dark-mode select, body.dark-mode textarea {
+      background: #252525; color: #eee; border-color: #555;
+    }
+    body.dark-mode .language-switcher select {
+        background: #444;
+        color: #eee;
+        border-color: #555;
+    }
+    body.dark-mode .consultation-card {
+        background: #2a2a2a;
+        border-color: #444;
+    }
+    body.dark-mode .consultation-card:hover {
+        background: var(--primary);
+    }
+    body.dark-mode .consultation-card p {
+        color: #aaa;
+    }
+    body.dark-mode .consultation-card:hover p {
+        color: #eee;
+    }
+
+    .consultation-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-top: 20px;
+    }
+    .consultation-card {
+        background: #f9f9f9;
+        border: 1px solid #eee;
+        border-radius: var(--border-radius);
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    .consultation-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        filter: brightness(95%);
+    }
+    .consultation-card:hover h4 {
+        color: var(--primary);
+    }
+    .consultation-card.selected {
+        border: 2px solid var(--primary);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+    .consultation-card.selected[data-color="red"] {
+        background-color: #e74c3c;
+        color: white;
+        border-color: #c0392b;
+    }
+    .consultation-card.selected[data-color="red"] p {
+        color: #f2f2f2;
+    }
+    .consultation-card h4 {
+        margin: 0 0 10px 0;
+        transition: color 0.3s ease;
+    }
+    .consultation-card p {
+        font-size: 0.9em;
+        color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div id="toast-container"></div>
+  <div class="top-left-controls">
+    <div class="language-switcher">
+        <select id="language-select">
+            <option value="fr">FR</option>
+            <option value="en">EN</option>
+        </select>
+    </div>
+    <button id="dark-mode-toggle" title="Mode sombre">🌙</button>
+  </div>
+
+  <div class="container">
+    <div class="logo">
+        <img src="/static/genidoc-logo.png" alt="GeniDoc logo" style="height: 80px;">
+    </div>
+    <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 24px;">
+        <a href="/" class="upload-btn" style="width:auto;">Accueil</a>
+        <a href="/logout" class="upload-btn" style="width:auto; background-color: #e74c3c;">Deconnexion</a>
+    </div>
+
+    <div class="card">
+      <h2>Prise de rendez-vous</h2>
+
+      <!-- Step 1: Consultation Type Selection -->
+      <div id="consultation-type-selection">
+          <p>Pour quel type de consultation prenez-vous rendez-vous ?</p>
+          <div class="consultation-grid">
+              <div class="consultation-card" data-type="Prise de sang" data-color="red">
+                  <h4>Prise de sang</h4>
+                  <p>Pour les analyses sanguines et prélèvements.</p>
+              </div>
+              <div class="consultation-card" data-type="Consultation Générale" style="background-color: #e0f7fa;">
+                  <h4>Consultation Générale</h4>
+                  <p>Pour un examen médical ou un avis général.</p>
+              </div>
+              <div class="consultation-card" data-type="Vaccination" style="background-color: #e8f5e9;">
+                  <h4>Vaccination</h4>
+                  <p>Pour l'administration de vaccins.</p>
+              </div>
+              <div class="consultation-card" data-type="Suivi de traitement" style="background-color: #fff3e0;">
+                  <h4>Suivi de traitement</h4>
+                  <p>Pour le suivi d'une condition existante.</p>
+              </div>
+          </div>
+      </div>
+
+      <div id="appointment-form-container" style="display:none;">
+        <button id="back-to-selection" class="upload-btn btn-muted" style="width:auto; margin-bottom: 15px;">&larr; Retour</button>
+        <form id="appointment-form">
+          <input type="hidden" id="consultationType" name="consultationType" value="">
+          <div class="form-row">
+            <div>
+              <label for="fullName">Nom complet *</label>
+              <input id="fullName" name="fullName" type="text" placeholder="Ex: Amine El Fassi" required />
+            </div>
+            <div>
+              <label for="email">Email *</label>
+              <input id="email" name="email" type="email" placeholder="vous@exemple.com" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div>
+              <label for="phone">Téléphone *</label>
+              <input id="phone" name="phone" type="tel" placeholder="Ex: +212 6xx xx xx xx" required />
+            </div>
+            <div>
+              <label for="service">Type de service *</label>
+              <select id="service" name="service" required>
+                <option value="">— Sélectionner —</option>
+                <option>Consultation</option>
+                <option>Suivi</option>
+                <option>Analyse</option>
+                <option>Urgence</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div>
+              <label for="date">Date *</label>
+              <input id="date" name="date" type="date" required />
+            </div>
+            <div>
+              <label for="time">Heure *</label>
+              <input id="time" name="time" type="time" step="900" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div>
+              <label for="mode">Mode *</label>
+              <select id="mode" name="mode" required>
+                <option value="">— Sélectionner —</option>
+                <option>Présentiel</option>
+                <option>Visio</option>
+              </select>
+            </div>
+            <div>
+              <label for="company">Société (facultatif)</label>
+              <input id="company" name="company" type="text" placeholder="Nom de votre organisation" />
+            </div>
+          </div>
+
+          <div style="margin-top:12px;">
+            <label for="notes">Message</label>
+            <textarea id="notes" name="notes" placeholder="Ajoutez toute information utile (contexte, besoins, contraintes)..."></textarea>
+            <div class="hint">Nous reviendrons vers vous pour confirmer ou proposer un autre créneau si nécessaire.</div>
+          </div>
+
+          <div style="display:flex; gap:10px; align-items:center; margin-top:18px;">
+            <button type="submit" class="upload-btn">Confirmer le rendez-vous</button>
+            <button type="reset" class="upload-btn btn-muted" id="reset-btn" title="Effacer le formulaire">Effacer</button>
+          </div>
+        </form>
+      </div>
+
+      <div id="confirmation" class="summary" style="display:none;"></div>
+    </div>
+
+    <div class="footer-note">© <span id="year"></span> GeniDoc — Tous droits réservés.</div>
+  </div>
+
+  <script>
+    // Dark mode toggle (echoes behavior from upload.html)
+    document.getElementById('dark-mode-toggle').addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+    });
+
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Language switcher logic
+    document.getElementById('language-select').addEventListener('change', (event) => {
+        const selectedLanguage = event.target.value;
+        // In a real application, you would trigger a page reload or content change here.
+        alert(`La langue a été changée en : ${selectedLanguage.toUpperCase()}`);
+    });
+
+    // Helper to generate .ics file content
+    function generateICS(details) {
+        const startDate = new Date(`${details.date}T${details.time}`);
+        const endDate = new Date(startDate.getTime() + 30 * 60000); // Assume 30 min duration
+
+        const toUTC = (date) => {
+            return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        };
+
+        const icsContent = [
+            'BEGIN:VCALENDAR',
+            'VERSION:2.0',
+            'PRODID:-//GeniDoc//Appointment//FR',
+            'BEGIN:VEVENT',
+            `UID:${Date.now()}@genidoc.com`,
+            `DTSTAMP:${toUTC(new Date())}`,
+            `DTSTART:${toUTC(startDate)}`,
+            `DTEND:${toUTC(endDate)}`,
+            `SUMMARY:Rendez-vous GeniDoc: ${details.consultationType}`,
+            `DESCRIPTION:Rendez-vous pour ${details.fullName}. Service: ${details.service}. Notes: ${details.notes || 'Aucune'}.`,
+            'LOCATION:GeniDoc Clinic',
+            'END:VEVENT',
+            'END:VCALENDAR'
+        ].join('\r\n');
+
+        return icsContent;
+    }
+
+    // Consultation type selection
+    const selectionContainer = document.getElementById('consultation-type-selection');
+    const formContainer = document.getElementById('appointment-form-container');
+    const consultationTypeInput = document.getElementById('consultationType');
+
+    document.querySelectorAll('.consultation-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const type = card.getAttribute('data-type');
+            consultationTypeInput.value = type;
+            selectionContainer.style.display = 'none';
+            formContainer.style.display = 'block';
+        });
+    });
+
+    document.getElementById('back-to-selection').addEventListener('click', () => {
+        selectionContainer.style.display = 'block';
+        formContainer.style.display = 'none';
+    });
+
+    // Helpers
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      document.getElementById('toast-container').appendChild(toast);
+      setTimeout(() => toast.remove(), 4000);
+    }
+
+    function pad(n){ return n < 10 ? '0' + n : '' + n; }
+
+    function toICS({ title, description, start, durationMinutes = 30, location = '' }) {
+      // start is a Date in local time; create floating time DTSTART (no TZ) to avoid server changes
+      const end = new Date(start.getTime() + durationMinutes * 60000);
+      const fmt = (d) => `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+      const uid = `genidoc-${start.getTime()}-${Math.random().toString(36).slice(2)}@local`;
+      return [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//GeniDoc//Appointment//FR',
+        'CALSCALE:GREGORIAN',
+        'METHOD:PUBLISH',
+        'BEGIN:VEVENT',
+        `UID:${uid}`,
+        `DTSTAMP:${fmt(new Date())}`,
+        `DTSTART:${fmt(start)}`,
+        `DTEND:${fmt(end)}`,
+        `SUMMARY:${title.replace(/\n/g, ' ')}`,
+        `DESCRIPTION:${description.replace(/\n/g, '\\n')}`,
+        `LOCATION:${location}`,
+        'END:VEVENT',
+        'END:VCALENDAR'
+      ].join('\r\n');
+    }
+
+    // Set min date to today (local)
+    const dateInput = document.getElementById('date');
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = (today.getMonth() + 1).toString().padStart(2, '0');
+    const dd = today.getDate().toString().padStart(2, '0');
+    dateInput.min = `${yyyy}-${mm}-${dd}`;
+
+    // Submit
+    const form = document.getElementById('appointment-form');
+    const confirmation = document.getElementById('confirmation');
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(form).entries());
+
+        // Basic validation
+        const required = ['fullName', 'email', 'phone', 'service', 'date', 'time', 'mode'];
+        for (const k of required) {
+          if (!data[k] || String(data[k]).trim() === '') {
+            showToast('Veuillez remplir tous les champs obligatoires.', 'error');
+            return;
+          }
+        }
+
+        // Envoyer au serveur
+        try {
+            showToast('Envoi en cours...', 'info');
+            
+            const response = await fetch('/api/appointments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Erreur lors de l\'enregistrement');
+            }
+
+            const appointment = result.data;
+            
+            // Generate ICS file
+            const icsData = generateICS(data);
+            const blob = new Blob([icsData], { type: 'text/calendar;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+
+            confirmation.style.display = 'block';
+            confirmation.innerHTML = `
+              <div style="color: #27ae60; font-weight: bold; margin-bottom: 10px;">✅ Rendez-vous confirmé !</div>
+              <p>Un rendez-vous pour <strong>${data.consultationType || data.service}</strong> a été enregistré pour <strong>${data.fullName}</strong> le <strong>${data.date}</strong> à <strong>${data.time}</strong>.</p>
+              <p><small>ID de réservation: ${appointment.id}</small></p>
+              <div style="display:flex; gap:10px; margin-top:15px;">
+                <a href="${url}" download="rendezvous-genidoc.ics" class="upload-btn" style="background-color: #27ae60;">Ajouter au calendrier</a>
+                <button onclick="location.reload()" class="upload-btn btn-muted">Nouveau rendez-vous</button>
+              </div>
+            `;
+
+            showToast('Votre rendez-vous a été confirmé avec succès !');
+            form.style.display = 'none';
+            document.getElementById('back-to-selection').style.display = 'none';
+
+        } catch (err) {
+            console.error('Erreur:', err);
+            showToast(err.message || "Impossible d'enregistrer le rendez-vous.", 'error');
+        }
+    });
+
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      confirmation.style.display = 'none';
+      confirmation.innerHTML = '';
+    });
+  </script>
+</body>
+</html>
