@@ -866,11 +866,11 @@
         transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1),
           right 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         pointer-events: none;
+        display: none;
       }
 
       .site-header:hover::after {
-        left: 0;
-        right: 0;
+        display: none;
       }
 
       .site-header.scrolled {
@@ -3327,9 +3327,9 @@
               </svg>
             </button>
             <div class="top-bar-dropdown-menu">
-              <a href="#browse-jobs">Parcourir les offres</a>
-              <a href="#saved-jobs">Mes offres sauvegardées</a>
-              <a href="#job-alerts">Alertes emploi</a>
+              <a href="/browse-jobs.html">Parcourir les offres</a>
+              <a href="/browse-jobs.html#saved">Mes offres sauvegardées</a>
+              <a href="/browse-jobs.html#alerts">Alertes emploi</a>
             </div>
           </div>
 
@@ -3352,9 +3352,9 @@
               </svg>
             </button>
             <div class="top-bar-dropdown-menu">
-              <a href="#help">Help Center</a>
-              <a href="#docs">Documentation</a>
-              <a href="#api">API Reference</a>
+              <a href="/support.html">Centre d'Aide</a>
+              <a href="/support.html#faq">Documentation</a>
+              <a href="/support.html#contact">Nous Contacter</a>
             </div>
           </div>
 
@@ -3377,9 +3377,9 @@
               </svg>
             </button>
             <div class="top-bar-dropdown-menu">
-              <a href="#profile">Profile</a>
-              <a href="#settings">Settings</a>
-              <a href="#logout">Logout</a>
+              <a href="/my-account.html">Mon Profil</a>
+              <a href="/my-account.html#settings">Paramètres</a>
+              <a href="/">Déconnexion</a>
             </div>
           </div>
 
