@@ -1,0 +1,829 @@
+<!-- Script déplacé en bas, voir plus loin -->
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Établissement - GeniDoc</title>
+    <link rel="icon" type="image/png" href="/static/genidoc-logo.png" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Space Grotesk", "Segoe UI", sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+        color: #2d3748;
+        min-height: 100vh;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #2056ae 0%, #174080 100%);
+        color: white;
+        padding: 20px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .header-left img {
+        height: 50px;
+        filter: brightness(0) invert(1);
+      }
+
+      .header-title {
+        font-size: 24px;
+        font-weight: 700;
+      }
+
+      .header-subtitle {
+        font-size: 14px;
+        opacity: 0.9;
+        margin-top: 4px;
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .user-info {
+        text-align: right;
+      }
+
+      .user-name {
+        font-weight: 600;
+        font-size: 16px;
+      }
+
+      .user-role {
+        font-size: 12px;
+        opacity: 0.8;
+      }
+
+      .logout-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s;
+      }
+
+      .logout-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 32px auto;
+        padding: 0 24px;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 32px;
+      }
+
+      .stat-card {
+        background: white;
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      .stat-label {
+        font-size: 14px;
+        color: #6a7a8a;
+        margin-bottom: 8px;
+      }
+
+      .stat-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: #2056ae;
+      }
+
+      .stat-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(32, 86, 174, 0.1);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+      }
+
+      .appointments-section {
+        background: white;
+        border-radius: 12px;
+        padding: 32px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid #e2e8f0;
+      }
+
+      .section-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #2056ae;
+      }
+
+      .filter-tabs {
+        display: flex;
+        gap: 8px;
+      }
+
+      .filter-tab {
+        padding: 8px 16px;
+        border: 2px solid #e2e8f0;
+        background: white;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s;
+      }
+
+      .filter-tab.active {
+        background: #2056ae;
+        color: white;
+        border-color: #2056ae;
+      }
+
+      .appointments-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .appointments-table th {
+        text-align: left;
+        padding: 12px;
+        background: #f8f9fa;
+        color: #6a7a8a;
+        font-weight: 600;
+        font-size: 14px;
+        border-bottom: 2px solid #e2e8f0;
+      }
+
+      .appointments-table td {
+        padding: 16px 12px;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .appointments-table tr:hover {
+        background: #f8f9fa;
+      }
+
+      .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .status-pending,
+      .status-en.attente {
+        background: #fff3cd;
+        color: #856404;
+      }
+
+      .status-confirmed,
+      .status-confirmé {
+        background: #d4edda;
+        color: #155724;
+      }
+
+      .status-cancelled,
+      .status-annulé {
+        background: #f8d7da;
+        color: #721c24;
+      }
+
+      .action-btn {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        transition: all 0.2s;
+        margin-right: 4px;
+      }
+
+      .btn-confirm {
+        background: #27ae60;
+        color: white;
+      }
+
+      .btn-cancel {
+        background: #e74c3c;
+        color: white;
+      }
+
+      .btn-edit {
+        background: #f39c12;
+        color: white;
+      }
+
+      .btn-view {
+        background: #2056ae;
+        color: white;
+      }
+
+      .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 64px 32px;
+        color: #6a7a8a;
+      }
+
+      .empty-state-icon {
+        font-size: 64px;
+        margin-bottom: 16px;
+      }
+
+      @media (max-width: 768px) {
+        .header {
+          flex-direction: column;
+          gap: 16px;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .appointments-table {
+          font-size: 14px;
+        }
+
+        .appointments-table th,
+        .appointments-table td {
+          padding: 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header action buttons will be in the header-right div -->
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <img src="/static/GeniDoc_IeHF2025.png" alt="GeniDoc" />
+        <div>
+          <div class="header-title">Dashboard Établissement</div>
+          <div class="header-subtitle" id="establishmentName">
+            Chargement...
+          </div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div
+          class="user-info"
+          style="display: flex; align-items: center; gap: 8px"
+        >
+          <div style="text-align: right">
+            <div class="user-name" id="userName">Admin</div>
+            <div class="user-role">Administrateur</div>
+          </div>
+          <a
+            class="header-btn"
+            href="settings.html"
+            title="Paramètres"
+            style="padding: 8px 12px; font-size: 1em; display: flex; align-items: center; gap: 6px; background: none; border: none; cursor: pointer; text-decoration: none;"
+          >
+            <img src="images-keyfeatures/parametres.png" alt="Paramètres" style="width: 22px; height: 22px; vertical-align: middle; margin-right: 4px;" />
+            <span style="vertical-align: middle; color: white;">Paramètres</span>
+          </a>
+            �
+          </button>
+        </div>
+        <button class="logout-btn" onclick="logout()">Déconnexion</button>
+      </div>
+      <script>
+        // Profile/settings button logic
+        const genidocId = "GD-428836";
+        document
+          .getElementById("profileBtn")
+          .addEventListener("click", function () {
+            window.location.href = "settings.html";
+          });
+      </script>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+      <!-- Statistiques -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg width="24" height="24" fill="#2056AE" viewBox="0 0 24 24">
+              <rect
+                x="3"
+                y="4"
+                width="18"
+                height="18"
+                rx="2"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+              <path
+                d="M16 2v4M8 2v4M3 10h18"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+            </svg>
+          </div>
+          <div class="stat-label">Rendez-vous en attente</div>
+          <div class="stat-value" id="statPending">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg width="24" height="24" fill="#27ae60" viewBox="0 0 24 24">
+              <circle
+                cx="12"
+                cy="12"
+                r="10"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+              <path
+                d="M9 12l2 2 4-4"
+                stroke="currentColor"
+                stroke-width="2"
+                fill="none"
+              />
+            </svg>
+          </div>
+          <div class="stat-label">Confirmés</div>
+          <div class="stat-value" id="statConfirmed">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg width="24" height="24" fill="#e74c3c" viewBox="0 0 24 24">
+              <circle
+                cx="12"
+                cy="12"
+                r="10"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+              <path
+                d="M15 9l-6 6M9 9l6 6"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+            </svg>
+          </div>
+          <div class="stat-label">Annulés</div>
+          <div class="stat-value" id="statCancelled">0</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg width="24" height="24" fill="#2056AE" viewBox="0 0 24 24">
+              <path
+                d="M12 2v20M2 12h20"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+            </svg>
+          </div>
+          <div class="stat-label">Total ce mois</div>
+          <div class="stat-value" id="statTotal">0</div>
+        </div>
+      </div>
+
+      <!-- Liste des rendez-vous -->
+      <div class="appointments-section">
+        <div class="section-header">
+          <h2 class="section-title">Rendez-vous</h2>
+          <div class="filter-tabs">
+            <button
+              class="filter-tab active"
+              data-filter="all"
+              onclick="filterAppointments('all')"
+            >
+              Tous
+            </button>
+            <button
+              class="filter-tab"
+              data-filter="pending"
+              onclick="filterAppointments('pending')"
+            >
+              En attente
+            </button>
+            <button
+              class="filter-tab"
+              data-filter="confirmed"
+              onclick="filterAppointments('confirmed')"
+            >
+              Confirmés
+            </button>
+            <button
+              class="filter-tab"
+              data-filter="cancelled"
+              onclick="filterAppointments('cancelled')"
+            >
+              Annulés
+            </button>
+          </div>
+        </div>
+
+        <div id="appointmentsContainer">
+          <table class="appointments-table" id="appointmentsTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Heure</th>
+                <th>Patient</th>
+                <th>Contact</th>
+                <th>Service</th>
+                <th>Mode</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="appointmentsBody">
+              <!-- Les rendez-vous seront chargés ici -->
+            </tbody>
+          </table>
+          <div id="emptyState" class="empty-state" style="display: none">
+            <div class="empty-state-icon">
+              <img
+                src="/static/rendez-vous.png"
+                alt="Aucun rendez-vous"
+                width="80"
+                height="80"
+              />
+            </div>
+            <h3>Aucun rendez-vous</h3>
+            <p>Vous n'avez pas encore de rendez-vous programmés.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let allAppointments = [];
+      let establishmentId = null;
+      let currentFilter = "all";
+
+      // Charger les données au démarrage
+      window.addEventListener("DOMContentLoaded", () => {
+        checkAuth();
+      });
+
+      // Vérifier l'authentification
+      function checkAuth() {
+        const token = localStorage.getItem("establishment_token");
+        const estId = localStorage.getItem("establishment_id");
+        const estName = localStorage.getItem("establishment_name");
+        if (!token || !estId) {
+          forceLogout();
+          return;
+        }
+        establishmentId = estId;
+        document.getElementById("establishmentName").textContent = estName || "Établissement";
+        document.getElementById("userName").textContent = localStorage.getItem("establishment_email") || "Admin";
+        loadAppointments();
+      }
+
+      // Charger les rendez-vous
+      async function loadAppointments() {
+        try {
+          const response = await secureFetch(
+            `/api/establishment/${establishmentId}/appointments`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("establishment_token")}`,
+              },
+            },
+            "Accès établissement interdit ou session expirée."
+          );
+          const data = await response.json();
+          if (data.success) {
+            allAppointments = data.data || [];
+            updateStats();
+            displayAppointments(allAppointments);
+          } else {
+            alert("Erreur lors du chargement des rendez-vous");
+          }
+        } catch (error) {
+          if (error.message !== "Déconnecté") {
+            console.error("Erreur:", error);
+            alert("Erreur de connexion au serveur");
+          }
+        }
+      }
+
+      // Mettre à jour les statistiques
+      function updateStats() {
+        const pending = allAppointments.filter(
+          (a) => a.status === "pending"
+        ).length;
+        const confirmed = allAppointments.filter(
+          (a) => a.status === "confirmed"
+        ).length;
+        const cancelled = allAppointments.filter(
+          (a) => a.status === "cancelled"
+        ).length;
+
+        document.getElementById("statPending").textContent = pending;
+        document.getElementById("statConfirmed").textContent = confirmed;
+        document.getElementById("statCancelled").textContent = cancelled;
+        document.getElementById("statTotal").textContent =
+          allAppointments.length;
+      }
+
+      // Afficher les rendez-vous
+      function displayAppointments(appointments) {
+        const tbody = document.getElementById("appointmentsBody");
+        const emptyState = document.getElementById("emptyState");
+        const table = document.getElementById("appointmentsTable");
+
+        if (!appointments || appointments.length === 0) {
+          table.style.display = "none";
+          emptyState.style.display = "block";
+          return;
+        }
+
+        table.style.display = "table";
+        emptyState.style.display = "none";
+
+        tbody.innerHTML = appointments
+          .map(
+            (apt) => `
+        <tr>
+          <td>${formatDate(apt.date)}</td>
+          <td>${apt.time}</td>
+          <td><strong>${apt.fullName}</strong></td>
+          <td>${apt.email}<br/><small>${apt.phone}</small></td>
+          <td>${apt.serviceType || apt.service}</td>
+          <td>${apt.mode}</td>
+          <td>
+            <span class="status-badge status-${apt.status}">
+              ${getStatusText(apt.status)}
+            </span>
+          </td>
+          <td>
+            ${
+              apt.status === "en attente"
+                ? `
+              <button class="action-btn btn-confirm" onclick="confirmAppointment('${apt.id}')">✓ Confirmer</button>
+              <button class="action-btn btn-cancel" onclick="cancelAppointment('${apt.id}')">✗ Annuler</button>
+              <button class="action-btn btn-edit" onclick="editAppointment('${apt.id}')">✎ Modifier</button>
+            `
+                : apt.status === "confirmé"
+                ? `
+              <button class="action-btn btn-cancel" onclick="cancelAppointment('${apt.id}')">✗ Annuler</button>
+              <button class="action-btn btn-edit" onclick="editAppointment('${apt.id}')">✎ Modifier</button>
+            `
+                : `
+              <button class="action-btn btn-confirm" onclick="confirmAppointment('${apt.id}')">✓ Réactiver</button>
+            `
+            }
+            <button class="action-btn btn-view" onclick="viewDetails('${
+              apt.id
+            }')">👁 Détails</button>
+          </td>
+        </tr>
+      `
+          )
+          .join("");
+      }
+
+      // Filtrer les rendez-vous
+      function filterAppointments(filter) {
+        currentFilter = filter;
+
+        // Mettre à jour les onglets actifs
+        document.querySelectorAll(".filter-tab").forEach((tab) => {
+          tab.classList.remove("active");
+          if (tab.dataset.filter === filter) {
+            tab.classList.add("active");
+          }
+        });
+
+        // Filtrer les données
+        let filtered = allAppointments;
+        if (filter !== "all") {
+          filtered = allAppointments.filter((a) => a.status === filter);
+        }
+
+        displayAppointments(filtered);
+      }
+
+      // Confirmer un rendez-vous
+      async function confirmAppointment(id) {
+        if (!confirm("Confirmer ce rendez-vous ?")) return;
+        try {
+          const response = await secureFetch(`/api/appointments/${id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("establishment_token")}`,
+            },
+            body: JSON.stringify({ status: "confirmed" }),
+          }, "Accès interdit ou session expirée lors de la confirmation.");
+          const data = await response.json();
+          if (data.success) {
+            alert("Rendez-vous confirmé !");
+            loadAppointments();
+          } else {
+            alert("Erreur lors de la confirmation");
+          }
+        } catch (error) {
+          if (error.message !== "Déconnecté") {
+            console.error("Erreur:", error);
+            alert("Erreur de connexion");
+          }
+        }
+      }
+
+      // Annuler un rendez-vous
+      async function cancelAppointment(id) {
+        const reason = prompt("Raison de l'annulation (facultatif) :");
+        if (reason === null) return;
+        try {
+          const response = await secureFetch(`/api/appointments/${id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("establishment_token")}`,
+            },
+            body: JSON.stringify({ status: "cancelled", cancellationReason: reason }),
+          }, "Accès interdit ou session expirée lors de l'annulation.");
+          const data = await response.json();
+          if (data.success) {
+            alert("Rendez-vous annulé");
+            loadAppointments();
+          } else {
+            alert("Erreur lors de l'annulation");
+          }
+        } catch (error) {
+          if (error.message !== "Déconnecté") {
+            console.error("Erreur:", error);
+            alert("Erreur de connexion");
+          }
+        }
+      }
+
+      // Modifier un rendez-vous (date/heure)
+      async function editAppointment(id) {
+        const apt = allAppointments.find((a) => a.id === id);
+        if (!apt) return;
+
+        // Créer un modal pour la modification
+        const newDate = prompt(
+          `Nouvelle date (actuelle: ${apt.date}):\nFormat: AAAA-MM-JJ`,
+          apt.date
+        );
+        if (!newDate || newDate === apt.date) {
+          // Si annulé ou pas de changement, demander l'heure
+          const newTime = prompt(
+            `Nouvelle heure (actuelle: ${apt.time}):\nFormat: HH:MM`,
+            apt.time
+          );
+          if (!newTime || newTime === apt.time) return;
+
+          // Mettre à jour uniquement l'heure
+          await updateAppointmentDateTime(id, apt.date, newTime);
+        } else {
+          // Demander aussi l'heure
+          const newTime = prompt(
+            `Nouvelle heure (actuelle: ${apt.time}):\nFormat: HH:MM`,
+            apt.time
+          );
+          if (!newTime) return;
+
+          // Mettre à jour date et heure
+          await updateAppointmentDateTime(id, newDate, newTime);
+        }
+      }
+
+      // Fonction helper pour mettre à jour date/heure
+      async function updateAppointmentDateTime(id, date, time) {
+        try {
+          const response = await secureFetch(`/api/appointments/${id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("establishment_token")}`,
+            },
+            body: JSON.stringify({ date, time, status: "confirmé" }),
+          }, "Accès interdit ou session expirée lors de la modification.");
+          const data = await response.json();
+          if (data.success) {
+            alert(`Rendez-vous modifié !\nNouvelle date: ${date} à ${time}`);
+            loadAppointments();
+          } else {
+            alert("Erreur lors de la modification");
+          }
+        } catch (error) {
+          if (error.message !== "Déconnecté") {
+            console.error("Erreur:", error);
+            alert("Erreur de connexion");
+          }
+        }
+      }
+
+      // Voir les détails
+      function viewDetails(id) {
+        const apt = allAppointments.find((a) => a.id === id);
+        if (!apt) return;
+
+        alert(
+          `
+Rendez-vous #${apt.id}
+
+Patient : ${apt.fullName}
+Email : ${apt.email}
+Téléphone : ${apt.phone}
+Date : ${formatDate(apt.date)} à ${apt.time}
+Service : ${apt.serviceType || apt.service}
+Mode : ${apt.mode}
+Société : ${apt.company || "N/A"}
+Message : ${apt.message || "Aucun message"}
+Statut : ${getStatusText(apt.status)}
+      `.trim()
+        );
+      }
+
+
+      // ========== SÉCURITÉ SESSION ========== //
+      function forceLogout(msg) {
+        localStorage.clear();
+        alert(msg || "Session expirée ou accès interdit. Veuillez vous reconnecter.");
+        window.location.href = "/establishment-login.html";
+      }
+
+      async function secureFetch(url, options = {}, errorMsg) {
+        const res = await fetch(url, options);
+        if (res.status === 401 || res.status === 403) {
+          forceLogout(errorMsg || "Session expirée ou accès interdit. Veuillez vous reconnecter.");
+          throw new Error("Déconnecté");
+        }
+        return res;
+      }
+
+      function logout() {
+        forceLogout();
+      }
+
+      // Fonctions utilitaires
+      function formatDate(dateStr) {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString("fr-FR", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        });
+      }
+
+      function getStatusText(status) {
+        const texts = {
+          "en attente": "En attente",
+          pending: "En attente",
+          confirmé: "Confirmé",
+          confirmed: "Confirmé",
+          annulé: "Annulé",
+          cancelled: "Annulé",
+        };
+        return texts[status] || status;
+      }
+    </script>
+  </body>
+</html>

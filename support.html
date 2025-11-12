@@ -1,179 +1,273 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
+  <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>GeniDoc — Support et Aide</title>
-    <meta name="description" content="Centre d'aide et support pour GeniDoc - vos réponses et assistance techniques." />
+    <meta
+      name="description"
+      content="Centre d'aide et support pour GeniDoc - vos réponses et assistance techniques."
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: "Space Grotesk", sans-serif;
-            background: #f5f5f5;
-            color: #333;
-        }
-        header {
-            background: #1f1f1f;
-            color: white;
-            padding: 2rem;
-            text-align: center;
-        }
-        header h1 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
+      :root {
+        --primary: #c71f37;
+        --primary-dark: #a01829;
+        --bg: #f5f5f5;
+        --header-bg: #1f1f1f;
+        --card-bg: #fff;
+        --text: #333;
+        --text-light: #666;
+        --radius: 12px;
+        --shadow: 0 2px 8px rgba(0,0,0,0.08);
+        --shadow-hover: 0 4px 16px rgba(0,0,0,0.13);
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Space Grotesk", Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+      }
+      header {
+        background: var(--header-bg);
+        color: #fff;
+        padding: 2rem 1rem 1.2rem 1rem;
+        text-align: center;
+        border-bottom-left-radius: var(--radius);
+        border-bottom-right-radius: var(--radius);
+        box-shadow: var(--shadow);
+      }
+      header h1 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+      }
+      header p {
+        font-size: 1.1rem;
+        color: #e2e2e2;
+      }
+      nav {
+        background: #fff;
+        box-shadow: var(--shadow);
+        border-radius: var(--radius);
+        margin: 1.5rem auto 2rem auto;
+        max-width: 1000px;
+        padding: 0.7rem 2rem;
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+        justify-content: center;
+      }
+      nav a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: color 0.2s;
+        padding: 0.3rem 0.7rem;
+        border-radius: 4px;
+      }
+      nav a:hover,
+      nav a.active {
+        background: var(--primary);
+        color: #fff;
+      }
+      .container {
+        max-width: 1000px;
+        margin: 2rem auto;
+        padding: 0 2rem;
+      }
+      .support-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+      }
+      .support-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 2rem 1.5rem;
+        box-shadow: var(--shadow);
+        text-align: center;
+        transition: transform 0.3s, box-shadow 0.3s;
+        border: 1px solid #f0f0f0;
+      }
+      .support-card:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: var(--shadow-hover);
+        border-color: var(--primary);
+      }
+      .support-icon {
+        font-size: 2.7rem;
+        margin-bottom: 1rem;
+        color: var(--primary);
+      }
+      .support-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 0.7rem;
+        color: var(--primary);
+      }
+      .support-description {
+        font-size: 0.97rem;
+        color: var(--text-light);
+        margin-bottom: 1.1rem;
+        line-height: 1.6;
+      }
+      .btn {
+        display: inline-block;
+        background: var(--primary);
+        color: #fff;
+        padding: 0.7rem 1.4rem;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: background 0.2s;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 1px 3px rgba(199,31,55,0.07);
+      }
+      .btn:hover {
+        background: var(--primary-dark);
+      }
+      .faq-section {
+        background: var(--card-bg);
+        padding: 2rem 1.5rem;
+        border-radius: var(--radius);
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow);
+        border: 1px solid #f0f0f0;
+      }
+      .faq-section h2 {
+        margin-bottom: 1.5rem;
+        font-size: 1.4rem;
+        color: var(--header-bg);
+        font-weight: 700;
+      }
+      .faq-item {
+        margin-bottom: 1.3rem;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 1.3rem;
+      }
+      .faq-item:last-child {
+        border-bottom: none;
+      }
+      .faq-question {
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        font-size: 1.05rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .faq-answer {
+        color: var(--text-light);
+        line-height: 1.6;
+        font-size: 0.98rem;
+        margin-left: 1.2rem;
+      }
+      @media (max-width: 600px) {
         .container {
-            max-width: 1000px;
-            margin: 2rem auto;
-            padding: 0 2rem;
+          padding: 0 0.5rem;
         }
-        .support-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            margin-bottom: 3rem;
+        nav {
+          padding: 0.7rem 0.5rem;
+          gap: 1rem;
         }
-        .support-card {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            text-align: center;
-            transition: transform 0.3s ease;
+        .support-card, .faq-section {
+          padding: 1.2rem 0.7rem;
         }
-        .support-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-        }
-        .support-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-        .support-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 0.8rem;
-            color: #c71f37;
-        }
-        .support-description {
-            font-size: 0.95rem;
-            color: #666;
-            margin-bottom: 1rem;
-            line-height: 1.6;
-        }
-        .btn {
-            display: inline-block;
-            background: #c71f37;
-            color: white;
-            padding: 0.8rem 1.5rem;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: background 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-        .btn:hover {
-            background: #a01829;
-        }
-        .faq-section {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .faq-section h2 {
-            margin-bottom: 1.5rem;
-            font-size: 1.5rem;
-            color: #1f1f1f;
-        }
-        .faq-item {
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 1.5rem;
-        }
-        .faq-item:last-child {
-            border-bottom: none;
-        }
-        .faq-question {
-            font-weight: 600;
-            color: #c71f37;
-            margin-bottom: 0.5rem;
-            cursor: pointer;
-        }
-        .faq-answer {
-            color: #666;
-            line-height: 1.6;
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <header>
-        <h1>Centre d'Aide GeniDoc</h1>
-        <p>Nous sommes là pour vous aider 24/7</p>
+      <h1>Centre d'Aide GeniDoc</h1>
+      <p>Nous sommes là pour vous aider 24/7</p>
     </header>
-
+    <nav>
+      <a href="genidoc.html">Accueil</a>
+      <a href="index.html">Mon espace</a>
+      <a href="appintment.html">Prendre RDV</a>
+      <a href="support.html" class="active">Support</a>
+      <a href="auth.html">Connexion</a>
+    </nav>
     <div class="container">
-        <div class="support-grid">
-            <div class="support-card">
-                <div class="support-icon">💬</div>
-                <div class="support-title">Chat en Direct</div>
-                <div class="support-description">Discutez avec nos agents de support en temps réel.</div>
-                <button class="btn">Démarrer un chat</button>
-            </div>
-
-            <div class="support-card">
-                <div class="support-icon">📧</div>
-                <div class="support-title">Email</div>
-                <div class="support-description">Envoyez-nous vos questions et nous répondrons dans les 24h.</div>
-                <a href="mailto:support@genidoc.com" class="btn">Envoyer un email</a>
-            </div>
-
-            <div class="support-card">
-                <div class="support-icon">📞</div>
-                <div class="support-title">Téléphone</div>
-                <div class="support-description">Appelez notre équipe de support disponible 7j/7.</div>
-                <a href="tel:+212612345678" class="btn">Appeler</a>
-            </div>
+      <div class="support-grid">
+        <div class="support-card">
+          <div class="support-icon">💬</div>
+          <div class="support-title">Chat en Direct</div>
+          <div class="support-description">
+            Discutez avec nos agents de support en temps réel.
+          </div>
+          <button class="btn">Démarrer un chat</button>
         </div>
-
-        <div class="faq-section">
-            <h2>Questions Fréquemment Posées</h2>
-            
-            <div class="faq-item">
-                <div class="faq-question">❓ Comment créer un compte GeniDoc?</div>
-                <div class="faq-answer">Pour créer un compte, visitez notre page d'inscription et remplissez le formulaire avec vos informations personnelles et professionnelles. Vous recevrez un email de confirmation.</div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question">❓ Comment réserver une consultation?</div>
-                <div class="faq-answer">Une fois connecté, accédez à la section "Rendez-vous" et sélectionnez le type de consultation, la date et l'heure qui vous conviennent.</div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question">❓ Pouvez-vous annuler une consultation?</div>
-                <div class="faq-answer">Oui, vous pouvez annuler jusqu'à 24 heures avant votre consultation sans frais supplémentaires.</div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question">❓ Mes données sont-elles sécurisées?</div>
-                <div class="faq-answer">Absolument! GeniDoc utilise le chiffrement de niveau médical pour protéger vos informations personnelles et sanitaires.</div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question">❓ Puis-je accéder à mes dossiers médicaux?</div>
-                <div class="faq-answer">Oui, tous vos dossiers médicaux électroniques sont accessible depuis votre tableau de bord personnel.</div>
-            </div>
+        <div class="support-card">
+          <div class="support-icon">📧</div>
+          <div class="support-title">Email</div>
+          <div class="support-description">
+            Envoyez-nous vos questions et nous répondrons dans les 24h.
+          </div>
+          <a href="mailto:support@genidoc.com" class="btn">Envoyer un email</a>
         </div>
+        <div class="support-card">
+          <div class="support-icon">📞</div>
+          <div class="support-title">Téléphone</div>
+          <div class="support-description">
+            Appelez notre équipe de support disponible 7j/7.
+          </div>
+          <a href="tel:+212612345678" class="btn">Appeler</a>
+        </div>
+      </div>
+      <div class="faq-section">
+        <h2>Questions Fréquemment Posées</h2>
+        <div class="faq-item">
+          <div class="faq-question">❓ Comment créer un compte GeniDoc?</div>
+          <div class="faq-answer">
+            Pour créer un compte, visitez notre page d'inscription et remplissez
+            le formulaire avec vos informations personnelles et professionnelles. Vous recevrez un email de confirmation.
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">❓ Comment réserver une consultation?</div>
+          <div class="faq-answer">
+            Une fois connecté, accédez à la section "Rendez-vous" et sélectionnez le type de consultation, la date et l'heure qui vous conviennent.
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">❓ Pouvez-vous annuler une consultation?</div>
+          <div class="faq-answer">
+            Oui, vous pouvez annuler jusqu'à 24 heures avant votre consultation sans frais supplémentaires.
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">❓ Mes données sont-elles sécurisées?</div>
+          <div class="faq-answer">
+            Absolument! GeniDoc utilise le chiffrement de niveau médical pour protéger vos informations personnelles et sanitaires.
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">❓ Puis-je accéder à mes dossiers médicaux?</div>
+          <div class="faq-answer">
+            Oui, tous vos dossiers médicaux électroniques sont accessibles depuis votre tableau de bord personnel.
+          </div>
+        </div>
+      </div>
     </div>
-</body>
+  </body>
 </html>

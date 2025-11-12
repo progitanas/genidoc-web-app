@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Paramètres — GeniDoc</title>
+    <link rel="icon" type="image/png" href="/static/genidoc-logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      :root {
+        --color-primary: #2056ae;
+        --color-secondary: #174080;
+        --color-accent: #e6eefc;
+        --color-text: #0f172a;
+        --color-muted: #6a7a8a;
+        --color-success: #27ae60;
+        --color-error: #e74c3c;
+        --color-warning: #f39c12;
+        --transition-fast: 0.2s ease;
+        --transition-slow: 0.3s ease;
+        --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.08);
+        --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.12);
+        --shadow-heavy: 0 8px 32px rgba(0, 0, 0, 0.16);
+        --border-radius: 12px;
+        --border-radius-large: 16px;
+      }
+      body {
+        font-family: "Space Grotesk", "Segoe UI", sans-serif;
+        background: linear-gradient(
+          135deg,
+          var(--color-primary) 0%,
+          var(--color-secondary) 100%
+        );
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        color: var(--color-text);
+      }
+      .container {
+        background: #fff;
+        border-radius: var(--border-radius-large);
+        padding: 36px 28px;
+        box-shadow: var(--shadow-heavy);
+        max-width: 720px;
+        width: 100%;
+        position: relative;
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 12px;
+      }
+      .logo {
+        height: 64px;
+        margin-bottom: 8px;
+      }
+      .title {
+        font-size: 20px;
+        color: var(--color-primary);
+        font-weight: 700;
+      }
+      .subtitle {
+        color: var(--color-muted);
+        font-size: 13px;
+        margin-top: 6px;
+      }
+      .top-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      .role-badge span {
+        display: inline-block;
+        background: var(--color-primary);
+        color: #fff;
+        padding: 6px 14px;
+        border-radius: 14px;
+        font-weight: 600;
+        font-size: 13px;
+      }
+      form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 14px;
+      }
+      label {
+        font-weight: 600;
+        color: #2d3748;
+        font-size: 14px;
+        margin-bottom: 4px;
+        display: block;
+      }
+      input,
+      select {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 8px;
+        border: 1.5px solid var(--color-accent);
+        font-size: 14px;
+        transition: border-color var(--transition-fast),
+          box-shadow var(--transition-fast);
+      }
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 6px 18px rgba(32, 86, 174, 0.08);
+      }
+      .full {
+        grid-column: 1 / -1;
+      }
+      .controls {
+        display: flex;
+        gap: 12px;
+        margin-top: 12px;
+      }
+      .btn {
+        flex: 1;
+        padding: 12px 14px;
+        border-radius: 8px;
+        border: none;
+        background: linear-gradient(
+          135deg,
+          var(--color-primary) 0%,
+          var(--color-secondary) 100%
+        );
+        color: #fff;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform var(--transition-fast),
+          box-shadow var(--transition-fast);
+      }
+      .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-medium);
+      }
+      .btn:active {
+        transform: scale(0.98);
+      }
+      .btn.secondary {
+        background: #f1f5f9;
+        color: var(--color-text);
+        border: 1px solid #e2e8f0;
+      }
+      .btn.secondary:hover {
+        background: #e2e8f0;
+      }
+      .btn.danger {
+        background: var(--color-error);
+      }
+      .btn.danger:hover {
+        background: #c0392b;
+      }
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+      #logout-btn {
+        background: var(--color-error);
+        color: #fff;
+        margin-top: 0;
+        font-weight: 600;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-light);
+        transition: background var(--transition-fast);
+        padding: 8px 12px;
+        flex: none;
+      }
+      #logout-btn:hover {
+        background: #c0392b;
+      }
+      #message {
+        min-height: 22px;
+        margin-top: 10px;
+        text-align: center;
+        font-weight: 500;
+      }
+      #loader {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.6);
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--color-primary);
+        z-index: 1000;
+      }
+      #success-check {
+        display: none;
+        justify-content: center;
+        margin-top: 6px;
+      }
+      #avatar {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: var(--color-accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: var(--color-text);
+        font-weight: 600;
+      }
+      @media (max-width: 720px) {
+        form {
+          grid-template-columns: 1fr;
+        }
+        .container {
+          padding: 24px 16px;
+        }
+        .top-row {
+          flex-direction: column;
+          gap: 16px;
+        }
+        .controls {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" role="main">
+      <div class="header">
+        <img class="logo" src="/static/GeniDoc_IeHF2025.png" alt="GeniDoc" />
+        <div class="title" id="title">Paramètres</div>
+        <div class="subtitle" id="subtitle">
+          Modifiez vos informations de profil
+        </div>
+      </div>
+
+      <div class="top-row">
+        <div id="roleBadge" class="role-badge"></div>
+        <div style="display: flex; gap: 10px; align-items: center">
+          <div id="avatar" aria-hidden="true"></div>
+          <button id="logout-btn" class="btn danger">Déconnexion</button>
+        </div>
+      </div>
+
+      <div id="message" aria-live="polite"></div>
+
+      <form id="settings-form" novalidate>
+        <div class="full">
+          <label for="username">Nom complet</label>
+          <input id="username" name="username" type="text" />
+        </div>
+
+        <div>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" />
+        </div>
+
+        <div>
+          <label for="telephone">Téléphone</label>
+          <input id="telephone" name="telephone" type="tel" />
+        </div>
+
+        <div>
+          <label for="birthdate">Date de naissance</label>
+          <input id="birthdate" name="birthdate" type="date" />
+        </div>
+
+        <div id="specialty-group" style="display: none">
+          <label for="specialty">Spécialité</label>
+          <input id="specialty" name="specialty" type="text" />
+        </div>
+
+        <div class="full controls">
+          <button id="save-btn" type="button" class="btn">
+            Enregistrer les modifications
+          </button>
+          <button id="cancel-btn" type="button" class="btn secondary">
+            Annuler
+          </button>
+        </div>
+      </form>
+
+      <div id="success-check" aria-hidden="true"></div>
+      <div id="loader">Chargement…</div>
+    </div>
+
+    <script>
+      // Utilities
+      function getLocalUser() {
+        try {
+          const r = localStorage.getItem("user");
+          return r ? JSON.parse(r) : {};
+        } catch (e) {
+          return {};
+        }
+      }
+      function setLocalUser(u) {
+        try {
+          localStorage.setItem("user", JSON.stringify(u));
+        } catch (e) {}
+      }
+
+      // Parse URL param fallback (allow opening ?genidocId=GD-...)
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlGenidocId = urlParams.get("genidocId");
+
+      // Initialize user/role
+      let user = getLocalUser();
+      if ((!user || !user.role) && urlGenidocId) {
+        // allow view/edit for patient when opened with ?genidocId
+        user = Object.assign({}, user, {
+          role: "patient",
+          genidocId: urlGenidocId,
+        });
+        setLocalUser(user);
+      }
+      let role = user && user.role ? user.role : null;
+
+      const $ = (id) => document.getElementById(id);
+
+      function forceLogout(msg) {
+        localStorage.clear();
+        alert(msg || "Session expirée. Veuillez vous reconnecter.");
+        window.location.href = "auth.html";
+      }
+
+      async function secureFetch(url, options = {}, errorMsg) {
+        const res = await fetch(url, options);
+        if (res.status === 401 || res.status === 403) {
+          forceLogout(errorMsg || "Accès interdit");
+          throw new Error("Déconnecté");
+        }
+        return res;
+      }
+
+      function renderAvatar(u) {
+        const c = $("avatar");
+        c.innerHTML = "";
+        const initials =
+          u && (u.username || u.email)
+            ? (u.username || u.email)
+                .split(" ")
+                .map((s) => s[0])
+                .slice(0, 2)
+                .join("")
+                .toUpperCase()
+            : "GD";
+        const el = document.createElement("div");
+        el.style.width = "64px";
+        el.style.height = "64px";
+        el.style.borderRadius = "50%";
+        el.style.background = "#e6eefc";
+        el.style.display = "flex";
+        el.style.alignItems = "center";
+        el.style.justifyContent = "center";
+        el.style.fontSize = "20px";
+        el.style.color = "#0f172a";
+        el.textContent = initials;
+        c.appendChild(el);
+      }
+
+      function setMessage(text, type) {
+        const m = $("message");
+        m.textContent = text || "";
+        if (!text) {
+          m.style.color = "";
+          return;
+        }
+        m.style.color = type === "error" ? "#e74c3c" : "#27ae60";
+      }
+
+      function applyFormValues(data) {
+        const fallback = (key) =>
+          data &&
+          data[key] !== undefined &&
+          data[key] !== null &&
+          data[key] !== ""
+            ? data[key]
+            : user && user[key]
+            ? user[key]
+            : "";
+        $("username").value = fallback("username");
+        $("email").value = fallback("email");
+        $("telephone").value = fallback("telephone");
+        $("birthdate").value = fallback("birthdate");
+        if (role === "doctor" || role === "médecin") {
+          $("specialty-group").style.display = "block";
+          $("specialty").value = fallback("specialty");
+        } else {
+          $("specialty-group").style.display = "none";
+        }
+        $("roleBadge").innerHTML =
+          "<span>" +
+          (role ? role.toString().toUpperCase() : "PATIENT") +
+          "</span>";
+        renderAvatar(user);
+      }
+
+      async function loadAndRender() {
+        $("loader").style.display = "flex";
+        setMessage("Chargement…");
+        // Accept patient via URL param even if not fully logged in
+        if (!role) {
+          if (urlGenidocId) {
+            role = "patient";
+            user = user || {};
+            user.genidocId = urlGenidocId;
+          } else {
+            forceLogout("Utilisateur non authentifié");
+            return;
+          }
+        }
+
+        try {
+          if (role === "admin" && user.id) {
+            const res = await secureFetch(
+              `/api/admin/${user.id}`,
+              {
+                headers: { "X-User-Role": "admin", "X-User-Id": user.id },
+              },
+              "Accès administrateur interdit"
+            );
+            const j = await res.json();
+            if (j.success && j.data) {
+              Object.assign(user, j.data);
+              setLocalUser(user);
+              applyFormValues(user);
+              setMessage("");
+            } else {
+              applyFormValues({});
+              setMessage(j.message || "Administrateur non trouvé", "error");
+            }
+          } else if ((role === "doctor" || role === "médecin") && user.id) {
+            const res = await secureFetch(
+              `/api/doctor/${user.id}`,
+              {
+                headers: { "X-User-Role": role, "X-User-Id": user.id },
+              },
+              "Accès médecin interdit"
+            );
+            const j = await res.json();
+            if (j.success && j.data) {
+              Object.assign(user, j.data);
+              setLocalUser(user);
+              applyFormValues(user);
+              setMessage("");
+            } else {
+              applyFormValues({});
+              setMessage(j.message || "Médecin non trouvé", "error");
+            }
+          } else if (role === "patient" && user.genidocId) {
+            const res = await secureFetch(
+              `/api/patient/${user.genidocId}`,
+              {
+                headers: {
+                  "X-User-Role": "patient",
+                  "X-GenidocId": user.genidocId,
+                },
+              },
+              "Accès patient interdit"
+            );
+            const j = await res.json();
+            if (j.success && j.data) {
+              Object.assign(user, j.data);
+              setLocalUser(user);
+              applyFormValues(user);
+              setMessage("");
+            } else {
+              applyFormValues({});
+              setMessage(j.message || "Patient non trouvé", "error");
+            }
+          } else {
+            applyFormValues({});
+            setMessage("");
+          }
+        } catch (e) {
+          if (e.message !== "Déconnecté") {
+            setMessage("Erreur lors du chargement", "error");
+          }
+        }
+        $("loader").style.display = "none";
+      }
+
+      // Save
+      $("save-btn").addEventListener("click", async function () {
+        $("loader").style.display = "flex";
+        setMessage("Sauvegarde en cours…");
+        const payload = {
+          username: $("username").value,
+          email: $("email").value,
+          telephone: $("telephone").value,
+          birthdate: $("birthdate").value,
+        };
+        if (role === "doctor" || role === "médecin")
+          payload.specialty = $("specialty").value;
+        let url = "";
+        let headers = { "Content-Type": "application/json" };
+        if (role === "admin") {
+          url = `/api/admin/${user.id}`;
+          headers["X-User-Role"] = "admin";
+          headers["X-User-Id"] = user.id;
+        } else if (role === "doctor" || role === "médecin") {
+          url = `/api/doctor/${user.id}`;
+          headers["X-User-Role"] = role;
+          headers["X-User-Id"] = user.id;
+        } else {
+          url = `/api/patient/${user.genidocId}`;
+          headers["X-User-Role"] = "patient";
+          headers["X-GenidocId"] = user.genidocId;
+        }
+
+        try {
+          const res = await secureFetch(
+            url,
+            {
+              method: "PUT",
+              headers,
+              body: JSON.stringify(payload),
+            },
+            "Accès refusé lors de la sauvegarde"
+          );
+          const j = await res.json();
+          if (j.success) {
+            Object.assign(user, payload, j.data || {});
+            setLocalUser(user);
+            applyFormValues(user);
+            setMessage("Modifications enregistrées ✔", "success");
+            $("success-check").innerHTML =
+              '<svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="19" cy="19" r="18" stroke="#10b981" stroke-width="3" fill="#eafaf3"/><path d="M11 20.5L17 26L27 14" stroke="#10b981" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+            $("success-check").style.display = "flex";
+            setTimeout(() => {
+              $("success-check").style.display = "none";
+            }, 1400);
+          } else {
+            setMessage(j.message || "Erreur lors de la sauvegarde", "error");
+          }
+        } catch (e) {
+          if (e.message !== "Déconnecté") {
+            setMessage("Erreur lors de la sauvegarde", "error");
+          }
+        }
+        $("loader").style.display = "none";
+      });
+
+      // Cancel
+      $("cancel-btn").addEventListener("click", function () {
+        applyFormValues(user);
+        setMessage("Modifications annulées");
+      });
+
+      // Logout
+      $("logout-btn").addEventListener("click", function () {
+        localStorage.clear();
+        window.location.href = "auth.html";
+      });
+
+      // Start
+      renderAvatar(user);
+      loadAndRender();
+    </script>
+  </body>
+</html>

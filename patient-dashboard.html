@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tableau de Bord Patient — GeniDoc</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary: #4d3aff;
+        --secondary: #00558c;
+        --light-bg: #f5f7fa;
+        --dark-text: #2d3748;
+        --border-radius: 8px;
+        --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--light-bg);
+        color: var(--dark-text);
+      }
+
+      .navbar {
+        background: linear-gradient(
+          135deg,
+          var(--primary) 0%,
+          var(--secondary) 100%
+        );
+        box-shadow: var(--box-shadow);
+        padding: 15px 0;
+      }
+
+      .navbar-brand {
+        font-size: 20px;
+        font-weight: bold;
+        color: white !important;
+      }
+
+      .navbar-brand i {
+        margin-right: 8px;
+      }
+
+      .nav-link {
+        color: rgba(255, 255, 255, 0.8) !important;
+        transition: var(--transition);
+      }
+
+      .nav-link:hover {
+        color: white !important;
+      }
+
+      .container-main {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 20px;
+      }
+
+      .welcome-banner {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: var(--box-shadow);
+        border-left: 5px solid var(--primary);
+      }
+
+      .welcome-banner h1 {
+        color: var(--dark-text);
+        margin-bottom: 10px;
+      }
+
+      .welcome-banner p {
+        color: #666;
+        margin: 0;
+      }
+
+      .section-title {
+        font-size: 22px;
+        font-weight: 600;
+        color: var(--secondary);
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--primary);
+      }
+
+      .card {
+        background: white;
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        margin-bottom: 20px;
+        transition: var(--transition);
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+      }
+
+      .card-header {
+        background: linear-gradient(
+          135deg,
+          var(--primary) 0%,
+          var(--secondary) 100%
+        );
+        color: white;
+        border: none;
+        padding: 15px 20px;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+      }
+
+      .card-header h5 {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      .card-body {
+        padding: 20px;
+      }
+
+      .appointment-item {
+        background: #f9f9f9;
+        border-left: 4px solid var(--primary);
+        padding: 15px;
+        margin-bottom: 12px;
+        border-radius: 4px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .appointment-info h6 {
+        margin: 0 0 5px 0;
+        color: var(--dark-text);
+        font-weight: 600;
+      }
+
+      .appointment-info p {
+        margin: 0;
+        font-size: 13px;
+        color: #666;
+      }
+
+      .btn-custom {
+        background: linear-gradient(135deg, var(--primary) 0%, #5a48ff 100%);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: var(--border-radius);
+        font-weight: 600;
+        transition: var(--transition);
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .btn-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(77, 58, 255, 0.3);
+        color: white;
+        text-decoration: none;
+      }
+
+      .btn-secondary-custom {
+        background: #6c757d;
+        color: white;
+      }
+
+      .btn-secondary-custom:hover {
+        background: #5a6268;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+      }
+
+      .profile-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .profile-item {
+        background: white;
+        padding: 15px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+      }
+
+      .profile-item label {
+        font-weight: 600;
+        color: var(--secondary);
+        font-size: 13px;
+        margin-bottom: 5px;
+        display: block;
+      }
+
+      .profile-item p {
+        color: var(--dark-text);
+        margin: 0;
+        font-size: 15px;
+      }
+
+      .no-appointments {
+        text-align: center;
+        padding: 40px 20px;
+        color: #999;
+      }
+
+      .no-appointments i {
+        font-size: 48px;
+        margin-bottom: 15px;
+        color: #ddd;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+      }
+
+      .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        text-align: center;
+      }
+
+      .stat-card .stat-number {
+        font-size: 32px;
+        font-weight: bold;
+        color: var(--primary);
+        margin-bottom: 8px;
+      }
+
+      .stat-card .stat-label {
+        font-size: 13px;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .alert-custom {
+        background-color: #e8f4f8;
+        border-left: 4px solid #00558c;
+        padding: 15px;
+        border-radius: var(--border-radius);
+        margin-bottom: 20px;
+      }
+
+      .alert-custom i {
+        color: #00558c;
+        margin-right: 10px;
+      }
+
+      @media (max-width: 768px) {
+        .container-main {
+          margin: 20px auto;
+        }
+
+        .profile-section {
+          grid-template-columns: 1fr;
+        }
+
+        .appointment-item {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .appointment-item .btn-custom {
+          margin-top: 10px;
+          width: 100%;
+          text-align: center;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      footer {
+        background: var(--dark-text);
+        color: white;
+        text-align: center;
+        padding: 20px;
+        margin-top: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+          <i class="fas fa-clinic-medical"></i> GeniDoc
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/patient-dashboard.html">
+                <i class="fas fa-home"></i> Accueil
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/appintment.html">
+                <i class="fas fa-calendar"></i> Nouveau RDV
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="settings.html"
+                title="Paramètres"
+                style="display: flex; align-items: center; gap: 6px"
+              >
+                <img
+                  src="images-keyfeatures/parametres.png"
+                  alt="Paramètres"
+                  style="
+                    width: 20px;
+                    height: 20px;
+                    vertical-align: middle;
+                    margin-right: 4px;
+                  "
+                />
+                <span style="vertical-align: middle">Paramètres</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Déconnexion
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-main">
+      <!-- Welcome Banner -->
+      <div class="welcome-banner">
+        <h1>
+          <i class="fas fa-user-circle"></i> Bienvenue,
+          <span id="patient-name">Patient</span>
+        </h1>
+        <p>Gérez vos rendez-vous médicaux et consultez votre profil</p>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number" id="total-appointments">0</div>
+          <div class="stat-label">Rendez-vous Total</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="upcoming-appointments">0</div>
+          <div class="stat-label">À venir</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="completed-appointments">0</div>
+          <div class="stat-label">Complétés</div>
+        </div>
+      </div>
+
+      <!-- My Appointments Section -->
+      <div class="card">
+        <div class="card-header">
+          <h5><i class="fas fa-calendar-check"></i> Mes Rendez-vous</h5>
+        </div>
+        <div class="card-body">
+          <div id="appointments-list">
+            <div class="no-appointments">
+              <i class="fas fa-calendar-times"></i>
+              <p>Aucun rendez-vous programmé</p>
+              <a
+                href="/appintment.html"
+                class="btn-custom"
+                style="margin-top: 15px"
+              >
+                <i class="fas fa-plus"></i> Prendre un rendez-vous
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Section -->
+      <div class="card">
+        <div class="card-header">
+          <h5><i class="fas fa-user"></i> Mon Profil</h5>
+        </div>
+        <div class="card-body">
+          <div class="profile-section">
+            <div class="profile-item">
+              <label><i class="fas fa-id-card"></i> GeniDoc ID</label>
+              <p id="profile-id">GD-000000</p>
+            </div>
+            <div class="profile-item">
+              <label><i class="fas fa-envelope"></i> Email</label>
+              <p id="profile-email">email@example.com</p>
+            </div>
+            <div class="profile-item">
+              <label><i class="fas fa-phone"></i> Téléphone</label>
+              <p id="profile-phone">+213 xxx xxx xxx</p>
+            </div>
+            <div class="profile-item">
+              <label><i class="fas fa-calendar-alt"></i> Inscription</label>
+              <p id="profile-date">--/--/----</p>
+            </div>
+          </div>
+          <button class="btn-custom" onclick="editProfile()">
+            <i class="fas fa-edit"></i> Modifier le profil
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <p>&copy; 2025 GeniDoc. Tous les droits réservés.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Load patient data
+      function loadPatientData() {
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        const appointments = JSON.parse(
+          localStorage.getItem("appointments") || "[]"
+        );
+
+        if (!user.id) {
+          window.location.href = "/auth.html";
+          return;
+        }
+
+        // Update welcome name
+        document.getElementById("patient-name").textContent =
+          user.firstName || "Patient";
+        document.getElementById("profile-email").textContent =
+          user.email || "--";
+        document.getElementById("profile-phone").textContent =
+          user.phone || "--";
+        document.getElementById("profile-id").textContent =
+          user.genidocId || "GD-000000";
+        document.getElementById("profile-date").textContent =
+          new Date().toLocaleDateString("fr-FR");
+
+        // Update stats
+        const userAppointments = appointments.filter(
+          (apt) => apt.patientId === user.id
+        );
+        const upcoming = userAppointments.filter(
+          (apt) => new Date(apt.date) > new Date()
+        ).length;
+        const completed = userAppointments.length - upcoming;
+
+        document.getElementById("total-appointments").textContent =
+          userAppointments.length;
+        document.getElementById("upcoming-appointments").textContent = upcoming;
+        document.getElementById("completed-appointments").textContent =
+          completed;
+
+        // Load appointments
+        loadAppointments(userAppointments);
+      }
+
+      function loadAppointments(appointments) {
+        const list = document.getElementById("appointments-list");
+        if (appointments.length === 0) {
+          list.innerHTML = `
+                    <div class="no-appointments">
+                        <i class="fas fa-calendar-times"></i>
+                        <p>Aucun rendez-vous programmé</p>
+                        <a href="/appintment.html" class="btn-custom" style="margin-top: 15px;">
+                            <i class="fas fa-plus"></i> Prendre un rendez-vous
+                        </a>
+                    </div>
+                `;
+          return;
+        }
+
+        list.innerHTML = appointments
+          .map(
+            (apt) => `
+                <div class="appointment-item">
+                    <div class="appointment-info">
+                        <h6><i class="fas fa-hospital"></i> ${
+                          apt.establishment || "Établissement"
+                        }</h6>
+                        <p><i class="fas fa-calendar"></i> ${new Date(
+                          apt.date
+                        ).toLocaleDateString("fr-FR")}</p>
+                        <p><i class="fas fa-clock"></i> ${
+                          apt.time || "Heure à définir"
+                        }</p>
+                        <p><i class="fas fa-user-md"></i> ${
+                          apt.doctor || "Médecin"
+                        }</p>
+                    </div>
+                    <div>
+                        <button class="btn-custom btn-sm" onclick="editAppointment('${
+                          apt.id
+                        }')">
+                            <i class="fas fa-edit"></i> Modifier
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteAppointment('${
+                          apt.id
+                        }')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      function editAppointment(id) {
+        alert("Modification du rendez-vous: " + id);
+      }
+
+      function deleteAppointment(id) {
+        if (confirm("Êtes-vous sûr de vouloir supprimer ce rendez-vous?")) {
+          alert("Rendez-vous supprimé");
+        }
+      }
+
+      function editProfile() {
+        alert("Redirection vers modification du profil");
+      }
+
+      function logout() {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "/auth.html";
+      }
+
+      // Load data on page load
+      document.addEventListener("DOMContentLoaded", loadPatientData);
+    </script>
+  </body>
+</html>

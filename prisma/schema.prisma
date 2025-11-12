@@ -1,0 +1,650 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum UserRole {
+  PATIENT
+  DOCTOR
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum AppointmentType {
+  IN_PERSON
+  VIDEO_CONSULTATION
+  PHONE_CONSULTATION
+  HOME_VISIT
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+  RESCHEDULED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  BANK_TRANSFER
+  WALLET
+  INSURANCE
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum NotificationType {
+  APPOINTMENT_CONFIRMATION
+  APPOINTMENT_REMINDER
+  APPOINTMENT_CANCELLATION
+  PAYMENT_CONFIRMATION
+  PAYMENT_FAILED
+  DOCTOR_MESSAGE
+  SYSTEM_ALERT
+  RATING_REQUEST
+  PROMOTION
+}
+
+enum ConsultationFeedbackRating {
+  POOR
+  FAIR
+  GOOD
+  VERY_GOOD
+  EXCELLENT
+}
+
+enum SpecialtyCategory {
+  GENERAL_MEDICINE
+  CARDIOLOGY
+  NEUROLOGY
+  ORTHOPEDICS
+  PEDIATRICS
+  DERMATOLOGY
+  PSYCHIATRY
+  OPHTHALMOLOGY
+  ENT
+  DENTISTRY
+  OTHER
+}
+
+// ============================================
+// BASE USER MODEL (Inheritance through relations)
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique @db.VarChar(255)
+  password      String    @db.VarChar(255)
+  firstName     String    @db.VarChar(100)
+  lastName      String    @db.VarChar(100)
+  phone         String?   @db.VarChar(20)
+  role          UserRole  @default(PATIENT)
+  status        UserStatus @default(ACTIVE)
+  profileImage  String?
+  isEmailVerified Boolean @default(false)
+  isPhoneVerified Boolean @default(false)
+  lastLogin     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  // Relations
+  patient       Patient?
+  doctor        Doctor?
+  admin         Admin?
+  appointments  Appointment[] @relation("UserAppointments")
+  consultations Consultation[]
+  notifications Notification[]
+  auditLogs     AuditLog[]
+  payments      Payment[] @relation("UserPayments")
+
+  @@index([email])
+  @@index([role])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ============================================
+// PATIENT MODEL
+// ============================================
+
+model Patient {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  genidocId         String    @unique @db.VarChar(20) // Format: GD-XXXXXX
+  dateOfBirth       DateTime?
+  gender            String?   @db.VarChar(20)
+  bloodType         String?   @db.VarChar(5)
+  address           String?
+  city              String?   @db.VarChar(100)
+  country           String?   @db.VarChar(100)
+  zipCode           String?   @db.VarChar(20)
+  allergies         String?   @db.Text // JSON or comma-separated
+  medicalHistory    String?   @db.Text // JSON or detailed text
+  emergencyContact  String?   @db.VarChar(255)
+  insuranceProvider String?   @db.VarChar(255)
+  insurancePolicyId String?   @db.VarChar(255)
+  totalSpent        Decimal   @default(0) @db.Decimal(10, 2)
+  totalAppointments Int       @default(0)
+  averageRating     Decimal   @default(0) @db.Decimal(3, 2)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments      Appointment[] @relation("PatientAppointments")
+  consultationFeedbacks ConsultationFeedback[]
+  doctorRatings     DoctorRating[]
+
+  @@index([userId])
+  @@index([genidocId])
+  @@index([createdAt])
+}
+
+// ============================================
+// DOCTOR MODEL
+// ============================================
+
+model Doctor {
+  id                  String    @id @default(cuid())
+  userId              String    @unique
+  licenseNumber       String    @unique @db.VarChar(50)
+  licenseExpiry       DateTime
+  specialization      SpecialtyCategory
+  bio                 String?   @db.Text
+  experience          Int?      // Years of experience
+  consultationFee     Decimal   @db.Decimal(8, 2)
+  followupFee         Decimal?  @db.Decimal(8, 2)
+  isVerified          Boolean   @default(false)
+  verificationDate    DateTime?
+  rating              Decimal   @default(0) @db.Decimal(3, 2)
+  totalRatings        Int       @default(0)
+  totalConsultations  Int       @default(0)
+  totalEarnings       Decimal   @default(0) @db.Decimal(12, 2)
+  bankName            String?   @db.VarChar(100)
+  bankAccountNumber   String?   @db.VarChar(50)
+  bankRoutingNumber   String?   @db.VarChar(50)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  // Relations
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specialties         DoctorSpecialty[]
+  establishments      DoctorEstablishment[]
+  schedules           DoctorSchedule[]
+  appointments        Appointment[] @relation("DoctorAppointments")
+  consultations       Consultation[] @relation("DoctorConsultations")
+  ratings             DoctorRating[]
+
+  @@index([userId])
+  @@index([licenseNumber])
+  @@index([specialization])
+  @@index([isVerified])
+  @@index([createdAt])
+}
+
+// ============================================
+// ADMIN MODEL
+// ============================================
+
+model Admin {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  department      String?   @db.VarChar(100)
+  permissions     String?   @db.Text // JSON array
+  canManageUsers  Boolean   @default(false)
+  canManageDoctors Boolean  @default(false)
+  canViewAnalytics Boolean  @default(false)
+  canApproveWithdrawals Boolean @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ============================================
+// SPECIALTY MODEL
+// ============================================
+
+model Specialty {
+  id          String    @id @default(cuid())
+  name        String    @unique @db.VarChar(100)
+  category    SpecialtyCategory
+  description String?   @db.Text
+  icon        String?   // URL to icon image
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  doctors     DoctorSpecialty[]
+
+  @@index([name])
+  @@index([category])
+}
+
+// ============================================
+// DOCTOR-SPECIALTY JUNCTION TABLE (M-N)
+// ============================================
+
+model DoctorSpecialty {
+  id        String   @id @default(cuid())
+  doctorId  String
+  specialtyId String
+  isPrimary Boolean  @default(false) // Primary specialization
+  yearsExperience Int?
+  createdAt DateTime @default(now())
+
+  // Relations
+  doctor    Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  specialty Specialty @relation(fields: [specialtyId], references: [id], onDelete: Cascade)
+
+  @@unique([doctorId, specialtyId])
+  @@index([doctorId])
+  @@index([specialtyId])
+}
+
+// ============================================
+// ESTABLISHMENT MODEL (Hospital/Clinic)
+// ============================================
+
+model Establishment {
+  id          String    @id @default(cuid())
+  name        String    @db.VarChar(255)
+  address     String    @db.VarChar(500)
+  city        String    @db.VarChar(100)
+  country     String    @db.VarChar(100)
+  zipCode     String?   @db.VarChar(20)
+  phone       String?   @db.VarChar(20)
+  email       String?   @db.VarChar(255)
+  website     String?   @db.VarChar(255)
+  latitude    Decimal?  @db.Decimal(10, 8)
+  longitude   Decimal?  @db.Decimal(11, 8)
+  openTime    String?   @db.VarChar(10)    // HH:MM format
+  closeTime   String?   @db.VarChar(10)    // HH:MM format
+  logo        String?
+  isVerified  Boolean   @default(false)
+  totalDoctors Int      @default(0)
+  averageRating Decimal @default(0) @db.Decimal(3, 2)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  doctors     DoctorEstablishment[]
+  departments EstablishmentDepartment[]
+
+  @@index([city])
+  @@index([name])
+}
+
+// ============================================
+// DOCTOR-ESTABLISHMENT JUNCTION TABLE (M-N)
+// ============================================
+
+model DoctorEstablishment {
+  id              String   @id @default(cuid())
+  doctorId        String
+  establishmentId  String
+  department      String?  @db.VarChar(100)
+  officeNumber    String?  @db.VarChar(50)
+  createdAt       DateTime @default(now())
+
+  // Relations
+  doctor          Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  establishment   Establishment @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+
+  @@unique([doctorId, establishmentId])
+  @@index([doctorId])
+  @@index([establishmentId])
+}
+
+// ============================================
+// ESTABLISHMENT DEPARTMENT
+// ============================================
+
+model EstablishmentDepartment {
+  id              String   @id @default(cuid())
+  establishmentId String
+  name            String   @db.VarChar(100)
+  description     String?  @db.Text
+  headDoctor      String?  @db.VarChar(255)
+  createdAt       DateTime @default(now())
+
+  // Relations
+  establishment   Establishment @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+
+  @@unique([establishmentId, name])
+}
+
+// ============================================
+// DOCTOR SCHEDULE
+// ============================================
+
+model DoctorSchedule {
+  id              String    @id @default(cuid())
+  doctorId        String
+  dayOfWeek       DayOfWeek
+  startTime       String    @db.VarChar(10) // HH:MM format
+  endTime         String    @db.VarChar(10) // HH:MM format
+  breakStartTime  String?   @db.VarChar(10)
+  breakEndTime    String?   @db.VarChar(10)
+  isAvailable     Boolean   @default(true)
+  slotDuration    Int       @default(30) // in minutes
+  maxSlots        Int       @default(10)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  doctor          Doctor    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@unique([doctorId, dayOfWeek])
+  @@index([doctorId])
+}
+
+// ============================================
+// APPOINTMENT
+// ============================================
+
+model Appointment {
+  id                      String    @id @default(cuid())
+  appointmentNumber       String    @unique @db.VarChar(50) // APT-XXXXXXXX
+  patientId               String
+  doctorId                String
+  userId                  String    // Creator (usually patient)
+  appointmentType         AppointmentType
+  status                  AppointmentStatus @default(PENDING)
+  scheduledDateTime       DateTime
+  estimatedDuration       Int       @default(30) // in minutes
+  actualDuration          Int?      // in minutes
+  symptoms                String?   @db.Text
+  medicalHistory          String?   @db.Text
+  attachmentUrls          String?   @db.Text // JSON array of URLs
+  meetingLink             String?   @db.VarChar(500) // For video consultations
+  notes                   String?   @db.Text
+  doctorNotes             String?   @db.Text
+  prescriptionUrl         String?
+  cancelledBy             String?   @db.VarChar(50) // PATIENT, DOCTOR, ADMIN
+  cancellationReason      String?   @db.Text
+  cancelledAt             DateTime?
+  startedAt               DateTime?
+  completedAt             DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  // Relations
+  patient                 Patient   @relation("PatientAppointments", fields: [patientId], references: [id], onDelete: Cascade)
+  doctor                  Doctor    @relation("DoctorAppointments", fields: [doctorId], references: [id], onDelete: Cascade)
+  user                    User      @relation("UserAppointments", fields: [userId], references: [id], onDelete: Cascade)
+  payment                 Payment?
+  consultation            Consultation?
+  feedback                ConsultationFeedback?
+
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([status])
+  @@index([scheduledDateTime])
+  @@index([createdAt])
+}
+
+// ============================================
+// CONSULTATION (During Appointment)
+// ============================================
+
+model Consultation {
+  id              String    @id @default(cuid())
+  appointmentId   String    @unique
+  patientId       String
+  doctorId        String
+  startedAt       DateTime  @default(now())
+  endedAt         DateTime?
+  duration        Int?      // in seconds
+  notes           String?   @db.Text
+  diagnosis       String?   @db.Text
+  treatment       String?   @db.Text
+  prescriptions   String?   @db.Text // JSON
+  recommendations String?   @db.Text
+  recordingUrl    String?
+  createdAt       DateTime  @default(now())
+
+  // Relations
+  appointment     Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  patient         Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor          Doctor    @relation("DoctorConsultations", fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@index([appointmentId])
+  @@index([patientId])
+  @@index([doctorId])
+}
+
+// ============================================
+// CONSULTATION FEEDBACK / RATING
+// ============================================
+
+model ConsultationFeedback {
+  id              String    @id @default(cuid())
+  appointmentId   String    @unique
+  patientId       String
+  rating          ConsultationFeedbackRating
+  comment         String?   @db.Text
+  wouldRecommend  Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  appointment     Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  patient         Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@index([patientId])
+  @@index([appointmentId])
+}
+
+// ============================================
+// DOCTOR RATING / REVIEW
+// ============================================
+
+model DoctorRating {
+  id          String    @id @default(cuid())
+  doctorId    String
+  patientId   String
+  rating      Decimal   @db.Decimal(3, 2)
+  review      String?   @db.Text
+  criteria    String?   @db.Text // JSON with detailed scoring
+  helpful     Int       @default(0)
+  unhelpful   Int       @default(0)
+  verified    Boolean   @default(true) // Verified purchase
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  doctor      Doctor    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  patient     Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@index([doctorId])
+  @@index([patientId])
+  @@index([rating])
+}
+
+// ============================================
+// PAYMENT
+// ============================================
+
+model Payment {
+  id                String    @id @default(cuid())
+  transactionId     String    @unique @db.VarChar(100)
+  appointmentId     String    @unique
+  userId            String
+  amount            Decimal   @db.Decimal(10, 2)
+  currency          String    @default("USD") @db.VarChar(3)
+  paymentMethod     PaymentMethod
+  status            PaymentStatus @default(PENDING)
+  stripePaymentIntentId String?
+  stripeChargeId    String?
+  stripeCustomerId  String?
+  receiptUrl        String?
+  invoiceUrl        String?
+  description       String?   @db.VarChar(255)
+  metadata          String?   @db.Text // JSON
+  refundedAt        DateTime?
+  refundReason      String?
+  refundAmount      Decimal?  @db.Decimal(10, 2)
+  failureReason     String?
+  failureCode       String?
+  processedAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  appointment       Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  user              User      @relation("UserPayments", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([appointmentId])
+  @@index([userId])
+  @@index([status])
+  @@index([stripePaymentIntentId])
+  @@index([createdAt])
+}
+
+// ============================================
+// NOTIFICATION
+// ============================================
+
+model Notification {
+  id          String    @id @default(cuid())
+  userId      String
+  type        NotificationType
+  title       String    @db.VarChar(255)
+  message     String    @db.Text
+  actionUrl   String?   @db.VarChar(500)
+  isRead      Boolean   @default(false)
+  readAt      DateTime?
+  metadata    String?   @db.Text // JSON for additional data
+  sentViaEmail Boolean   @default(true)
+  sentViaSms  Boolean   @default(false)
+  sentViaPush Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  expireAt    DateTime? // Auto-delete after this date
+
+  // Relations
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+// ============================================
+// AUDIT LOG (For compliance & security)
+// ============================================
+
+model AuditLog {
+  id          String    @id @default(cuid())
+  userId      String
+  action      String    @db.VarChar(50) // CREATE, UPDATE, DELETE, LOGIN, etc.
+  resourceType String   @db.VarChar(50) // User, Appointment, Payment, etc.
+  resourceId  String    @db.VarChar(100)
+  changes     String?   @db.Text // JSON of what changed
+  ipAddress   String?   @db.VarChar(50)
+  userAgent   String?   @db.Text
+  statusCode  Int?
+  errorMessage String?  @db.Text
+  createdAt   DateTime  @default(now())
+
+  // Relations
+  user        User      @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@index([resourceType])
+  @@index([createdAt])
+}
+
+// ============================================
+// WALLET / BALANCE (For future use)
+// ============================================
+
+model Wallet {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  balance     Decimal   @default(0) @db.Decimal(12, 2)
+  currency    String    @default("USD") @db.VarChar(3)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+// ============================================
+// WITHDRAWAL REQUEST (For doctor payouts)
+// ============================================
+
+model WithdrawalRequest {
+  id          String    @id @default(cuid())
+  doctorId    String
+  amount      Decimal   @db.Decimal(12, 2)
+  status      String    @default("PENDING") @db.VarChar(20)
+  bankName    String    @db.VarChar(100)
+  accountNumber String  @db.VarChar(50)
+  requestedAt DateTime  @default(now())
+  processedAt DateTime?
+  processedBy String?   @db.VarChar(50)
+  notes       String?   @db.Text
+  createdAt   DateTime  @default(now())
+
+  @@index([doctorId])
+  @@index([status])
+}
+
+// ============================================
+// BLACKLIST TOKEN (For logout)
+// ============================================
+
+model BlacklistedToken {
+  id          String    @id @default(cuid())
+  token       String    @unique @db.Text
+  userId      String
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+
+  @@index([expiresAt])
+}

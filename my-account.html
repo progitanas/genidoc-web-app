@@ -1,279 +1,310 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
+  <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>GeniDoc — Mon Compte</title>
-    <meta name="description" content="Gérez votre compte GeniDoc et vos préférences." />
+    <meta
+      name="description"
+      content="Gérez votre compte GeniDoc et vos préférences."
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="/static/ong_GeniDoc1preview.png" />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: "Space Grotesk", sans-serif;
-            background: #f5f5f5;
-            color: #333;
-        }
-        header {
-            background: #1f1f1f;
-            color: white;
-            padding: 2rem;
-            text-align: center;
-        }
-        header h1 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-        .container {
-            max-width: 1000px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-        }
-        .account-grid {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-        .sidebar {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            height: fit-content;
-        }
-        .profile-card {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        .profile-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: #c71f37;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: white;
-            margin: 0 auto 1rem;
-        }
-        .profile-name {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 0.3rem;
-        }
-        .profile-email {
-            font-size: 0.9rem;
-            color: #666;
-        }
-        .menu-item {
-            padding: 0.8rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-        .menu-item:hover {
-            background: #f0f0f0;
-        }
-        .menu-item.active {
-            background: #c71f37;
-            color: white;
-        }
-        .content {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .section-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            color: #1f1f1f;
-            border-bottom: 2px solid #c71f37;
-            padding-bottom: 0.8rem;
-        }
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: #333;
-        }
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            font-family: inherit;
-        }
-        .form-group textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-        .btn {
-            display: inline-block;
-            background: #c71f37;
-            color: white;
-            padding: 0.8rem 1.5rem;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: background 0.3s ease;
-            border: none;
-            cursor: pointer;
-            margin-right: 1rem;
-        }
-        .btn:hover {
-            background: #a01829;
-        }
-        .btn-secondary {
-            background: #ddd;
-            color: #333;
-        }
-        .btn-secondary:hover {
-            background: #bbb;
-        }
-        .settings-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-        }
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            background: #f9f9f9;
-            border-radius: 6px;
-            margin-bottom: 1rem;
-        }
-        .toggle {
-            width: 50px;
-            height: 30px;
-            background: #ddd;
-            border-radius: 15px;
-            position: relative;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-        .toggle.active {
-            background: #22c55e;
-        }
-        .toggle::after {
-            content: '';
-            position: absolute;
-            width: 26px;
-            height: 26px;
-            background: white;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: left 0.3s ease;
-        }
-        .toggle.active::after {
-            left: 22px;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Space Grotesk", "Segoe UI", Tahoma, Geneva, Verdana,
+          sans-serif;
+        background: #f5f7fa;
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .dashboard-header {
+        background: #fff;
+      }
     </style>
-</head>
-<body>
-    <header>
-        <h1>Mon Compte GeniDoc</h1>
-        <p>Gérez votre profil et vos préférences</p>
+  </head>
+  <body>
+  <header class="dashboard-header">
+      <div class="header-left">
+        <img src="/static/GeniDoc_IeHF2025.png" alt="GeniDoc Logo" />
+        <div class="header-welcome">
+          Bienvenue, <span id="patient-name">Patient</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <!-- Notifications -->
+        <button
+          class="notification-btn"
+          id="notificationBtn"
+          title="Notifications"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#2056AE"
+            stroke-width="2"
+          >
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          <span class="notification-badge" id="notificationBadge">0</span>
+        </button>
+        <!-- Profil -->
+        <button class="profile-btn" id="profileBtn" title="Mon profil">
+          <svg
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#2056AE"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 20c0-4 4-7 8-7s8 3 8 7" />
+          </svg>
+        </button>
+        <!-- Paramètres -->
+        <button
+          class="profile-btn"
+          id="settingsBtn"
+          title="Paramètres"
+          onclick="window.open('my-account.html#settings','_blank')"
+        >
+          <svg
+            width="26"
+            height="26"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#2056AE"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 5 15.4a1.65 1.65 0 0 0-1.51-1V13a2 2 0 0 1 0-4v-.09A1.65 1.65 0 0 0 5 8.6a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09A1.65 1.65 0 0 0 16 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1V11a2 2 0 0 1 0 4v.09A1.65 1.65 0 0 0 19.4 15z"
+            />
+          </svg>
+        </button>
+      </div>
+      <!-- Dropdown profil -->
+      <div class="profile-dropdown" id="profileDropdown">
+        <label>GeniDoc ID</label>
+        <div class="profile-value" id="profile-gd"></div>
+        <label>Email</label>
+        <div class="profile-value" id="profile-email"></div>
+        <label>Date de naissance</label>
+        <div class="profile-value" id="profile-birth"></div>
+        <label>Username</label>
+        <div class="profile-value" id="profile-username"></div>
+        <button class="logout-btn" id="logoutBtn">Se déconnecter</button>
+      </div>
     </header>
 
-    <div class="container">
-        <div class="account-grid">
-            <div class="sidebar">
-                <div class="profile-card">
-                    <div class="profile-avatar">👤</div>
-                    <div class="profile-name">Prénom Nom</div>
-                    <div class="profile-email">email@example.com</div>
-                </div>
+    <main class="main-content">
+      <button class="btn" id="back-dashboard-btn" style="margin-bottom: 1.5rem">
+        ← Retour au Dashboard
+      </button>
+      <div class="section-title">Informations Personnelles</div>
+      <div class="form-group">
+        <label for="username">Nom complet:</label>
+        <input type="text" id="username" name="username" value="" />
+      </div>
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" value="" />
+      </div>
+      <div class="form-group">
+        <label for="phone">Téléphone:</label>
+        <input type="tel" id="phone" name="phone" value="" />
+      </div>
+      <div class="form-group">
+        <label for="birthdate">Date de naissance:</label>
+        <input type="date" id="birthdate" name="birthdate" />
+      </div>
+      <button class="btn" id="save-btn">Enregistrer les modifications</button>
+      <button class="btn btn-secondary" id="cancel-btn">Annuler</button>
+      <div
+        id="account-message"
+        style="margin-top: 1rem; font-weight: 500"
+      ></div>
+    </main>
+    <!-- JS regroupé dans un seul bloc à la fin du body pour éviter les erreurs -->
+    
+  </body>
+</main>
+<script>
+  // JS regroupé dans un seul bloc pour éviter les erreurs
+  // Récupération du GeniDoc ID depuis l'URL
+  const params = new URLSearchParams(window.location.search);
+  const genidocId = params.get("genidocId");
 
-                <div class="menu-item active">👤 Informations Personnelles</div>
-                <div class="menu-item">🔐 Sécurité & Mot de passe</div>
-                <div class="menu-item">🔔 Notifications</div>
-                <div class="menu-item">📋 Historique</div>
-                <div class="menu-item">⚙️ Préférences</div>
-                <div class="menu-item">🚪 Déconnexion</div>
-            </div>
+  if (!genidocId) {
+    window.location.href = "auth.html";
+  }
 
-            <div class="content">
-                <div class="section-title">Informations Personnelles</div>
-                
-                <div class="form-group">
-                    <label for="firstname">Prénom:</label>
-                    <input type="text" id="firstname" value="Prénom" />
-                </div>
+  // Bouton retour dashboard
+  document.addEventListener("DOMContentLoaded", function () {
+    document
+      .getElementById("back-dashboard-btn")
+      .addEventListener("click", function () {
+        if (genidocId) {
+          window.location.href = `index-dashbord.html?genidocId=${genidocId}`;
+        } else {
+          window.location.href = "index-dashbord.html";
+        }
+      });
 
-                <div class="form-group">
-                    <label for="lastname">Nom:</label>
-                    <input type="text" id="lastname" value="Nom" />
-                </div>
+    // Remplir le header avec le nom du patient
+    function updateHeaderName(name) {
+      document.getElementById("patient-name").textContent = name || "Patient";
+    }
 
-                <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" value="email@example.com" />
-                </div>
+    // Remplir le profil dropdown
+    function updateProfileDropdown(patient) {
+      document.getElementById("profile-gd").textContent =
+        patient.genidocId || "";
+      document.getElementById("profile-email").textContent =
+        patient.email || "";
+      document.getElementById("profile-birth").textContent =
+        patient.birthdate || "";
+      document.getElementById("profile-username").textContent =
+        patient.username || "";
+    }
 
-                <div class="form-group">
-                    <label for="phone">Téléphone:</label>
-                    <input type="tel" id="phone" value="+212 6 12 34 56 78" />
-                </div>
+    // Helper: déconnexion forcée et fetch sécurisé (gère 401/403)
+    function forceLogout(msg) {
+      localStorage.clear();
+      alert(msg || "Session expirée ou accès interdit. Veuillez vous reconnecter.");
+      window.location.href = 'auth.html';
+    }
 
-                <div class="form-group">
-                    <label for="dob">Date de naissance:</label>
-                    <input type="date" id="dob" />
-                </div>
+    async function secureFetch(url, options = {}, errorMsg) {
+      const res = await fetch(url, options);
+      if (res.status === 401 || res.status === 403) {
+        forceLogout(errorMsg || "Session expirée ou accès interdit. Veuillez vous reconnecter.");
+        throw new Error('Déconnecté');
+      }
+      return res;
+    }
 
-                <div class="form-group">
-                    <label for="address">Adresse:</label>
-                    <input type="text" id="address" placeholder="Rue, Ville, Code postal" />
-                </div>
+    // Charger les infos du patient (utilise secureFetch + headers obligatoires)
+    async function loadPatientInfo() {
+      if (!genidocId) return;
+      try {
+        const res = await secureFetch(`/api/patient/${genidocId}`, {
+          headers: {
+            'X-User-Role': 'patient',
+            'X-GenidocId': genidocId
+          }
+        }, 'Accès patient interdit ou expiré.');
+        const result = await res.json();
+        if (result.success && result.data) {
+          const p = result.data;
+          document.getElementById("username").value = p.username || "";
+          document.getElementById("email").value = p.email || "";
+          document.getElementById("phone").value = p.telephone || "";
+          document.getElementById("birthdate").value = p.birthdate || "";
+          updateHeaderName(p.username);
+          updateProfileDropdown(p);
+        } else {
+          document.getElementById("account-message").textContent = result.message || 'Patient non trouvé';
+          document.getElementById("account-message").style.color = "#e74c3c";
+        }
+      } catch (e) {
+        if (e.message !== 'Déconnecté') {
+          document.getElementById("account-message").textContent = "Erreur chargement profil";
+          document.getElementById("account-message").style.color = "#e74c3c";
+        }
+      }
+    }
 
-                <button class="btn">Enregistrer les modifications</button>
-                <button class="btn btn-secondary">Annuler</button>
+    // Save changes
+    document
+      .getElementById("save-btn")
+      .addEventListener("click", async function (e) {
+        e.preventDefault();
+        if (!genidocId) return;
+        const data = {
+          username: document.getElementById("username").value,
+          email: document.getElementById("email").value,
+          telephone: document.getElementById("phone").value,
+          birthdate: document.getElementById("birthdate").value,
+        };
+        try {
+          const res = await secureFetch(`/api/patient/${genidocId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json", 'X-User-Role': 'patient', 'X-GenidocId': genidocId },
+            body: JSON.stringify(data),
+          }, 'Accès refusé lors de la sauvegarde');
+          const result = await res.json();
+          if (result.success) {
+            document.getElementById("account-message").textContent =
+              "Modifications enregistrées ✔";
+            document.getElementById("account-message").style.color =
+              "#27ae60";
+            loadPatientInfo();
+          } else {
+            document.getElementById("account-message").textContent =
+              result.message || "Erreur lors de la sauvegarde";
+            document.getElementById("account-message").style.color =
+              "#e74c3c";
+          }
+        } catch (e) {
+          if (e.message !== 'Déconnecté') {
+            document.getElementById("account-message").textContent =
+              "Erreur lors de la sauvegarde";
+            document.getElementById("account-message").style.color = "#e74c3c";
+          }
+        }
+      });
 
-                <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #eee;">
-                    <div class="section-title">Préférences de Notification</div>
-                    
-                    <div class="setting-item">
-                        <span>Notifications par email</span>
-                        <div class="toggle active"></div>
-                    </div>
+    // Cancel button: reload info
+    document
+      .getElementById("cancel-btn")
+      .addEventListener("click", function (e) {
+        e.preventDefault();
+        loadPatientInfo();
+        document.getElementById("account-message").textContent = "";
+      });
 
-                    <div class="setting-item">
-                        <span>Notifications SMS</span>
-                        <div class="toggle"></div>
-                    </div>
+    // Dropdown profil
+    const profileBtn = document.getElementById("profileBtn");
+    const profileDropdown = document.getElementById("profileDropdown");
+    profileBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      profileDropdown.classList.toggle("active");
+    });
+    document.addEventListener("click", () => {
+      profileDropdown.classList.remove("active");
+    });
+    profileDropdown.addEventListener("click", (e) => {
+      e.stopPropagation();
+    });
 
-                    <div class="setting-item">
-                        <span>Rappels de rendez-vous</span>
-                        <div class="toggle active"></div>
-                    </div>
+    // Déconnexion
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      if (confirm("Voulez-vous vraiment vous déconnecter ?")) {
+        window.location.href = "auth.html";
+      }
+    });
 
-                    <div class="setting-item">
-                        <span>Actualités et promotions</span>
-                        <div class="toggle"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</body>
+    // Charger infos au démarrage
+    loadPatientInfo();
+  });
+</script>
 </html>
+<!-- FICHIER OBSOLÈTE : Les paramètres sont désormais gérés dans settings.html -->

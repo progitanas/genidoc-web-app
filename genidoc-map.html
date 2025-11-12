@@ -138,11 +138,13 @@
         ></textarea>
 
         <div class="actions">
-          <button type="button" id="analyze">Analyser & structurer</button>
+          <button type="button" id="analyze">Pré-remplir le formulaire</button>
           <button type="submit" class="secondary">
-            Analyser et envoyer au serveur
+            Valider et enregistrer
           </button>
-          <button type="button" id="clear" class="secondary">Vider</button>
+          <button type="button" id="clear" class="secondary">
+            Réinitialiser
+          </button>
         </div>
       </form>
 
@@ -168,6 +170,95 @@
               <label>Adresse (libre)</label>
               <input id="field-address" type="text" />
             </div>
+            <div class="field">
+              <label>Ville</label>
+              <input id="field-city" type="text" />
+            </div>
+            <div class="field">
+              <label>Latitude</label>
+              <div style="display: flex; gap: 8px; align-items: center">
+                <input
+                  id="field-lat"
+                  type="text"
+                  placeholder="33.5899"
+                  style="flex: 1"
+                />
+                <button
+                  type="button"
+                  id="gps-btn"
+                  title="Utiliser ma position"
+                  style="padding: 6px 10px; font-size: 0.95em"
+                >
+                  📍 GPS
+                </button>
+              </div>
+              <script>
+                // GPS button: fill latitude/longitude from browser geolocation
+                document.addEventListener("DOMContentLoaded", function () {
+                  const gpsBtn = document.getElementById("gps-btn");
+                  if (gpsBtn) {
+                    gpsBtn.onclick = function () {
+                      if (!navigator.geolocation) {
+                        alert(
+                          "La géolocalisation n'est pas supportée par ce navigateur."
+                        );
+                        return;
+                      }
+                      gpsBtn.disabled = true;
+                      gpsBtn.textContent = "Recherche...";
+                      navigator.geolocation.getCurrentPosition(
+                        function (pos) {
+                          document.getElementById("field-lat").value =
+                            pos.coords.latitude.toFixed(6);
+                          document.getElementById("field-lng").value =
+                            pos.coords.longitude.toFixed(6);
+                          gpsBtn.textContent = "📍 GPS";
+                          gpsBtn.disabled = false;
+                        },
+                        function (err) {
+                          alert("Erreur géolocalisation: " + err.message);
+                          gpsBtn.textContent = "📍 GPS";
+                          gpsBtn.disabled = false;
+                        },
+                        { enableHighAccuracy: true, timeout: 10000 }
+                      );
+                    };
+                  }
+                });
+              </script>
+            </div>
+            <div class="field">
+              <label>Longitude</label>
+              <input id="field-lng" type="text" placeholder="-7.6039" />
+            </div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div>
+            <label>Horaires (ex: lun 08:30-18:00)</label>
+            <input
+              id="field-hours"
+              type="text"
+              placeholder="lun 08:30-18:00; mar 08:30-18:00"
+            />
+          </div>
+          <div>
+            <label>Services (ex: télémédecine, PMR, parking)</label>
+            <input
+              id="field-services"
+              type="text"
+              placeholder="télémédecine, PMR, parking"
+            />
+          </div>
+        </div>
+        <div class="two-col">
+          <div>
+            <label>ICE (si Maroc)</label>
+            <input id="field-ice" type="text" />
+          </div>
+          <div>
+            <label>Registre de l'ordre</label>
+            <input id="field-order" type="text" />
           </div>
         </div>
 
@@ -195,21 +286,7 @@
           <textarea id="field-notes" rows="3"></textarea>
         </div>
 
-        <div class="actions" style="margin-top: 12px">
-          <button id="copy-json">Copier JSON</button>
-          <button id="download-json" class="secondary">Télécharger JSON</button>
-          <button id="open-maps" class="secondary">
-            Ouvrir dans Google Maps
-          </button>
-          <button id="send-server">Envoyer au serveur</button>
-        </div>
-
-        <h4 style="margin-top: 14px; color: #25407a">
-          Aperçu structuré (JSON-LD)
-        </h4>
-        <div style="background: #ffffff; border-radius: 8px; padding: 10px">
-          <pre id="jsonld" style="margin: 0"></pre>
-        </div>
+        <!-- Actions avancées et aperçu JSON supprimés pour la production -->
       </div>
     </div>
 
@@ -351,13 +428,33 @@
         const name = fieldName.value || "";
         const specialty = fieldSpecialty.value || "";
         const address = fieldAddress.value || "";
+        const city = document.getElementById("field-city").value || "";
+        const lat = document.getElementById("field-lat").value || "";
+        const lng = document.getElementById("field-lng").value || "";
         const phones = (fieldPhone.value || "")
           .split(/[;,]+/)
           .map((s) => s.trim())
           .filter(Boolean);
         const contact = fieldContact.value || "";
         const notes = fieldNotes.value || descriptionInput.value || "";
-        const obj = { name, specialty, address, phone: phones, contact, notes };
+        const hours = document.getElementById("field-hours").value || "";
+        const services = document.getElementById("field-services").value || "";
+        const ice = document.getElementById("field-ice").value || "";
+        const order = document.getElementById("field-order").value || "";
+        const obj = {
+          name,
+          specialty,
+          address,
+          city,
+          location: lat && lng ? { lat, lng } : undefined,
+          phone: phones,
+          contact,
+          notes,
+          hours,
+          services,
+          ice,
+          order,
+        };
         jsonldEl.textContent = buildJsonLd(obj);
         return obj;
       }
@@ -381,6 +478,13 @@
         fieldPhone.value = phones.join("; ");
         fieldContact.value = emails.concat(urls).join("; ");
         fieldNotes.value = descriptionInput.value || "";
+        document.getElementById("field-city").value = "";
+        document.getElementById("field-lat").value = "";
+        document.getElementById("field-lng").value = "";
+        document.getElementById("field-hours").value = "";
+        document.getElementById("field-services").value = "";
+        document.getElementById("field-ice").value = "";
+        document.getElementById("field-order").value = "";
 
         // show thumbnail if present
         if (photoInput.files[0]) {

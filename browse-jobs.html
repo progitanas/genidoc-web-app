@@ -1,249 +1,278 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
+  <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>GeniDoc — Parcourir les offres d'emploi</title>
-    <meta name="description" content="Découvrez toutes les offres d'emploi disponibles dans le secteur de la santé au Maroc." />
+    <meta
+      name="description"
+      content="Découvrez toutes les offres d'emploi disponibles dans le secteur de la santé au Maroc."
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: "Space Grotesk", sans-serif;
-            background: #f5f5f5;
-            color: #333;
-        }
-        header {
-            background: #1f1f1f;
-            color: white;
-            padding: 2rem;
-            text-align: center;
-        }
-        header h1 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-        }
-        .jobs-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-        .job-card {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-        }
-        .job-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-        }
-        .job-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #c71f37;
-        }
-        .job-company {
-            font-size: 1rem;
-            color: #666;
-            margin-bottom: 1rem;
-        }
-        .job-location {
-            font-size: 0.9rem;
-            color: #999;
-            margin-bottom: 1rem;
-        }
-        .job-description {
-            font-size: 0.95rem;
-            color: #555;
-            line-height: 1.6;
-            margin-bottom: 1rem;
-        }
-        .job-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        .tag {
-            background: #e8e8e8;
-            color: #333;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-        }
-        .btn {
-            display: inline-block;
-            background: #c71f37;
-            color: white;
-            padding: 0.8rem 1.5rem;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: background 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-        .btn:hover {
-            background: #a01829;
-        }
-        .filters {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .filters h3 {
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
-        }
-        .filter-group {
-            margin-bottom: 1.5rem;
-        }
-        .filter-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-        .filter-group input,
-        .filter-group select {
-            width: 100%;
-            padding: 0.6rem;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 0.95rem;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Space Grotesk", sans-serif;
+        background: #f5f5f5;
+        color: #333;
+      }
+      header {
+        background: #1f1f1f;
+        color: white;
+        padding: 2rem;
+        text-align: center;
+      }
+      header h1 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 2rem;
+      }
+      .jobs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+      }
+      .job-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+      .job-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      }
+      .job-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #c71f37;
+      }
+      .job-company {
+        font-size: 1rem;
+        color: #666;
+        margin-bottom: 1rem;
+      }
+      .job-location {
+        font-size: 0.9rem;
+        color: #999;
+        margin-bottom: 1rem;
+      }
+      .job-description {
+        font-size: 0.95rem;
+        color: #555;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+      }
+      .job-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      .tag {
+        background: #e8e8e8;
+        color: #333;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+      }
+      .btn {
+        display: inline-block;
+        background: #c71f37;
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background 0.3s ease;
+        border: none;
+        cursor: pointer;
+      }
+      .btn:hover {
+        background: #a01829;
+      }
+      .filters {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      .filters h3 {
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+      }
+      .filter-group {
+        margin-bottom: 1.5rem;
+      }
+      .filter-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+      }
+      .filter-group input,
+      .filter-group select {
+        width: 100%;
+        padding: 0.6rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 0.95rem;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <header>
-        <h1>Offres d'Emploi GeniDoc</h1>
-        <p>Parcourez les meilleures opportunités de carrière dans le secteur de la santé</p>
+      <h1>Offres d'Emploi GeniDoc</h1>
+      <p>
+        Parcourez les meilleures opportunités de carrière dans le secteur de la
+        santé
+      </p>
     </header>
 
     <div class="container">
-        <div class="filters">
-            <h3>Filtres de recherche</h3>
-            <div class="filter-group">
-                <label for="title">Titre du poste:</label>
-                <input type="text" id="title" placeholder="Ex: Médecin, Infirmier..." />
-            </div>
-            <div class="filter-group">
-                <label for="location">Localisation:</label>
-                <select id="location">
-                    <option value="">Tous les emplacements</option>
-                    <option value="casablanca">Casablanca</option>
-                    <option value="rabat">Rabat</option>
-                    <option value="fes">Fès</option>
-                    <option value="marrakech">Marrakech</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label for="type">Type de contrat:</label>
-                <select id="type">
-                    <option value="">Tous les types</option>
-                    <option value="cdi">CDI</option>
-                    <option value="cdd">CDD</option>
-                    <option value="stage">Stage</option>
-                </select>
-            </div>
+      <div class="filters">
+        <h3>Filtres de recherche</h3>
+        <div class="filter-group">
+          <label for="title">Titre du poste:</label>
+          <input
+            type="text"
+            id="title"
+            placeholder="Ex: Médecin, Infirmier..."
+          />
+        </div>
+        <div class="filter-group">
+          <label for="location">Localisation:</label>
+          <select id="location">
+            <option value="">Tous les emplacements</option>
+            <option value="casablanca">Casablanca</option>
+            <option value="rabat">Rabat</option>
+            <option value="fes">Fès</option>
+            <option value="marrakech">Marrakech</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="type">Type de contrat:</label>
+          <select id="type">
+            <option value="">Tous les types</option>
+            <option value="cdi">CDI</option>
+            <option value="cdd">CDD</option>
+            <option value="stage">Stage</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="jobs-grid">
+        <!-- Job Card 1 -->
+        <div class="job-card">
+          <div class="job-title">Médecin Généraliste</div>
+          <div class="job-company">Clinique du Palmier</div>
+          <div class="job-location">📍 Casablanca</div>
+          <div class="job-description">
+            Nous recherchons un médecin généraliste expérimenté pour rejoindre
+            notre équipe.
+          </div>
+          <div class="job-tags">
+            <span class="tag">CDI</span>
+            <span class="tag">Santé</span>
+          </div>
+          <button class="btn">Postuler</button>
         </div>
 
-        <div class="jobs-grid">
-            <!-- Job Card 1 -->
-            <div class="job-card">
-                <div class="job-title">Médecin Généraliste</div>
-                <div class="job-company">Clinique du Palmier</div>
-                <div class="job-location">📍 Casablanca</div>
-                <div class="job-description">Nous recherchons un médecin généraliste expérimenté pour rejoindre notre équipe.</div>
-                <div class="job-tags">
-                    <span class="tag">CDI</span>
-                    <span class="tag">Santé</span>
-                </div>
-                <button class="btn">Postuler</button>
-            </div>
-
-            <!-- Job Card 2 -->
-            <div class="job-card">
-                <div class="job-title">Infirmier(ère) Spécialisé(e)</div>
-                <div class="job-company">Hôpital Ibn Sina</div>
-                <div class="job-location">📍 Rabat</div>
-                <div class="job-description">Rejoignez notre équipe de soins spécialisés avec des perspectives de carrière exceptionnelles.</div>
-                <div class="job-tags">
-                    <span class="tag">CDI</span>
-                    <span class="tag">Infirmerie</span>
-                </div>
-                <button class="btn">Postuler</button>
-            </div>
-
-            <!-- Job Card 3 -->
-            <div class="job-card">
-                <div class="job-title">Dentiste</div>
-                <div class="job-company">Centre Dentaire Excellence</div>
-                <div class="job-location">📍 Fès</div>
-                <div class="job-description">Cabinet dentaire moderne cherche dentiste pour renforcer son équipe.</div>
-                <div class="job-tags">
-                    <span class="tag">CDI</span>
-                    <span class="tag">Dentisterie</span>
-                </div>
-                <button class="btn">Postuler</button>
-            </div>
-
-            <!-- Job Card 4 -->
-            <div class="job-card">
-                <div class="job-title">Pharmacien</div>
-                <div class="job-company">Pharmacie du Centre</div>
-                <div class="job-location">📍 Marrakech</div>
-                <div class="job-description">Pharmacien expérimenté pour gérer notre pharmacie en pleine expansion.</div>
-                <div class="job-tags">
-                    <span class="tag">CDI</span>
-                    <span class="tag">Pharmacie</span>
-                </div>
-                <button class="btn">Postuler</button>
-            </div>
-
-            <!-- Job Card 5 -->
-            <div class="job-card">
-                <div class="job-title">Radiologiste</div>
-                <div class="job-company">Imaging Center Pro</div>
-                <div class="job-location">📍 Casablanca</div>
-                <div class="job-description">Spécialiste en radiologie pour rejoindre notre centre d'imagerie de pointe.</div>
-                <div class="job-tags">
-                    <span class="tag">CDI</span>
-                    <span class="tag">Radiologie</span>
-                </div>
-                <button class="btn">Postuler</button>
-            </div>
-
-            <!-- Job Card 6 -->
-            <div class="job-card">
-                <div class="job-title">Psychologue Clinicien</div>
-                <div class="job-company">Cabinet Santé Mentale</div>
-                <div class="job-location">📍 Rabat</div>
-                <div class="job-description">Psychologue pour nos services de santé mentale et bien-être.</div>
-                <div class="job-tags">
-                    <span class="tag">CDI</span>
-                    <span class="tag">Psychologie</span>
-                </div>
-                <button class="btn">Postuler</button>
-            </div>
+        <!-- Job Card 2 -->
+        <div class="job-card">
+          <div class="job-title">Infirmier(ère) Spécialisé(e)</div>
+          <div class="job-company">Hôpital Ibn Sina</div>
+          <div class="job-location">📍 Rabat</div>
+          <div class="job-description">
+            Rejoignez notre équipe de soins spécialisés avec des perspectives de
+            carrière exceptionnelles.
+          </div>
+          <div class="job-tags">
+            <span class="tag">CDI</span>
+            <span class="tag">Infirmerie</span>
+          </div>
+          <button class="btn">Postuler</button>
         </div>
+
+        <!-- Job Card 3 -->
+        <div class="job-card">
+          <div class="job-title">Dentiste</div>
+          <div class="job-company">Centre Dentaire Excellence</div>
+          <div class="job-location">📍 Fès</div>
+          <div class="job-description">
+            Cabinet dentaire moderne cherche dentiste pour renforcer son équipe.
+          </div>
+          <div class="job-tags">
+            <span class="tag">CDI</span>
+            <span class="tag">Dentisterie</span>
+          </div>
+          <button class="btn">Postuler</button>
+        </div>
+
+        <!-- Job Card 4 -->
+        <div class="job-card">
+          <div class="job-title">Pharmacien</div>
+          <div class="job-company">Pharmacie du Centre</div>
+          <div class="job-location">📍 Marrakech</div>
+          <div class="job-description">
+            Pharmacien expérimenté pour gérer notre pharmacie en pleine
+            expansion.
+          </div>
+          <div class="job-tags">
+            <span class="tag">CDI</span>
+            <span class="tag">Pharmacie</span>
+          </div>
+          <button class="btn">Postuler</button>
+        </div>
+
+        <!-- Job Card 5 -->
+        <div class="job-card">
+          <div class="job-title">Radiologiste</div>
+          <div class="job-company">Imaging Center Pro</div>
+          <div class="job-location">📍 Casablanca</div>
+          <div class="job-description">
+            Spécialiste en radiologie pour rejoindre notre centre d'imagerie de
+            pointe.
+          </div>
+          <div class="job-tags">
+            <span class="tag">CDI</span>
+            <span class="tag">Radiologie</span>
+          </div>
+          <button class="btn">Postuler</button>
+        </div>
+
+        <!-- Job Card 6 -->
+        <div class="job-card">
+          <div class="job-title">Psychologue Clinicien</div>
+          <div class="job-company">Cabinet Santé Mentale</div>
+          <div class="job-location">📍 Rabat</div>
+          <div class="job-description">
+            Psychologue pour nos services de santé mentale et bien-être.
+          </div>
+          <div class="job-tags">
+            <span class="tag">CDI</span>
+            <span class="tag">Psychologie</span>
+          </div>
+          <button class="btn">Postuler</button>
+        </div>
+      </div>
     </div>
-</body>
+  </body>
 </html>

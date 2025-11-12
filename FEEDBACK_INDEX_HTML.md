@@ -9,6 +9,7 @@
 ## 🎯 RÉSUMÉ EXÉCUTIF
 
 **Points Forts:** ✅
+
 - Design system CSS variables bien structuré
 - Micro-interactions (@keyframes) humanisantes défini
 - Dropdown menus JavaScript fix fonctionnel
@@ -16,6 +17,7 @@
 - Accessibilité basique présente
 
 **Points Faibles:** ❌
+
 - Animations définies mais pas toutes appliquées aux éléments
 - Manque d'aria-labels sur icônes
 - CSS non-optimisé (variables non utilisées partout)
@@ -31,6 +33,7 @@
 **État:** Bon ✓
 
 ✅ **Present:**
+
 - Meta charset UTF-8
 - Viewport responsive
 - X-UA-Compatible IE edge
@@ -40,20 +43,30 @@
 - Favicon SVG inline
 
 ✅ **À améliorer:**
+
 ```html
 <!-- AVANT (actuel) -->
 <link rel="stylesheet" href="styles/main.css" />
 
 <!-- APRÈS (recommandé) -->
 <link rel="preload" as="style" href="styles/main.css" />
-<link rel="stylesheet" href="styles/main.css" media="print" onload="this.media='all'" />
+<link
+  rel="stylesheet"
+  href="styles/main.css"
+  media="print"
+  onload="this.media='all'"
+/>
 ```
 
 ❌ **MANQUENT - CRITIQUES:**
+
 ```html
 <!-- Open Graph (réseaux sociaux) -->
 <meta property="og:title" content="GeniDoc — Votre santé mérite mieux" />
-<meta property="og:description" content="Trouvez un médecin au Maroc et prenez RDV en ligne" />
+<meta
+  property="og:description"
+  content="Trouvez un médecin au Maroc et prenez RDV en ligne"
+/>
 <meta property="og:image" content="/og-image.png" />
 <meta property="og:url" content="https://genidoc.ma" />
 <meta property="og:type" content="website" />
@@ -61,12 +74,18 @@
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="GeniDoc" />
-<meta name="twitter:description" content="Trouvez un médecin au Maroc et prenez RDV en ligne" />
+<meta
+  name="twitter:description"
+  content="Trouvez un médecin au Maroc et prenez RDV en ligne"
+/>
 
 <!-- PWA & Mobile -->
 <meta name="theme-color" content="#c71f37" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta
+  name="apple-mobile-web-app-status-bar-style"
+  content="black-translucent"
+/>
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
 <!-- Favicon alternatives -->
@@ -84,6 +103,7 @@
 **État:** Excellent ✓✓
 
 ✅ **Bien structuré:**
+
 ```css
 :root {
   --color-primary: #c71f37;
@@ -96,6 +116,7 @@
 ```
 
 ⚠️ **MANQUENT:**
+
 ```css
 /* Font sizes standardisées */
 --font-size-xs: 0.75rem;
@@ -130,15 +151,17 @@
 **État:** Partiellement implémenté (⚠️ À compléter)
 
 ✅ **Animations définies:**
+
 ```css
 @keyframes fadeInUp ✓
 @keyframes slideInLeft ✓
 @keyframes pulse-subtle ✓
 @keyframes bounce-gentle ✓
-@keyframes shimmer ✓
+@keyframes shimmer ✓;
 ```
 
 ✅ **Animations APPLIQUÉES:**
+
 - `.hero-content` → `fadeInUp 0.8s` ✓
 - `.specialty-card` → `fadeInUp 0.6s` staggered ✓
 - `.specialty-icon:hover` → `bounce-gentle 0.6s` ✓
@@ -147,13 +170,18 @@
 - `.btn:active::before` → `ripple 0.6s` ✓
 
 ❌ **Animations NON APPLIQUÉES (manquées):**
+
 ```css
 /* Service cards - devraient avoir fadeInUp staggered */
 .service-card {
   animation: fadeInUp 0.7s ease forwards;
 }
-.service-card:nth-child(1) { animation-delay: 0.1s; }
-.service-card:nth-child(2) { animation-delay: 0.2s; }
+.service-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.service-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
 /* ... etc */
 
 /* Hero image slide in from right */
@@ -175,8 +203,12 @@
 .search-tab {
   animation: fadeInUp 0.3s ease-out;
 }
-.search-tab:nth-child(1) { animation-delay: 0.1s; }
-.search-tab:nth-child(2) { animation-delay: 0.2s; }
+.search-tab:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.search-tab:nth-child(2) {
+  animation-delay: 0.2s;
+}
 ```
 
 ---
@@ -193,14 +225,18 @@
 <svg class="specialty-icon">...</svg>
 
 <!-- APRÈS -->
-<svg class="specialty-icon" aria-label="Consultation générale" role="img">...</svg>
+<svg class="specialty-icon" aria-label="Consultation générale" role="img">
+  ...
+</svg>
 
 <!-- 2. Boutons sans texte visible (icônes) -->
 <!-- AVANT -->
 <button><i class="icon-search"></i></button>
 
 <!-- APRÈS -->
-<button aria-label="Rechercher"><i class="icon-search" aria-hidden="true"></i></button>
+<button aria-label="Rechercher">
+  <i class="icon-search" aria-hidden="true"></i>
+</button>
 
 <!-- 3. Sections sémantiques -->
 <!-- AVANT -->
@@ -233,6 +269,7 @@
 ```
 
 ⚠️ **À tester:**
+
 - Contraste des couleurs (axe DevTools)
 - Keyboard navigation (Tab, Shift+Tab, Escape)
 - Screen reader (NVDA, JAWS)
@@ -244,11 +281,13 @@
 **État:** Bon pour mobile/tablet
 
 ✅ **Breakpoints correctes:**
+
 - Mobile: < 480px ✓
 - Tablet: 480px - 768px ✓
 - Desktop: > 1024px ✓
 
 ❌ **MANQUENT:**
+
 ```css
 /* Ultra-wide screens */
 @media (min-width: 2560px) {
@@ -260,9 +299,16 @@
 
 /* Print stylesheet */
 @media print {
-  .no-print { display: none; }
-  body { background: white; color: black; }
-  a { text-decoration: underline; }
+  .no-print {
+    display: none;
+  }
+  body {
+    background: white;
+    color: black;
+  }
+  a {
+    text-decoration: underline;
+  }
 }
 ```
 
@@ -300,6 +346,7 @@ Vous avez créé des variables (ligne ~26-120) mais beaucoup de CSS **hardcoded*
 ```
 
 📋 **À faire - Remplacer dans tout le fichier:**
+
 1. `box-shadow: 0 2px 8px...` → `var(--shadow-sm)`
 2. `padding: 48px 28px` → `padding: var(--space-3xl) var(--space-2xl)`
 3. `transition: all 0.3s ease` → `var(--transition-base)`
@@ -313,6 +360,7 @@ Vous avez créé des variables (ligne ~26-120) mais beaucoup de CSS **hardcoded*
 **État:** Variables définies mais incomplets
 
 ⚠️ **PROBLÈME:**
+
 ```css
 /* Vous avez dark mode variables (ligne ~510+) */
 html[data-theme="dark"] {
@@ -333,9 +381,10 @@ html[data-theme="dark"] {
 ```
 
 ❌ **À tester:**
+
 ```javascript
 // Test dark mode toggle
-document.documentElement.setAttribute('data-theme', 'dark');
+document.documentElement.setAttribute("data-theme", "dark");
 // Vérifier: TOUS les éléments doivent s'adapter
 ```
 
@@ -346,25 +395,27 @@ document.documentElement.setAttribute('data-theme', 'dark');
 **État:** Fonctionne bien
 
 ✅ **Points positifs:**
+
 - Clone dropdown to body (position:fixed) ✓
 - Dynamic positioning avec getBoundingClientRect() ✓
 - Multi-event handlers (mouseenter/mouseleave) ✓
 - 200ms delay to prevent rapid closing ✓
 
 ⚠️ **À améliorer:**
+
 ```javascript
 /* AJOUTER */
 // Fermer au Escape key
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    clonedMenu.style.display = 'none';
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    clonedMenu.style.display = "none";
   }
 });
 
 // Fermer au click outside
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('.dropdown')) {
-    clonedMenu.style.display = 'none';
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".dropdown")) {
+    clonedMenu.style.display = "none";
   }
 });
 ```
@@ -376,12 +427,13 @@ document.addEventListener('click', (e) => {
 **État:** À optimiser
 
 ❌ **MANQUENT:**
+
 ```html
 <!-- Lazy loading sur images -->
 <img src="..." loading="lazy" alt="Description" />
 
 <!-- Responsive images -->
-<img 
+<img
   src="/images/specialty-med.png"
   srcset="/images/specialty-med-2x.png 2x"
   alt="Médecin consultation"
@@ -402,6 +454,7 @@ document.addEventListener('click', (e) => {
 ### 10. PERFORMANCE SCORING 🚀
 
 **À tester avec Lighthouse:**
+
 ```
 Actuellement (estimé): 70/100
 Performance:    ⚠️ 65 (images, CSS size)
@@ -418,22 +471,33 @@ PWA:           ❌ 0 (pas de service worker)
 ### **QUICK WINS (1-2 heures)**
 
 1. ✏️ **Ajouter les @keyframes manquantes** (shimmer, slideInRight, etc.)
+
 ```css
 @keyframes slideInRight {
-  from { opacity: 0; transform: translateX(30px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 ```
 
 2. 🎯 **Appliquer animations aux service-card:**
+
 ```css
 .service-card {
   animation: fadeInUp 0.7s ease forwards;
 }
-.service-card:nth-child(n) { animation-delay: 0.1s * n; }
+.service-card:nth-child(n) {
+  animation-delay: 0.1s * n;
+}
 ```
 
 3. ♿ **Ajouter :focus-visible global:**
+
 ```css
 :focus-visible {
   outline: 2px solid var(--color-primary);
@@ -442,11 +506,13 @@ PWA:           ❌ 0 (pas de service worker)
 ```
 
 4. 🏷️ **Ajouter aria-labels aux icônes:**
+
 ```html
 <svg aria-label="Rendez-vous en ligne" role="img">...</svg>
 ```
 
 5. 📱 **Ajouter meta tags OG:**
+
 ```html
 <meta property="og:image" content="/og-image.png" />
 ```
@@ -456,22 +522,26 @@ PWA:           ❌ 0 (pas de service worker)
 ### **MOYEN TERME (3-5 heures)**
 
 6. 🎨 **Remplacer TOUS les hardcoded values par variables:**
-   - box-shadow → var(--shadow-*)
-   - padding/gap → var(--space-*)
-   - transition → var(--transition-*)
-   - border-radius → var(--radius-*)
-   - colors → var(--color-*)
+
+   - box-shadow → var(--shadow-\*)
+   - padding/gap → var(--space-\*)
+   - transition → var(--transition-\*)
+   - border-radius → var(--radius-\*)
+   - colors → var(--color-\*)
 
 7. 🌙 **Standardiser dark mode:**
+
    - Remplacer tous les colors hardcoded
    - Tester toggle complet
 
 8. 🖼️ **Optimiser images:**
+
    - Ajouter `loading="lazy"`
    - Créer WebP versions
    - Responsive srcset
 
 9. ♿ **Accessibility fixes:**
+
    - Form labels + ids
    - Section roles
    - Keyboard nav (Escape, Tab)
@@ -487,6 +557,7 @@ PWA:           ❌ 0 (pas de service worker)
 ## 📝 CODE EXAMPLES
 
 ### Example 1: Service Card Animation
+
 ```css
 .service-card {
   display: flex;
@@ -500,12 +571,19 @@ PWA:           ❌ 0 (pas de service worker)
   opacity: 0;
 }
 
-.service-card:nth-child(1) { animation-delay: 0.1s; }
-.service-card:nth-child(2) { animation-delay: 0.2s; }
-.service-card:nth-child(3) { animation-delay: 0.3s; }
+.service-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.service-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.service-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
 ```
 
 ### Example 2: Focus Visible Pattern
+
 ```css
 :focus-visible {
   outline: 2px solid var(--color-primary);
@@ -521,6 +599,7 @@ a:focus-visible {
 ```
 
 ### Example 3: Reduced Motion Support
+
 ```css
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -553,6 +632,7 @@ a:focus-visible {
 ## 🎓 NEXT STEPS
 
 **Prochaine séance:**
+
 1. Appliquer les 10 quick wins ci-dessus
 2. Tester avec Lighthouse
 3. Valider avec accessibilité tools

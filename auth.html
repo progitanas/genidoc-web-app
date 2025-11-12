@@ -1,264 +1,488 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <link rel="icon" type="image/png" href="/static/ong_GeniDoc1preview.png" />
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Connexion — GeniDoc</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f5f7fa;
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .auth-card {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
-      padding: 32px 28px 24px 28px;
-      max-width: 350px;
-      width: 100%;
-      text-align: center;
-    }
-    .auth-card .logo {
-      margin-bottom: 18px;
-    }
-    .auth-card .logo img {
-      height: 60px;
-    }
-    .auth-card h2 {
-      color: #4D3AFF;
-      margin-bottom: 18px;
-      font-size: 1.2em;
-    }
+  <head>
+    <link rel="icon" type="image/png" href="/static/ong_GeniDoc1preview.png" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Connexion — GeniDoc</title>
+    <style>
+      body {
+        font-family: "Space Grotesk", "Segoe UI", Tahoma, Geneva, Verdana,
+          sans-serif;
+        background: #f5f7fa;
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .auth-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        padding: 32px 28px 24px 28px;
+        max-width: 450px;
+        width: 100%;
+        text-align: center;
+      }
+      .auth-card .logo {
+        margin-bottom: 18px;
+      }
+      .auth-card .logo img {
+        height: 60px;
+      }
+      .auth-card h2 {
+        color: #2056ae;
+        margin-bottom: 18px;
+        font-size: 1.3em;
+        font-weight: 700;
+      }
+      .role-selection {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+        justify-content: center;
+      }
+      .role-btn {
+        flex: 1;
+        padding: 20px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        background: #fafbf8;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      }
+      .role-btn:hover {
+        border-color: #2056ae;
+        background: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(32, 86, 174, 0.15);
+      }
+      .role-btn.active {
+        border-color: #2056ae;
+        background: #f0f5ff;
+        box-shadow: 0 4px 12px rgba(32, 86, 174, 0.2);
+      }
+      .role-btn svg {
+        width: 40px;
+        height: 40px;
+        stroke: #2056ae;
+      }
+      .role-btn span {
+        font-weight: 600;
+        color: #1f1f1f;
+        font-size: 1.05em;
+      }
 
-    .auth-card input#username,
-  .auth-card input#password,
-  .auth-card input#new-username,
-  .auth-card input#new-password,
-  .auth-card input#new-email {
-      max-width: 320px;
-      width: 100%;
-      margin-left: auto;
-      margin-right: auto;
-      display: block;
-      padding: 14px 16px;
-      border-radius: 10px;
-      border: 1.5px solid #d6d6f7;
-      margin-bottom: 18px;
-      font-size: 1.08em;
-      outline: none;
-      background: #eaf1ff;
-      box-sizing: border-box;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .auth-card input#new-birthdate {
-      max-width: 320px;
-      width: 100%;
-      margin-left: auto;
-      margin-right: auto;
-      display: block;
-      padding: 14px 16px;
-      border-radius: 10px;
-      border: 1.5px solid #d6d6f7;
-      margin-bottom: 18px;
-      font-size: 1.08em;
-      outline: none;
-      background: #eaf1ff;
-      box-sizing: border-box;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      color: #444;
-    }
-    .auth-card input#new-birthdate:focus {
-      border-color: #4D3AFF;
-    }
-    .auth-card input:focus {
-      border-color: #4D3AFF;
-    }
-    .auth-card button {
-  background: #1d06ea !important;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 12px 24px;
-      font-size: 1em;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.2s;
-      margin-top: 10px;
-    }
-    .auth-card .btn-google {
-      background: #fff !important;
-      color: #222 !important;
-      border: 1.5px solid #ea4335;
-      font-weight: 700;
-      position: relative;
-      margin-bottom: 10px;
-      transition: box-shadow 0.2s, border 0.2s;
-    }
-    .auth-card .btn-google::before {
-      content: '';
-      display: inline-block;
-      vertical-align: middle;
-      width: 20px;
-      height: 20px;
-      margin-right: 10px;
-      background: url('https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg') no-repeat center/contain;
-    }
-    .auth-card .btn-google:hover {
-      box-shadow: 0 2px 8px #ea433522;
-      border-color: #c5221f;
-    }
-    .auth-card .btn-outlook {
-      background: #0072c6 !important;
-      color: #fff !important;
-      font-weight: 700;
-      border: none;
-      margin-bottom: 0;
-      transition: background 0.2s, box-shadow 0.2s;
-    }
-    .auth-card .btn-outlook:hover {
-      background: #005999 !important;
-      box-shadow: 0 2px 8px #0072c633;
-    }
-    .auth-card button:hover {
-      background: #3729b6;
-    }
-  </style>
-</head>
-<body>
-  <div id="toast" style="display:none;position:fixed;top:32px;left:50%;transform:translateX(-50%);background:#2056AE;color:#fff;padding:18px 32px;border-radius:12px;box-shadow:0 4px 24px #2056ae33;font-size:1.08em;z-index:9999;transition:opacity 0.3s;"></div>
-  <div class="auth-card">
-    <div class="logo">
-      <img src="/static/GeniDoc_IeHF2025.png" alt="GeniDoc logo" />
-    </div>
-    <h2>Connexion à votre espace patient</h2>
-    <form id="login-form">
-      <input type="text" id="username" placeholder="Identifiant patient" required />
-      <input type="password" id="password" placeholder="Mot de passe" required />
-      <button type="submit">Se connecter</button>
-    </form>
-    <div style="margin:18px 0 8px 0; font-size:0.98em; color:#444;">Pas encore de compte ? <a href="#" id="show-register" style="color:#4D3AFF; text-decoration:underline;">Créer un compte</a></div>
-    <div style="margin:18px 0 8px 0;">
-      <button id="google-login" class="btn-google" type="button">Se connecter avec Google</button><br>
-      <button id="outlook-login" class="btn-outlook" type="button">Se connecter avec Outlook</button>
-    </div>
-  </div>
-  <script>
-    document.getElementById('login-form').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const emailOrId = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value;
-      let email = emailOrId;
-      // Si l'utilisateur entre un GeniDoc ID, on va chercher l'email associé
-      if (/^GD-\d{5,}$/.test(emailOrId)) {
-        try {
-          const res = await fetch('/api/patient/' + emailOrId);
-          const result = await res.json();
-          if (result.success && result.data) {
-            email = result.data.email;
-          } else {
-            alert('Identifiant patient inconnu');
-            return;
-          }
-        } catch {
-          alert('Erreur réseau');
-          return;
+      .role-btn span {
+        font-weight: 600;
+        color: #1f1f1f;
+        font-size: 1.05em;
+      }
+      .form-section {
+        display: none;
+      }
+      .form-section.active {
+        display: block;
+        animation: fadeIn 0.4s ease;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
         }
       }
-      try {
-        const res = await fetch('/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        });
-        const result = await res.json();
-        if (result.success) {
-          window.location.href = 'index.html?genidocId=' + result.genidocId;
-        } else {
-          alert(result.message || 'Identifiants invalides');
-        }
-      } catch {
-        alert('Erreur réseau');
+      .auth-card input {
+        max-width: 420px;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+        padding: 14px 16px;
+        border-radius: 10px;
+        border: 1.5px solid #e5e7eb;
+        margin-bottom: 16px;
+        font-size: 1.05em;
+        outline: none;
+        background: #fafbf8;
+        box-sizing: border-box;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        font-family: "Space Grotesk", sans-serif;
       }
-    });
-    document.getElementById('show-register').onclick = function(e) {
-      e.preventDefault();
-      document.querySelector('.auth-card').innerHTML = `
-        <div class='logo'>
-          <img src='/static/genidoc-logo.png' alt='GeniDoc logo' />
+      .auth-card input:focus {
+        border-color: #2056ae;
+        box-shadow: 0 0 0 3px rgba(32, 86, 174, 0.1);
+      }
+      .auth-card button[type="submit"] {
+        background: #2056ae;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 14px 24px;
+        font-size: 1.05em;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-top: 10px;
+        width: 100%;
+        font-family: "Space Grotesk", sans-serif;
+      }
+      .auth-card button[type="submit"]:hover {
+        background: #174080;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(32, 86, 174, 0.25);
+      }
+      .toggle-text {
+        margin-top: 20px;
+        font-size: 0.98em;
+        color: #6a7a8a;
+      }
+      .toggle-text a {
+        color: #2056ae;
+        text-decoration: underline;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .toggle-text a:hover {
+        color: #174080;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="auth-card">
+      <div class="logo">
+        <img src="/static/GeniDoc_IeHF2025.png" alt="GeniDoc logo" />
+      </div>
+
+      <div id="role-selection-screen">
+        <h2>Bienvenue sur GeniDoc</h2>
+        <p style="color: #6a7a8a; margin-bottom: 24px">
+          Veuillez choisir votre profil
+        </p>
+
+        <div class="role-selection">
+          <div class="role-btn" data-role="patient">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <span>Patient</span>
+          </div>
+          <div class="role-btn" data-role="doctor">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+            </svg>
+            <span>Médecin</span>
+          </div>
+          <div class="role-btn" data-role="admin">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            <span>Admin Hôpital</span>
+          </div>
         </div>
-        <h2>Créer un compte patient</h2>
-        <form id='register-form'>
-          <input type='text' id='new-username' placeholder='Identifiant patient' required />
-          <input type='email' id='new-email' placeholder='Email' required />
-          <input type='date' id='new-birthdate' placeholder='Date de naissance' required style='margin-bottom:18px;' />
-          <input type='password' id='new-password' placeholder='Mot de passe' required />
-          <button type='submit'>Créer le compte</button>
+      </div>
+
+      <!-- Formulaire Patient -->
+      <div id="patient-form" class="form-section">
+        <h2>Inscription Patient</h2>
+        <form id="register-patient-form">
+          <input
+            type="text"
+            id="patient-username"
+            placeholder="Nom complet"
+            required
+          />
+          <input type="email" id="patient-email" placeholder="Email" required />
+          <input
+            type="date"
+            id="patient-birthdate"
+            placeholder="Date de naissance"
+            required
+          />
+          <input
+            type="password"
+            id="patient-password"
+            placeholder="Mot de passe"
+            required
+          />
+          <button type="submit">Créer mon compte patient</button>
         </form>
-        <div style='margin:18px 0 8px 0; font-size:0.98em; color:#444;'>Déjà inscrit ? <a href='auth.html' style='color:#4D3AFF; text-decoration:underline;'>Se connecter</a></div>
-        <div style='margin:18px 0 8px 0;'>
-          <button id='google-login' class='btn-google' type='button'>Créer avec Google</button><br>
-          <button id='outlook-login' class='btn-outlook' type='button'>Créer avec Outlook</button>
+        <div class="toggle-text">
+          Déjà inscrit ? <a id="login-patient-link">Se connecter</a> |
+          <a id="back-to-role">Retour</a>
         </div>
-      `;
-      document.getElementById('register-form').onsubmit = async function(e) {
-        e.preventDefault();
-        const data = {
-          username: document.getElementById('new-username').value,
-          email: document.getElementById('new-email').value,
-          birthdate: document.getElementById('new-birthdate').value,
-          password: document.getElementById('new-password').value
-        };
-        try {
-          const res = await fetch('/api/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-          });
-          const result = await res.json();
-          if (result.success) {
-            if (result.alreadyExists) {
-              showToast('Un compte existe déjà avec cet email. Redirection vers votre espace patient...');
-              setTimeout(() => {
-                window.location.href = 'index.html?genidocId=' + result.genidocId;
-              }, 2000);
-            } else {
-              window.location.href = 'index.html?genidocId=' + result.genidocId;
-            }
-          } else {
-            alert(result.message || 'Erreur lors de la création du compte');
-          }
-        } catch (err) {
-          alert('Erreur réseau');
+      </div>
+
+      <!-- Connexion Patient -->
+      <div id="login-patient-form" class="form-section">
+        <h2>Connexion Patient</h2>
+        <form id="patient-login-form">
+          <input
+            type="text"
+            id="patient-login-id"
+            placeholder="Email ou GeniDoc ID"
+            required
+          />
+          <input
+            type="password"
+            id="patient-login-password"
+            placeholder="Mot de passe"
+            required
+          />
+          <button type="submit">Se connecter</button>
+        </form>
+        <div class="toggle-text">
+          Pas de compte ? <a id="register-patient-link">S'inscrire</a> |
+          <a id="back-to-role-2">Retour</a>
+        </div>
+      </div>
+
+      <!-- Formulaire Médecin -->
+      <div id="doctor-form" class="form-section">
+        <h2>Inscription Médecin</h2>
+        <form id="register-doctor-form">
+          <input
+            type="text"
+            id="doctor-name"
+            placeholder="Nom complet"
+            required
+          />
+          <input
+            type="email"
+            id="doctor-email"
+            placeholder="Email professionnel"
+            required
+          />
+          <input
+            type="text"
+            id="doctor-license"
+            placeholder="Numéro de licence"
+            required
+          />
+          <input
+            type="text"
+            id="doctor-specialization"
+            placeholder="Spécialité"
+            required
+          />
+          <input
+            type="password"
+            id="doctor-password"
+            placeholder="Mot de passe"
+            required
+          />
+          <button type="submit">Créer mon compte médecin</button>
+        </form>
+        <div class="toggle-text">
+          Déjà inscrit ? <a id="login-doctor-link">Se connecter</a> |
+          <a id="back-to-role-3">Retour</a>
+        </div>
+      </div>
+
+      <!-- Connexion Médecin -->
+      <div id="login-doctor-form" class="form-section">
+        <h2>Connexion Médecin</h2>
+        <form id="doctor-login-form">
+          <input
+            type="email"
+            id="doctor-login-email"
+            placeholder="Email professionnel"
+            required
+          />
+          <input
+            type="password"
+            id="doctor-login-password"
+            placeholder="Mot de passe"
+            required
+          />
+          <button type="submit">Se connecter</button>
+        </form>
+        <div class="toggle-text">
+          Pas de compte ? <a id="register-doctor-link">S'inscrire</a> |
+          <a id="back-to-role-4">Retour</a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Navigation entre écrans
+      const screens = {
+        role: document.getElementById("role-selection-screen"),
+        patientForm: document.getElementById("patient-form"),
+        loginPatient: document.getElementById("login-patient-form"),
+        doctorForm: document.getElementById("doctor-form"),
+        loginDoctor: document.getElementById("login-doctor-form"),
+      };
+
+      function showScreen(screenName) {
+        Object.values(screens).forEach((screen) => {
+          if (screen) screen.style.display = "none";
+        });
+        if (screens[screenName]) {
+          screens[screenName].style.display = "block";
+          screens[screenName].classList.add("active");
         }
-    // Toast visuel moderne
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      toast.textContent = msg;
-      toast.style.display = 'block';
-      toast.style.opacity = '1';
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        setTimeout(() => { toast.style.display = 'none'; }, 400);
-      }, 1800);
-    }
-      };
-      document.getElementById('google-login').onclick = function() {
-        // Simule une inscription Google
-        const genidocId = 'GD-' + Math.floor(100000 + Math.random() * 900000);
-        window.location.href = 'index.html?genidocId=' + genidocId;
-      };
-      document.getElementById('outlook-login').onclick = function() {
-        // Simule une inscription Outlook
-        const genidocId = 'GD-' + Math.floor(100000 + Math.random() * 900000);
-        window.location.href = 'index.html?genidocId=' + genidocId;
-      };
-    };
-  </script>
-</body>
+      }
+
+      // Sélection du rôle
+      document.querySelectorAll(".role-btn").forEach((btn) => {
+        btn.addEventListener("click", function () {
+          const role = this.dataset.role;
+          if (role === "patient") {
+            showScreen("patientForm");
+          } else if (role === "doctor") {
+            showScreen("doctorForm");
+          } else if (role === "admin") {
+            // Rediriger vers la page de connexion établissement
+            window.location.href = "/establishment-login.html";
+          }
+        });
+      });
+
+      // Liens de navigation
+      document.querySelectorAll('[id^="back-to-role"]').forEach((link) => {
+        link.addEventListener("click", () => showScreen("role"));
+      });
+
+      document
+        .getElementById("login-patient-link")
+        .addEventListener("click", () => showScreen("loginPatient"));
+      document
+        .getElementById("register-patient-link")
+        .addEventListener("click", () => showScreen("patientForm"));
+      document
+        .getElementById("login-doctor-link")
+        .addEventListener("click", () => showScreen("loginDoctor"));
+      document
+        .getElementById("register-doctor-link")
+        .addEventListener("click", () => showScreen("doctorForm"));
+
+      // Inscription Patient
+      document
+        .getElementById("register-patient-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const data = {
+            username: document.getElementById("patient-username").value.trim(),
+            email: document.getElementById("patient-email").value.trim(),
+            birthdate: document.getElementById("patient-birthdate").value,
+            password: document.getElementById("patient-password").value,
+          };
+
+          try {
+            const res = await fetch("/api/register", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data),
+            });
+            const result = await res.json();
+
+            if (result.success) {
+              // Redirection vers le dashboard patient avec GD unique
+              window.location.href = `index-dashbord.html?genidocId=${result.genidocId}`;
+            } else {
+              alert(result.message || "Erreur lors de l'inscription");
+            }
+          } catch (err) {
+            alert("Erreur réseau. Veuillez réessayer.");
+          }
+        });
+
+      // Connexion Patient
+      document
+        .getElementById("patient-login-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const identifier = document
+            .getElementById("patient-login-id")
+            .value.trim();
+          const password = document.getElementById(
+            "patient-login-password"
+          ).value;
+
+          let email = identifier;
+
+          // Si c'est un GeniDoc ID, récupérer l'email
+          if (/^GD-\d{6}$/.test(identifier)) {
+            try {
+              const res = await fetch(`/api/patient/${identifier}`);
+              const result = await res.json();
+              if (result.success && result.data) {
+                email = result.data.email;
+              } else {
+                alert("Identifiant GeniDoc introuvable");
+                return;
+              }
+            } catch {
+              alert("Erreur réseau");
+              return;
+            }
+          }
+
+          try {
+            const res = await fetch("/api/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email, password }),
+            });
+            const result = await res.json();
+
+            if (result.success) {
+              window.location.href = `index-dashbord.html?genidocId=${result.genidocId}`;
+            } else {
+              alert(result.message || "Identifiants invalides");
+            }
+          } catch {
+            alert("Erreur réseau");
+          }
+        });
+
+      // Inscription Médecin (sera implémenté plus tard avec endpoints backend spécifiques)
+      document
+        .getElementById("register-doctor-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          alert(
+            "L'inscription médecin sera disponible prochainement. Contactez l'administration GeniDoc."
+          );
+        });
+
+      // Connexion Médecin (sera implémenté plus tard)
+      document
+        .getElementById("doctor-login-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          alert("La connexion médecin sera disponible prochainement.");
+        });
+
+      // Afficher l'écran de sélection au chargement
+      showScreen("role");
+    </script>
+  </body>
 </html>

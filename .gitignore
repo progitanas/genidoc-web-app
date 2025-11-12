@@ -1,0 +1,79 @@
+# === ENVIRONMENT & SECRETS ===
+.env
+.env.local
+.env.*.local
+.env.production
+
+# === NODE MODULES ===
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+
+# === PRISMA ===
+prisma/dev.db
+prisma/dev.db-journal
+.prisma/
+
+# === UPLOADS & FILES ===
+uploads/
+*.log
+*.tmp
+tmp/
+
+# === OS FILES ===
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# === IDE & EDITORS ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.sublime-project
+.sublime-workspace
+*.vs/
+*.code-workspace
+
+# === BUILD & DIST ===
+dist/
+build/
+out/
+.next/
+.nuxt/
+coverage/
+
+# === TESTING ===
+.nyc_output/
+coverage/
+*.lcov
+test-results/
+
+# === DOCKER ===
+docker-compose.override.yml
+.docker/
+
+# === CACHE ===
+.cache/
+.eslintcache
+.stylelintcache
+
+# === RUNTIME ===
+.pid
+*.pid
+*.seed
+*.pid.lock
+
+# === TEMPORARY ===
+temp/
+*.bak
+*.backup

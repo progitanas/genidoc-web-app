@@ -1,579 +1,1347 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <link rel="icon" type="image/png" href="/static/ong_GeniDoc1preview.png" />
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Accueil — Carte Vitale GeniDoc</title>
-  <style>
-    .profile-dropdown .logout-btn {
-      margin-top: 18px;
-      width: 100%;
-      background: #fff;
-      color: #d32f2f;
-      border: 1.5px solid #d32f2f;
-      border-radius: 8px;
-      padding: 10px 0;
-      font-size: 1em;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-    }
-    .profile-dropdown .logout-btn:hover {
-      background: #d32f2f;
-      color: #fff;
-    }
-    .header-flex {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 24px;
-      margin-bottom: 32px;
-      max-width: 950px;
-      width: 100%;
-    }
-    .profile-menu {
-      position: relative;
-      display: inline-block;
-    }
-    .profile-btn {
-      background: #fff;
-      border: none;
-      border-radius: 50%;
-      box-shadow: 0 2px 8px #2056ae22;
-      width: 48px;
-      height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: box-shadow 0.2s;
-      margin-left: 18px;
-    }
-    .profile-btn:hover {
-      box-shadow: 0 4px 16px #2056ae44;
-    }
-    .profile-dropdown {
-      display: none;
-      position: fixed;
-      right: 48px;
-      top: 90px;
-      background: #fff;
-      min-width: 260px;
-      box-shadow: 0 8px 32px #2056ae22;
-      border-radius: 16px;
-      z-index: 100;
-      padding: 22px 28px;
-      font-size: 1em;
-      color: #222;
-    }
-    .profile-dropdown.active {
-      display: block;
-    }
-    .profile-dropdown label {
-      font-weight: 600;
-      color: #2056AE;
-      margin-top: 8px;
-      display: block;
-    }
-    .profile-dropdown .profile-value {
-      margin-bottom: 8px;
-      color: #333;
-      font-weight: 400;
-      word-break: break-all;
-    }
-    /* Effet glassmorphism pour la carte vitale */
-    .vitale-glass {
-      background: rgba(255,255,255,0.7);
-      border-radius: 22px;
-      box-shadow: 0 8px 32px #4d3aff22, 0 0 0 4px #4d3aff11;
-      backdrop-filter: blur(8px);
-      border: 2px solid #4D3AFF33;
-      padding: 32px 32px 24px 32px;
-      max-width: 400px;
-      margin: 0 auto 32px auto;
-      position: relative;
-      text-align: left;
-      transition: box-shadow 0.2s;
-    }
-    .vitale-glass .badge-secure {
-      position: absolute;
-      top: 18px;
-      right: 24px;
-      background: #4D3AFF;
-      color: #fff;
-      font-size: 0.85em;
-      font-weight: 700;
-      border-radius: 8px;
-      padding: 4px 12px;
-      letter-spacing: 0.04em;
-      box-shadow: 0 2px 8px #4d3aff33;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .vitale-glass .badge-secure svg {
-      width: 16px; height: 16px;
-      vertical-align: middle;
-    }
-    .vitale-glass .genidoc-id {
-      color: #3a2aff;
-      font-weight: bold;
-      font-size: 1.1em;
-      margin-bottom: 8px;
-    }
-    .vitale-glass .date-inscription {
-      color: #555;
-      font-size: 0.98em;
-    }
-    .vitale-glass .title {
-      font-size: 1.25em;
-      font-weight: 700;
-      margin-bottom: 10px;
-      color: #222;
-    }
-    .vitale-btn {
-      background: #2056AE !important;
-      color: #fff;
-      border: none;
-      border-radius: 18px;
-      box-shadow: 0 4px 24px #2056ae22;
-      padding: 18px 0;
-      width: 100%;
-      max-width: 400px;
-      min-height: 60px;
-      font-size: 1.15em;
-      font-weight: 700;
-      cursor: pointer;
-      transition: box-shadow 0.2s, transform 0.2s, background 0.2s;
-      margin: 0 auto 32px auto;
-      display: block;
-    }
-    .vitale-btn:hover {
-      box-shadow: 0 8px 32px #2056ae44;
-      transform: scale(1.03);
-      background: #174080 !important;
-    }
-    /* Grille responsive 2x2 pour les modules */
-    .modules-grid2 {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(220px, 1fr));
-      gap: 32px;
-      justify-content: center;
-      margin: 40px auto 0 auto;
-      width: 100%;
-      max-width: 800px;
-    }
-    @media (max-width: 700px) {
-      .modules-grid2 { grid-template-columns: 1fr; }
-    }
-    /* Carte vitale effet flip */
-    .vitale-flip-container {
-      perspective: 900px;
-      width: 350px;
-      margin: 0 auto 32px auto;
-      height: 180px;
-    }
-    .vitale-flip {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      transition: transform 0.7s cubic-bezier(.4,0,.2,1);
-      transform-style: preserve-3d;
-    }
-    .vitale-flip.flipped {
-      transform: rotateY(180deg);
-    }
-    .vitale-face, .vitale-back {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      backface-visibility: hidden;
-      border-radius: 18px;
-      box-shadow: 0 8px 32px #4d3aff22, 0 0 0 4px #4d3aff11;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(90deg,#4D3AFF 60%,#00558C 100%);
-      color: #fff;
-      font-size: 1.25em;
-      font-weight: 700;
-      letter-spacing: 0.01em;
-    }
-    .vitale-back {
-      background: #fff;
-      color: #222;
-      transform: rotateY(180deg);
-      flex-direction: column;
-      padding: 24px 18px 18px 18px;
-      font-size: 1.08em;
-      font-weight: 500;
-      align-items: flex-start;
-      justify-content: center;
-    }
-    .vitale-back .genidoc-id {
-      color: #4D3AFF;
-      font-weight: bold;
-      margin-bottom: 6px;
-    }
-    .vitale-back .date-inscription {
-      color: #555;
-      font-size: 0.98em;
-    }
-    body {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
-      background: #f5f7fa;
-      margin: 0;
-    }
-    .main-top {
-      width: 100%;
-      max-width: 950px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding-top: 36px;
-    }
-    .main-bottom {
-      width: 100%;
-      max-width: 950px;
-      margin: 0 auto 32px auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
-    }
-    .header-flex {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 32px;
-      margin: 0 auto 32px auto;
-      max-width: 900px;
-      flex-wrap: wrap;
-    }
-    .header-flex .welcome {
-      font-size: 1.15em;
-      color: #222;
-      font-weight: 500;
-      min-width: 180px;
-      text-align: left;
-    }
-    .header-flex .logo-accueil img {
-      height: 64px;
-      width: auto;
-      display: block;
-    }
-    .header-flex .vitale-block {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      min-width: 220px;
-    }
-    .header-flex .vitale-title {
-      font-size: 1.15em;
-      font-weight: 700;
-      margin-bottom: 4px;
-      letter-spacing: 0.01em;
-    }
-    .header-flex .genidoc-id, .header-flex .date-inscription {
-      font-size: 1em;
-      color: #333;
-      margin-bottom: 2px;
-    }
-    .vitale-btn {
-      background: linear-gradient(90deg,#4D3AFF 60%,#00558C 100%);
-      color: #fff;
-      border: none;
-      border-radius: 18px;
-      box-shadow: 0 4px 24px #4d3aff22;
-      padding: 0;
-      width: 100%;
-      max-width: 350px;
-      min-height: 80px;
-      cursor: pointer;
-      transition: box-shadow 0.2s, transform 0.2s;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .vitale-btn:hover { box-shadow: 0 8px 32px #4d3aff44; transform: scale(1.03); }
-    .vitale-btn .logo img { height: 48px; margin-right: 18px; }
-    .vitale-details {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 8px 32px #4d3aff22;
-      padding: 24px 18px 18px 18px;
-      margin: 0 auto 24px auto;
-      max-width: 350px;
-      width: 100%;
-      text-align: center;
-      opacity: 0;
-      transform: translateY(-16px) scale(0.98);
-      pointer-events: none;
-      transition: opacity 0.35s cubic-bezier(.4,0,.2,1), transform 0.35s cubic-bezier(.4,0,.2,1);
-      box-shadow: 0 8px 32px #4d3aff22, 0 0 0 4px #4d3aff11;
-    }
-    .vitale-details.active {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-      pointer-events: auto;
-    }
-    .modules-vertical {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 28px;
-      margin: 40px 0 0 0;
-      width: 100%;
-    }
-    .module-card {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 4px 16px #4d3aff11;
-      padding: 32px 24px;
-      width: 100%;
-      max-width: 350px;
-      text-align: center;
-      transition: transform 0.2s, box-shadow 0.2s;
-      cursor: pointer;
-      margin: 0 auto;
-    }
-    .module-card:hover { transform: translateY(-8px) scale(1.03); box-shadow: 0 8px 32px #4d3aff22; }
-    .module-card.disabled, .module-card[disabled] {
-      opacity: 0.7;
-      cursor: not-allowed;
-      pointer-events: none;
-    }
-    .logo-accueil {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 18px;
-    }
-    .logo-accueil img {
-      height: 64px;
-      width: auto;
-    }
-    .vitale-details {
-      margin-bottom: 18px;
-    }
-    .module-card .icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 48px;
-      margin-bottom: 12px;
-    }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f5f7fa;
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .card-vitale {
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
-      padding: 32px 28px 24px 28px;
-      max-width: 350px;
-      width: 100%;
-      text-align: center;
-      position: relative;
-    }
-    .card-vitale .logo {
-      margin-bottom: 18px;
-    }
-    .card-vitale .logo img {
-      height: 60px;
-    }
-    .card-vitale .genidoc-id {
-      font-size: 1.1em;
-      font-weight: bold;
-      color: #4D3AFF;
-      margin-bottom: 8px;
-    }
-    .card-vitale .date-inscription {
-      color: #555;
-      font-size: 0.98em;
-      margin-bottom: 18px;
-    }
-    .card-vitale .btn-rdv {
-      background: #4D3AFF;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 12px 24px;
-      font-size: 1em;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.2s;
-      margin-top: 10px;
-    }
-    .card-vitale .btn-rdv:hover {
-      background: #3729b6;
-    }
-  </style>
-</head>
-<body>
-  <div class="main-top">
-    <div class="header-flex">
-      <div class="welcome" style="min-width:220px;display:flex;align-items:center;gap:18px;">
-        <span>Bienvenue à votre espace patient,<br>Ravis de vous revoir !</span>
-        <span class="logo-accueil"><img src="/static/genidoc-logo.png" alt="GeniDoc logo" /></span>
-      </div>
-      <div class="profile-menu">
-        <button class="profile-btn" id="profileBtn" title="Profil patient">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2056AE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg>
-        </button>
-        <div class="profile-dropdown" id="profileDropdown">
-          <button class="logout-btn" id="logoutBtn">Se déconnecter</button>
-          <label>Email (Gmail)</label>
-          <div class="profile-value" id="profile-email">user@gmail.com</div>
-          <label>Mot de passe</label>
-          <div class="profile-value" id="profile-password">••••••••</div>
-          <label>Date de naissance</label>
-          <div class="profile-value" id="profile-birth">1990-01-01</div>
-          <label>Username</label>
-          <div class="profile-value" id="profile-username">patient123</div>
-        </div>
-      </div>
-    </div>
-    <div class="vitale-glass" id="vitaleGlass" style="display:none;">
-      <div class="badge-secure">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><circle cx="12" cy="8" r="1"/></svg>
-        Sécurisé
-      </div>
-      <div class="title">Carte Vitale GeniDoc</div>
-      <div class="genidoc-id">GeniDoc ID : <span id="genidoc-id">GD-678442</span></div>
-      <div class="date-inscription">Date d'inscription : <span id="date-inscription"></span></div>
-    </div>
-    <button class="vitale-btn" id="vitaleBtn">
-      Afficher la carte vitale
-    </button>
-  </div>
-  <div class="main-bottom">
-    <div class="modules-grid2">
-      <div class="module-card" onclick="window.location.href='appintment.html'">
-        <div class="icon">
-          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#4D3AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="4"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-        </div>
-        <div style="font-weight:700;font-size:1.1em;">Prendre un rendez-vous</div>
-        <div style="color:#555;font-size:.98em;margin-top:8px;">Réservez une consultation ou un service santé en 1 clic.</div>
-      </div>
-      <div class="module-card" onclick="window.location.href='genidoc-map.html'">
-        <div class="icon">
-          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#4D3AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"/></svg>
-        </div>
-        <div style="font-weight:700;font-size:1.1em;">GeniDoc Map</div>
-        <div style="color:#555;font-size:.98em;margin-top:8px;">Trouvez cabinets, hôpitaux et pharmacies autour de vous.</div>
-      </div>
-      <div class="module-card" onclick="window.location.href='teleconsultation.html'">
-        <div class="icon">
-          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#4D3AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="3"/><path d="M16 3v4M8 3v4M12 12v2"/><circle cx="18" cy="12" r="2"/></svg>
-        </div>
-        <div style="font-weight:700;font-size:1.1em;">GeniDoc Téléconsultation</div>
-        <div style="color:#555;font-size:.98em;margin-top:8px;">Consultez un médecin en visio, sans vous déplacer.</div>
-      </div>
-      <div class="module-card" onclick="window.location.href='alertes.html'">
-        <div class="icon">
-          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#4D3AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v2m0 4h.01"/><path d="M5.07 19H19a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z"/></svg>
-        </div>
-        <div style="font-weight:700;font-size:1.1em;">GeniDoc Alertes Locales</div>
-        <div style="color:#555;font-size:.98em;margin-top:8px;">Soyez informé des campagnes de vaccination, alertes sanitaires ou nouvelles réglementations dans votre ville.</div>
-      </div>
-      <div class="module-card" onclick="window.location.href='transport.html'">
-        <div class="icon">
-          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#4D3AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="3"/><path d="M7 17v2a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2"/><circle cx="7" cy="19" r="2"/><circle cx="17" cy="19" r="2"/></svg>
-        </div>
-        <div style="font-weight:700;font-size:1.1em;">Transport sanitaire</div>
-        <div style="color:#555;font-size:.98em;margin-top:8px;">Réservez une ambulance ou trouvez un covoiturage médical à moindre coût.</div>
-      </div>
-      <div class="module-card" onclick="window.location.href='pharmacie.html'">
-        <div class="icon">
-          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#4D3AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
-        </div>
-        <div style="font-weight:700;font-size:1.1em;">Pharmacie numérique</div>
-        <div style="color:#555;font-size:.98em;margin-top:8px;">Gérez vos ordonnances et stocks de médicaments en ligne.</div>
-      </div>
-      <div class="module-card" onclick="window.location.href='accessibilite.html'">
-        <div class="icon">
-          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#4D3AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/><path d="M8 16a4 4 0 0 1 8 0"/></svg>
-        </div>
-        <div style="font-weight:700;font-size:1.1em;">Langues & accessibilité</div>
-        <div style="color:#555;font-size:.98em;margin-top:8px;">Interface multilingue, options audio/visuel, vidéos explicatives.</div>
-      </div>
-      <div class="module-card" onclick="window.location.href='urgences.html'">
-        <div class="icon">
-          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#4D3AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 22 22 22 12 2"/><circle cx="12" cy="17" r="1"/><path d="M12 9v4"/></svg>
-        </div>
-        <div style="font-weight:700;font-size:1.1em;">Gestion des urgences</div>
-        <div style="color:#555;font-size:.98em;margin-top:8px;">Consignes, numéros d'urgence, carte des points d'urgence et rassemblement.</div>
-      </div>
-    </div>
-  </div>
-  <script>
-    // Confirmation déconnexion
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-      logoutBtn.onclick = (e) => {
-        e.preventDefault();
-        if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
-          window.location.href = 'auth.html';
+  <head>
+    <link rel="icon" type="image/png" href="/static/ong_GeniDoc1preview.png" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Patient — GeniDoc</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Space Grotesk", "Segoe UI", Tahoma, Geneva, Verdana,
+          sans-serif;
+        background: #f5f7fa;
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Header avec logo et profil */
+      .dashboard-header {
+        background: #fff;
+        border-bottom: 2px solid #e5e7eb;
+        padding: 16px 32px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .header-left img {
+        height: 50px;
+      }
+
+      .header-welcome {
+        font-size: 1.1em;
+        font-weight: 600;
+        color: #1f1f1f;
+        font-family: "Space Grotesk", "Segoe UI", Tahoma, Geneva, Verdana,
+          sans-serif;
+        letter-spacing: 0.01em;
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      /* Notifications */
+      .notification-btn {
+        background: #fff;
+        border: 2px solid #e5e7eb;
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
+      }
+
+      .notification-btn:hover {
+        border-color: #2056ae;
+        box-shadow: 0 4px 12px rgba(32, 86, 174, 0.15);
+      }
+
+      .notification-badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        background: #e74c3c;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        display: none;
+      }
+
+      .notification-badge.active {
+        display: flex;
+      }
+
+      .notification-dropdown {
+        display: none;
+        position: absolute;
+        right: 96px;
+        top: 80px;
+        background: #fff;
+        width: 400px;
+        max-height: 500px;
+        overflow-y: auto;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        border-radius: 12px;
+        z-index: 200;
+      }
+
+      .notification-dropdown.active {
+        display: block;
+        animation: fadeInDown 0.3s ease;
+      }
+
+      .notification-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .notification-header h3 {
+        font-size: 16px;
+        color: #1f1f1f;
+      }
+
+      .notification-mark-read {
+        font-size: 12px;
+        color: #2056ae;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .notification-mark-read:hover {
+        text-decoration: underline;
+      }
+
+      .notification-list {
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .notification-item {
+        padding: 16px 20px;
+        border-bottom: 1px solid #f0f0f0;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .notification-item:hover {
+        background: #f8f9fa;
+      }
+
+      .notification-item.unread {
+        background: #f0f9ff;
+      }
+
+      .notification-item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 8px;
+      }
+
+      .notification-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: #1f1f1f;
+      }
+
+      .notification-time {
+        font-size: 11px;
+        color: #6a7a8a;
+      }
+
+      .notification-message {
+        font-size: 13px;
+        color: #6a7a8a;
+        line-height: 1.5;
+      }
+
+      .notification-empty {
+        padding: 40px 20px;
+        text-align: center;
+        color: #6a7a8a;
+      }
+
+      .notification-empty-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+      }
+
+      /* Styles pour la section des rendez-vous patients */
+      .appointments-section {
+        background: white;
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        margin-bottom: 32px;
+      }
+
+      .filter-apt-btn {
+        padding: 8px 16px;
+        border: 2px solid #ddd;
+        background: white;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s;
+        font-size: 0.9em;
+      }
+
+      .filter-apt-btn:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+
+      .filter-apt-btn.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+      }
+
+      .patient-appointment-card {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-left: 4px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 12px;
+        transition: all 0.3s;
+      }
+
+      .patient-appointment-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .patient-appointment-card.en-attente {
+        border-left-color: #f39c12;
+      }
+
+      .patient-appointment-card.confirmé {
+        border-left-color: #27ae60;
+      }
+
+      .patient-appointment-card.annulé {
+        border-left-color: #e74c3c;
+        opacity: 0.75;
+      }
+
+      .apt-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .apt-title {
+        font-weight: 700;
+        font-size: 1.1em;
+        color: var(--dark-text);
+      }
+
+      .apt-status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.85em;
+        font-weight: 600;
+      }
+
+      .apt-status-badge.en-attente {
+        background: #fff3cd;
+        color: #856404;
+      }
+
+      .apt-status-badge.confirmé {
+        background: #d4edda;
+        color: #155724;
+      }
+
+      .apt-status-badge.annulé {
+        background: #f8d7da;
+        color: #721c24;
+      }
+
+      .apt-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+        margin-top: 12px;
+        font-size: 0.95em;
+      }
+
+      .apt-detail {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .apt-detail strong {
+        color: var(--secondary);
+      }
+
+      .empty-appointments-dashboard {
+        text-align: center;
+        padding: 40px 20px;
+        color: #999;
+      }
+
+      .empty-appointments-dashboard img {
+        width: 80px;
+        margin-bottom: 16px;
+        opacity: 0.5;
+      }
+
+      .profile-btn {
+        background: #fff;
+        border: 2px solid #e5e7eb;
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .profile-btn:hover {
+        border-color: #2056ae;
+        box-shadow: 0 4px 12px rgba(32, 86, 174, 0.15);
+      }
+
+      .profile-dropdown {
+        display: none;
+        position: absolute;
+        right: 32px;
+        top: 80px;
+        background: #fff;
+        min-width: 280px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        border-radius: 12px;
+        z-index: 200;
+        padding: 20px 24px;
+        font-size: 0.95em;
+      }
+
+      .profile-dropdown.active {
+        display: block;
+        animation: fadeInDown 0.3s ease;
+      }
+
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
         }
-      };
-    }
-    // Menu profil déroulant
-    const profileBtn = document.getElementById('profileBtn');
-    const profileDropdown = document.getElementById('profileDropdown');
-    profileBtn.onclick = (e) => {
-      e.stopPropagation();
-      profileDropdown.classList.toggle('active');
-    };
-    document.body.addEventListener('click', () => {
-      profileDropdown.classList.remove('active');
-    });
-    // Récupère le GeniDoc ID depuis l'URL si présent
-    const params = new URLSearchParams(window.location.search);
-    const genidocId = params.get('genidocId');
-    if (genidocId) {
-      document.getElementById('genidoc-id').textContent = genidocId;
-      // Récupère les infos patient depuis l'API
-      fetch(`/api/patient/${genidocId}`)
-        .then(r => r.json())
-        .then(data => {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .profile-dropdown label {
+        font-weight: 600;
+        color: #2056ae;
+        margin-top: 12px;
+        display: block;
+        font-size: 0.9em;
+      }
+
+      .profile-dropdown .profile-value {
+        margin-bottom: 8px;
+        color: #333;
+        word-break: break-word;
+      }
+
+      .logout-btn {
+        margin-top: 16px;
+        width: 100%;
+        background: #fff;
+        color: #2056ae;
+        border: 2px solid #2056ae;
+        border-radius: 8px;
+        padding: 10px 0;
+        font-size: 0.95em;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .logout-btn:hover {
+        background: #2056ae;
+        color: #fff;
+      }
+
+      /* Container principal */
+      .main-content {
+        flex: 1;
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 32px;
+        width: 100%;
+      }
+
+      /* Carte vitale */
+      .vitale-section {
+        text-align: center;
+        margin-bottom: 48px;
+      }
+
+      .vitale-btn {
+        background: linear-gradient(135deg, #2056ae 0%, #174080 100%);
+        color: #fff;
+        border: none;
+        border-radius: 16px;
+        padding: 20px 40px;
+        font-size: 1.15em;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 16px rgba(32, 86, 174, 0.25);
+        font-family: "Space Grotesk", sans-serif;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .vitale-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 24px rgba(32, 86, 174, 0.35);
+      }
+
+      .vitale-card {
+        display: none;
+        background: linear-gradient(135deg, #2056ae 0%, #174080 100%);
+        border-radius: 20px;
+        padding: 32px;
+        max-width: 450px;
+        margin: 24px auto 0;
+        box-shadow: 0 12px 40px rgba(32, 86, 174, 0.3);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        animation: slideDown 0.4s ease;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .vitale-card::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.1) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      .vitale-card.active {
+        display: block;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .vitale-card .badge-secure {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.25);
+        color: #fff;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.85em;
+        font-weight: 700;
+        margin-bottom: 16px;
+        backdrop-filter: blur(10px);
+      }
+
+      .vitale-card .title {
+        font-size: 1.4em;
+        font-weight: 700;
+        margin-bottom: 16px;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .vitale-card .genidoc-id {
+        font-size: 1.3em;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 12px;
+        letter-spacing: 2px;
+        font-family: "Courier New", monospace;
+      }
+
+      .vitale-card .date-inscription {
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 0.95em;
+      }
+
+      .vitale-card .logo-card {
+        position: absolute;
+        top: 24px;
+        right: 24px;
+        opacity: 0.3;
+      }
+
+      /* Grille modules */
+      .modules-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 24px;
+        margin-top: 32px;
+      }
+
+      .module-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 32px 24px;
+        text-align: center;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        border: 2px solid #e5e7eb;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .module-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 8px 32px rgba(32, 86, 174, 0.15);
+        border-color: #2056ae;
+      }
+
+      .module-card .icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 56px;
+        margin-bottom: 16px;
+      }
+
+      .module-card .icon svg {
+        width: 56px;
+        height: 56px;
+        stroke: #2056ae;
+      }
+
+      .module-card h3 {
+        font-size: 1.15em;
+        font-weight: 700;
+        color: #1f1f1f;
+        margin-bottom: 8px;
+      }
+
+      .module-card p {
+        font-size: 0.95em;
+        color: #6a7a8a;
+        line-height: 1.5;
+      }
+
+      @media (max-width: 768px) {
+        .dashboard-header {
+          padding: 12px 16px;
+        }
+
+        .header-left img {
+          height: 40px;
+        }
+
+        .header-welcome {
+          font-size: 0.95em;
+        }
+
+        .main-content {
+          padding: 0 16px;
+          margin: 24px auto;
+        }
+
+        .modules-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <!-- Header -->
+    <header class="dashboard-header">
+      <div class="header-left">
+        <img src="/static/GeniDoc_IeHF2025.png" alt="GeniDoc Logo" />
+        <div class="header-welcome">
+          Bienvenue, <span id="patient-name">Patient</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <!-- Notifications -->
+        <button
+          class="notification-btn"
+          id="notificationBtn"
+          title="Notifications"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#2056AE"
+            stroke-width="2"
+          >
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          <span class="notification-badge" id="notificationBadge">0</span>
+        </button>
+
+        <!-- Profil -->
+        <button class="profile-btn" id="profileBtn" title="Mon profil">
+          <svg
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#2056AE"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 20c0-4 4-7 8-7s8 3 8 7" />
+          </svg>
+        </button>
+
+        <!-- Paramètres -->
+        <button
+          class="profile-btn"
+          id="settingsBtn"
+          title="Paramètres"
+          onclick="window.location.href='settings.html'"
+          style="
+            background: none;
+            border: none;
+            padding: 0;
+            margin-left: 8px;
+            cursor: pointer;
+          "
+        >
+          <img
+            src="images-keyfeatures/parametres.png"
+            alt="Paramètres"
+            style="width: 26px; height: 26px; vertical-align: middle"
+          />
+        </button>
+      </div>
+
+      <!-- Dropdown notifications -->
+      <div class="notification-dropdown" id="notificationDropdown">
+        <div class="notification-header">
+          <h3>Notifications</h3>
+          <span class="notification-mark-read" onclick="markAllAsRead()"
+            >Tout marquer lu</span
+          >
+        </div>
+        <div class="notification-list" id="notificationList">
+          <div class="notification-empty">
+            <div class="notification-empty-icon">🔔</div>
+            <p>Aucune notification</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dropdown profil -->
+      <div class="profile-dropdown" id="profileDropdown">
+        <label>GeniDoc ID</label>
+        <div class="profile-value" id="profile-gd"></div>
+
+        <label>Email</label>
+        <div class="profile-value" id="profile-email"></div>
+
+        <label>Date de naissance</label>
+        <div class="profile-value" id="profile-birth"></div>
+
+        <label>Username</label>
+        <div class="profile-value" id="profile-username"></div>
+
+        <button class="logout-btn" id="logoutBtn">Se déconnecter</button>
+      </div>
+    </header>
+
+    <!-- Contenu principal -->
+    <main class="main-content">
+      <!-- Section Carte Vitale -->
+      <section class="vitale-section">
+        <button class="vitale-btn" id="vitaleBtn">
+          <svg
+            width="20"
+            height="20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            style="margin-right: 8px"
+          >
+            <rect x="2" y="3" width="20" height="14" rx="2" />
+            <path d="M8 21h8M12 17v4" />
+          </svg>
+          Afficher ma Carte Vitale GeniDoc
+        </button>
+
+        <div class="vitale-card" id="vitaleCard">
+          <div class="badge-secure">
+            <svg
+              width="16"
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            Sécurisé
+          </div>
+          <div class="logo-card">
+            <img
+              src="/static/GeniDoc_IeHF2025.png"
+              alt="GeniDoc"
+              style="height: 40px; margin-bottom: 16px"
+            />
+          </div>
+          <div class="title">Carte Vitale Numérique</div>
+          <div class="genidoc-id">
+            ID Patient : <span id="genidoc-id-display">GD-000000</span>
+          </div>
+          <div class="date-inscription">
+            Membre depuis : <span id="date-inscription">10/11/2025</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Grille des modules/fonctionnalités -->
+      <section class="modules-grid">
+        <div class="module-card" onclick="redirectToPage('appintment.html')">
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <rect x="3" y="4" width="18" height="18" rx="4" />
+              <path d="M16 2v4M8 2v4M3 10h18" />
+            </svg>
+          </div>
+          <h3>Prendre un rendez-vous</h3>
+          <p>Réservez une consultation ou un service santé en 1 clic.</p>
+        </div>
+
+        <div class="module-card" onclick="redirectToPage('genidoc-map.html')">
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="12" cy="10" r="3" />
+              <path
+                d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7z"
+              />
+            </svg>
+          </div>
+          <h3>GeniDoc Map</h3>
+          <p>Trouvez cabinets, hôpitaux et pharmacies autour de vous.</p>
+        </div>
+
+        <div
+          class="module-card"
+          onclick="window.location.href='teleconsultation.html'"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <rect x="2" y="7" width="20" height="15" rx="3" />
+              <path d="M16 3v4M8 3v4" />
+            </svg>
+          </div>
+          <h3>Téléconsultation</h3>
+          <p>Consultez un médecin en visio, sans vous déplacer.</p>
+        </div>
+
+        <div class="module-card" onclick="window.location.href='alertes.html'">
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+              />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+          </div>
+          <h3>Alertes Locales</h3>
+          <p>
+            Vaccinations, alertes sanitaires, réglementations dans votre ville.
+          </p>
+        </div>
+
+        <div
+          class="module-card"
+          onclick="window.location.href='transport.html'"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <rect x="1" y="3" width="15" height="13" />
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+              <circle cx="5.5" cy="18.5" r="2.5" />
+              <circle cx="18.5" cy="18.5" r="2.5" />
+            </svg>
+          </div>
+          <h3>Transport sanitaire</h3>
+          <p>Réservez une ambulance ou trouvez un covoiturage médical.</p>
+        </div>
+
+        <div
+          class="module-card"
+          onclick="window.location.href='pharmacie.html'"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="4" />
+              <path d="M8 12h8M12 8v8" />
+            </svg>
+          </div>
+          <h3>Pharmacie numérique</h3>
+          <p>Gérez vos ordonnances et stocks de médicaments en ligne.</p>
+        </div>
+
+        <div
+          class="module-card"
+          onclick="window.location.href='accessibilite.html'"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+          </div>
+          <h3>Accessibilité</h3>
+          <p>
+            Interface multilingue, options audio/visuel, vidéos explicatives.
+          </p>
+        </div>
+
+        <div class="module-card" onclick="window.location.href='urgences.html'">
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+            </svg>
+          </div>
+          <h3>Gestion des urgences</h3>
+          <p>Consignes, numéros d'urgence, carte des points d'urgence.</p>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // ========== SÉCURITÉ SESSION ========== //
+      function forceLogout(msg) {
+        localStorage.clear();
+        alert(
+          msg || "Session expirée ou accès interdit. Veuillez vous reconnecter."
+        );
+        window.location.href = "auth.html";
+      }
+
+      async function secureFetch(url, options = {}, errorMsg) {
+        const res = await fetch(url, options);
+        if (res.status === 401 || res.status === 403) {
+          forceLogout(
+            errorMsg ||
+              "Session expirée ou accès interdit. Veuillez vous reconnecter."
+          );
+          throw new Error("Déconnecté");
+        }
+        return res;
+      }
+
+      // Récupération du GeniDoc ID depuis l'URL
+      const params = new URLSearchParams(window.location.search);
+      const genidocId = params.get("genidocId");
+
+      // Fonction pour rediriger avec genidocId
+      function redirectToPage(page) {
+        if (genidocId) {
+          window.location.href = `${page}?genidocId=${genidocId}`;
+        } else {
+          window.location.href = page;
+        }
+      }
+
+      async function refreshPatientHeaderAndProfile() {
+        if (!genidocId) return;
+        try {
+          const res = await secureFetch(`/api/patient/${genidocId}`);
+          const data = await res.json();
           if (data.success && data.data) {
-            const p = data.data;
-            document.getElementById('profile-email').textContent = p.email || '';
-            document.getElementById('profile-password').textContent = p.password ? '••••••••' : '';
-            document.getElementById('profile-birth').textContent = p.birthdate || '';
-            document.getElementById('profile-username').textContent = p.username || '';
-            document.getElementById('date-inscription').textContent = (p.createdAt||'').slice(0,10);
+            const patient = data.data;
+            document.getElementById("patient-name").textContent =
+              patient.username || "Patient";
+            document.getElementById("profile-email").textContent =
+              patient.email || "Non renseigné";
+            document.getElementById("profile-birth").textContent =
+              patient.birthdate || "Non renseignée";
+            document.getElementById("profile-username").textContent =
+              patient.username || "Non renseigné";
+            if (patient.createdAt) {
+              const date = new Date(patient.createdAt);
+              document.getElementById("date-inscription").textContent =
+                date.toLocaleDateString("fr-FR");
+            }
           }
+        } catch (e) {
+          if (e.message !== "Déconnecté") {
+            console.error(
+              "Erreur lors de la récupération des données patient:",
+              e
+            );
+          }
+        }
+      }
+
+      if (!genidocId) {
+        window.location.href = "auth.html";
+      } else {
+        document.getElementById("genidoc-id-display").textContent = genidocId;
+        document.getElementById("profile-gd").textContent = genidocId;
+        refreshPatientHeaderAndProfile();
+      }
+
+      // Rafraîchir le header/profil si retour de la page paramètres
+      window.addEventListener("focus", function () {
+        refreshPatientHeaderAndProfile();
+      });
+
+      // Toggle menu profil
+      const profileBtn = document.getElementById("profileBtn");
+      const profileDropdown = document.getElementById("profileDropdown");
+
+      profileBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        profileDropdown.classList.toggle("active");
+        notificationDropdown.classList.remove("active");
+      });
+
+      // Toggle notifications
+      const notificationBtn = document.getElementById("notificationBtn");
+      const notificationDropdown = document.getElementById(
+        "notificationDropdown"
+      );
+
+      notificationBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        notificationDropdown.classList.toggle("active");
+        profileDropdown.classList.remove("active");
+        loadNotifications();
+      });
+
+      // Fermer les dropdowns si on clique ailleurs
+      document.addEventListener("click", () => {
+        profileDropdown.classList.remove("active");
+        notificationDropdown.classList.remove("active");
+      });
+
+      profileDropdown.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+
+      notificationDropdown.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+
+      // Charger les notifications
+      async function loadNotifications() {
+        try {
+          const res = await secureFetch(`/api/notifications/${genidocId}`);
+          const data = await res.json();
+          if (data.success && data.data && data.data.length > 0) {
+            displayNotifications(data.data);
+            updateNotificationBadge(data.unreadCount || 0);
+          }
+        } catch (error) {
+          if (error.message !== "Déconnecté") {
+            console.error("Erreur chargement notifications:", error);
+          }
+        }
+      }
+
+      // Afficher les notifications
+      function displayNotifications(notifications) {
+        const listEl = document.getElementById("notificationList");
+
+        listEl.innerHTML = notifications
+          .map(
+            (notif) => `
+          <div class="notification-item ${
+            notif.read ? "" : "unread"
+          }" onclick="markAsRead('${notif.id}')">
+            <div class="notification-item-header">
+              <div class="notification-title">${notif.title}</div>
+              <div class="notification-time">${formatNotificationTime(
+                notif.createdAt
+              )}</div>
+            </div>
+            <div class="notification-message">${notif.message}</div>
+          </div>
+        `
+          )
+          .join("");
+      }
+
+      // Mettre à jour le badge
+      function updateNotificationBadge(count) {
+        const badge = document.getElementById("notificationBadge");
+        if (count > 0) {
+          badge.textContent = count > 9 ? "9+" : count;
+          badge.classList.add("active");
+        } else {
+          badge.classList.remove("active");
+        }
+      }
+
+      // Marquer comme lu
+      async function markAsRead(notificationId) {
+        try {
+          await secureFetch(`/api/notifications/${notificationId}/read`, {
+            method: "PUT",
+          });
+          loadNotifications();
+        } catch (error) {
+          if (error.message !== "Déconnecté") {
+            console.error("Erreur:", error);
+          }
+        }
+      }
+
+      // Marquer tout comme lu
+      async function markAllAsRead() {
+        try {
+          await secureFetch(`/api/notifications/${genidocId}/read-all`, {
+            method: "PUT",
+          });
+          loadNotifications();
+        } catch (error) {
+          if (error.message !== "Déconnecté") {
+            console.error("Erreur:", error);
+          }
+        }
+      }
+
+      // Formater le temps
+      function formatNotificationTime(dateStr) {
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMins / 60);
+        const diffDays = Math.floor(diffHours / 24);
+
+        if (diffMins < 1) return "À l'instant";
+        if (diffMins < 60) return `Il y a ${diffMins} min`;
+        if (diffHours < 24) return `Il y a ${diffHours}h`;
+        if (diffDays < 7) return `Il y a ${diffDays}j`;
+        return date.toLocaleDateString("fr-FR");
+      }
+
+      // Charger les notifications au démarrage
+      loadNotifications();
+
+      // Recharger toutes les 30 secondes
+      setInterval(loadNotifications, 30000);
+
+      // ========== GESTION DES RENDEZ-VOUS PATIENTS ==========
+      let allPatientAppointments = [];
+
+      // Normaliser les statuts (anglais -> français)
+      function normalizeStatus(status) {
+        const statusMap = {
+          pending: "en attente",
+          confirmed: "confirmé",
+          cancelled: "annulé",
+          canceled: "annulé",
+          "en attente": "en attente",
+          confirmé: "confirmé",
+          annulé: "annulé",
+        };
+        return statusMap[status?.toLowerCase()] || status;
+      }
+
+      // Charger les rendez-vous du patient
+      async function loadPatientAppointments(filter = "all") {
+        if (!genidocId) {
+          console.log(
+            "Aucun genidocId - impossible de charger les rendez-vous"
+          );
+          return;
+        }
+        try {
+          const res = await secureFetch(
+            `/api/appointments?genidocId=${genidocId}`
+          );
+          const result = await res.json();
+          if (result.success && result.data) {
+            allPatientAppointments = result.data;
+            // Mettre à jour le compteur
+            document.getElementById("appointments-count").textContent =
+              allPatientAppointments.length;
+            if (allPatientAppointments.length > 0) {
+              document.getElementById("appointments-section").style.display =
+                "block";
+              displayPatientAppointments(filter);
+            } else {
+              document.getElementById("appointments-section").style.display =
+                "block";
+              document.getElementById("patient-appointments-list").innerHTML = `
+                <div class="empty-appointments-dashboard">
+                  <img src="/static/rendez-vous.png" alt="Aucun rendez-vous">
+                  <p>Vous n'avez pas encore de rendez-vous.</p>
+                  <button onclick="redirectToPage('appintment.html')" style="margin-top: 16px; padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                    Prendre un rendez-vous
+                  </button>
+                </div>
+              `;
+            }
+          }
+        } catch (error) {
+          if (error.message !== "Déconnecté") {
+            console.error("Erreur lors du chargement des rendez-vous:", error);
+          }
+        }
+      }
+
+      // Afficher les rendez-vous
+      function displayPatientAppointments(filter = "all") {
+        const container = document.getElementById("patient-appointments-list");
+
+        // Normaliser les statuts
+        const normalizedAppointments = allPatientAppointments.map((apt) => ({
+          ...apt,
+          status: normalizeStatus(apt.status),
+        }));
+
+        const filtered =
+          filter === "all"
+            ? normalizedAppointments
+            : normalizedAppointments.filter((apt) => apt.status === filter);
+
+        if (filtered.length === 0) {
+          container.innerHTML = `
+            <div class="empty-appointments-dashboard">
+              <p>Aucun rendez-vous ${filter === "all" ? "" : filter}.</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = filtered
+          .map((apt) => {
+            const statusClass = apt.status.replace(" ", "-");
+            const statusText =
+              apt.status.charAt(0).toUpperCase() + apt.status.slice(1);
+
+            return `
+            <div class="patient-appointment-card ${statusClass}">
+              <div class="apt-header">
+                <div class="apt-title">${apt.service || "Consultation"}</div>
+                <span class="apt-status-badge ${statusClass}">${statusText}</span>
+              </div>
+              <div class="apt-details">
+                <div class="apt-detail">
+                  <strong>📅 Date:</strong> ${new Date(
+                    apt.date
+                  ).toLocaleDateString("fr-FR")}
+                </div>
+                <div class="apt-detail">
+                  <strong>🕐 Heure:</strong> ${apt.time}
+                </div>
+                <div class="apt-detail">
+                  <strong>🏥 Lieu:</strong> ${
+                    apt.establishment_name || apt.location || "Non spécifié"
+                  }
+                </div>
+                <div class="apt-detail">
+                  <strong>📍 Ville:</strong> ${
+                    apt.establishment_ville || "Non spécifié"
+                  }
+                </div>
+                <div class="apt-detail">
+                  <strong>🩺 Mode:</strong> ${apt.mode || "Présentiel"}
+                </div>
+                ${
+                  apt.consultationType
+                    ? `
+                <div class="apt-detail">
+                  <strong>💉 Type:</strong> ${apt.consultationType}
+                </div>
+                `
+                    : ""
+                }
+              </div>
+              ${
+                apt.notes
+                  ? `
+                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ddd;">
+                  <strong>📝 Notes:</strong> ${apt.notes}
+                </div>
+              `
+                  : ""
+              }
+              ${
+                apt.status === "annulé" && apt.cancellationReason
+                  ? `
+                <div style="margin-top: 10px; padding: 10px; background: #fff3cd; border-radius: 4px;">
+                  <strong>⚠️ Raison d'annulation:</strong> ${apt.cancellationReason}
+                </div>
+              `
+                  : ""
+              }
+              <div style="margin-top: 12px; font-size: 0.85em; color: #999;">
+                Créé le ${new Date(apt.createdAt).toLocaleDateString(
+                  "fr-FR"
+                )} à ${new Date(apt.createdAt).toLocaleTimeString("fr-FR")}
+              </div>
+            </div>
+          `;
+          })
+          .join("");
+      }
+
+      // Gestion des filtres de rendez-vous
+      document.querySelectorAll(".filter-apt-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          const filter = e.target.dataset.filter;
+
+          // Mettre à jour le bouton actif
+          document
+            .querySelectorAll(".filter-apt-btn")
+            .forEach((b) => b.classList.remove("active"));
+          e.target.classList.add("active");
+
+          // Afficher les rendez-vous filtrés
+          displayPatientAppointments(filter);
         });
-    } else {
-      document.getElementById('date-inscription').textContent = '2023-09-24';
-    }
-    // Affichage/masquage carte vitale glassmorphism
-    const vitaleBtn = document.getElementById('vitaleBtn');
-    const vitaleGlass = document.getElementById('vitaleGlass');
-    let vitaleVisible = false;
-    vitaleBtn.onclick = () => {
-      vitaleVisible = !vitaleVisible;
-      vitaleGlass.style.display = vitaleVisible ? 'block' : 'none';
-      vitaleBtn.textContent = vitaleVisible ? 'Masquer la carte vitale' : 'Afficher la carte vitale';
-    };
-  </script>
-</body>
+      });
+
+      // Charger les rendez-vous au démarrage
+      loadPatientAppointments();
+
+      // Fermer le dropdown si on clique ailleurs
+      document.addEventListener("click", () => {
+        profileDropdown.classList.remove("active");
+      });
+
+      profileDropdown.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+
+      // Bouton déconnexion sécurisé
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        if (confirm("Voulez-vous vraiment vous déconnecter ?")) {
+          forceLogout();
+        }
+      });
+
+      // Toggle carte vitale
+      const vitaleBtn = document.getElementById("vitaleBtn");
+      const vitaleCard = document.getElementById("vitaleCard");
+      let vitaleVisible = false;
+
+      vitaleBtn.addEventListener("click", () => {
+        vitaleVisible = !vitaleVisible;
+        vitaleCard.classList.toggle("active");
+
+        // Mise à jour du texte et de l'icône
+        const svg = vitaleVisible
+          ? '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right: 8px;"><path d="M6 18L18 6M6 6l12 12"/></svg>'
+          : '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right: 8px;"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>';
+
+        vitaleBtn.innerHTML = vitaleVisible
+          ? svg + "Masquer ma Carte Vitale"
+          : svg + "Afficher ma Carte Vitale GeniDoc";
+      });
+    </script>
+  </body>
 </html>
