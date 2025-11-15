@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Consultation à distance — GeniDoc</title>
+    <link rel="icon" type="image/png" href="/static/ong_GeniDoc1preview.png" />
+    <style>
+      body {
+        font-family: "Space Grotesk", "Segoe UI", Tahoma, Geneva, Verdana,
+          sans-serif;
+        background: #f5f7fa;
+        margin: 0;
+        min-height: 100vh;
+      }
+      .main-content {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 16px;
+      }
+      h1 {
+        color: #2056ae;
+        text-align: center;
+        margin-bottom: 32px;
+      }
+      .modules-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 32px;
+      }
+      .submodule-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 32px 24px;
+        text-align: center;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        border: 2px solid #e5e7eb;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      .submodule-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 8px 32px rgba(32, 86, 174, 0.15);
+        border-color: #2056ae;
+      }
+      .submodule-card .icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 56px;
+        margin-bottom: 16px;
+      }
+      .submodule-card .icon svg {
+        width: 56px;
+        height: 56px;
+        stroke: #2056ae;
+      }
+      .submodule-card h2 {
+        font-size: 1.15em;
+        font-weight: 700;
+        color: #1f1f1f;
+        margin-bottom: 8px;
+      }
+      .submodule-card p {
+        font-size: 0.95em;
+        color: #6a7a8a;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="main-content">
+      <h1>Consultation à distance</h1>
+      <section class="modules-grid">
+        <!-- Téléconsultation -->
+        <div
+          class="submodule-card"
+          onclick="window.location.href='teleconsultation.html'"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <rect x="2" y="7" width="20" height="15" rx="3" />
+              <path d="M16 3v4M8 3v4" />
+            </svg>
+          </div>
+          <h2>Téléconsultation</h2>
+          <p>
+            Consultation vidéo/audio en temps réel entre patient et médecin.
+            Messagerie sécurisée et partage de documents médicaux.
+          </p>
+        </div>
+        <!-- Téléexpertise -->
+        <div
+          class="submodule-card"
+          onclick="window.location.href='teleexpertise.html'"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path d="M4 4h16v16H4z" />
+              <path d="M8 8h8v8H8z" />
+              <path d="M12 12h0" />
+            </svg>
+          </div>
+          <h2>Téléexpertise</h2>
+          <p>
+            Échange entre professionnels de santé pour avis médical à distance.
+            Système de requête, validation et gestion d’historique.
+          </p>
+        </div>
+        <!-- Téléassistance -->
+        <div
+          class="submodule-card"
+          onclick="window.location.href='teleassistance.html'"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 8v4l3 3" />
+            </svg>
+          </div>
+          <h2>Téléassistance</h2>
+          <p>
+            Assistance technique ou médicale à distance pour guider un patient
+            ou un professionnel. Support en temps réel via vidéo, audio ou chat.
+          </p>
+        </div>
+        <!-- Télésoin -->
+        <div
+          class="submodule-card"
+          onclick="window.location.href='telesoin.html'"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="4" />
+              <path d="M8 8h8M8 12h6M8 16h4" />
+            </svg>
+          </div>
+          <h2>Télésoin</h2>
+          <p>
+            Suivi continu de traitement par professionnels à distance.
+            Monitoring de l’évolution avec alertes et feedback.
+          </p>
+        </div>
+        <!-- Télémonitoring -->
+        <div
+          class="submodule-card"
+          onclick="window.location.href='telemonitoring.html'"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 6v6l4 2" />
+            </svg>
+          </div>
+          <h2>Télémonitoring</h2>
+          <p>
+            Collecte et analyse des données de santé via dispositifs connectés
+            (wearables, IoT). Alertes automatiques et dashboards pour médecins
+            et patients.
+          </p>
+        </div>
+        <!-- E-prescription -->
+        <div
+          class="submodule-card"
+          onclick="window.location.href='e-prescription.html'"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="4" />
+              <path d="M8 12h8M12 8v8" />
+            </svg>
+          </div>
+          <h2>E-prescription</h2>
+          <p>
+            Prescription sécurisée et transmission électronique des ordonnances.
+            Suivi des médicaments délivrés.
+          </p>
+        </div>
+        <!-- Gestion RDV & facturation -->
+        <div
+          class="submodule-card"
+          onclick="window.location.href='rdv-facturation.html'"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <rect x="3" y="4" width="18" height="18" rx="4" />
+              <path d="M16 2v4M8 2v4M3 10h18" />
+            </svg>
+          </div>
+          <h2>Gestion RDV & facturation</h2>
+          <p>
+            Prise de rendez-vous en ligne, rappels automatiques, gestion des
+            créneaux, paiements et remboursements.
+          </p>
+        </div>
+        <!-- Modules IA avancés -->
+        <div
+          class="submodule-card"
+          onclick="window.location.href='ia-avancee.html'"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9 9h6v6H9z" />
+            </svg>
+          </div>
+          <h2>Modules IA avancés</h2>
+          <p>
+            Triage assisté par IA, documentation clinique automatisée,
+            biomarqueurs vocaux, jumeau numérique du patient.
+          </p>
+        </div>
+        <!-- Sécurité Blockchain -->
+        <div
+          class="submodule-card"
+          onclick="window.location.href='blockchain.html'"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <rect x="4" y="4" width="16" height="16" rx="2" />
+              <path d="M8 8h8v8H8z" />
+            </svg>
+          </div>
+          <h2>Sécurité Blockchain</h2>
+          <p>
+            Gestion sécurisée, traçabilité, contrôle d’accès décentralisé,
+            interopérabilité avec systèmes tiers.
+          </p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

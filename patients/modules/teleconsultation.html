@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Téléconsultation — Espace Patient</title>
+	<style>
+		body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; margin: 0; }
+		.container { max-width: 700px; margin: 40px auto; background: #fff; border-radius: 18px; box-shadow: 0 8px 32px #4d3aff22; padding: 36px 28px; }
+		h1 { color: #2056AE; font-size: 1.5em; margin-bottom: 18px; }
+		.desc { color: #444; margin-bottom: 24px; }
+		.specialties-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin-bottom: 24px; }
+		.specialty-card { background: #eaf1fb; border-radius: 12px; padding: 18px; text-align: center; cursor: pointer; transition: box-shadow 0.2s; }
+		.specialty-card:hover { box-shadow: 0 4px 16px #2056ae22; }
+		.status-panel { background: #f8f9fa; border-radius: 14px; padding: 24px; text-align: center; margin-top: 24px; }
+		.btn { background: #2056AE; color: #fff; border: none; border-radius: 8px; padding: 10px 22px; font-size: 1em; font-weight: 700; cursor: pointer; margin-top: 18px; }
+		.btn:hover { background: #174080; }
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h1>Téléconsultation</h1>
+		<div class="desc">Sélectionnez une spécialité pour démarrer une téléconsultation avec un médecin disponible.</div>
+		<div class="specialties-grid" id="specialtiesGrid"></div>
+		<div class="status-panel" id="statusPanel">
+			<div id="initialState">Veuillez choisir une spécialité.</div>
+			<div id="loadingState" style="display:none;">Recherche d'un médecin disponible...</div>
+			<div id="successState" style="display:none;"></div>
+			<div id="errorState" style="display:none;color:#e74c3c;"></div>
+		</div>
+		<a href="../../dashboard-patient.html" class="btn">Retour espace patient</a>
+	</div>
+	<script>
+		// Placeholder: specialties (à remplacer par API)
+		const specialties = ["Généraliste", "Cardiologie", "Dermatologie", "Pédiatrie", "Psychiatrie", "Gynécologie"];
+		const specialtiesGrid = document.getElementById('specialtiesGrid');
+		const statusPanel = document.getElementById('statusPanel');
+		const initialState = document.getElementById('initialState');
+		const loadingState = document.getElementById('loadingState');
+		const successState = document.getElementById('successState');
+		const errorState = document.getElementById('errorState');
+
+		specialtiesGrid.innerHTML = specialties.map(s => `<div class="specialty-card" data-specialty="${s}">${s}</div>`).join('');
+
+		specialtiesGrid.addEventListener('click', async (event) => {
+			const card = event.target.closest('.specialty-card');
+			if (!card) return;
+			const specialty = card.dataset.specialty;
+			console.log('[LOG] Téléconsultation: spécialité sélectionnée:', specialty);
+			initialState.style.display = 'none';
+			loadingState.style.display = 'block';
+			successState.style.display = 'none';
+			errorState.style.display = 'none';
+			try {
+				// Appel API backend (stub)
+				const res = await fetch('/api/teleconsultation/request', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ specialty })
+				});
+				const data = await res.json();
+				console.log('[LOG] Réponse API /api/teleconsultation/request:', data);
+				loadingState.style.display = 'none';
+				if(data.success && data.data && data.data.doctor) {
+					successState.style.display = 'block';
+					successState.innerHTML = `<div style='color:#27ae60;font-size:1.1em;'>Médecin disponible pour ${specialty} : <b>${data.data.doctor.name}</b><br><a href='${data.data.consultation.link}' class='btn' target='_blank'>Rejoindre la consultation</a></div>`;
+				} else {
+					errorState.style.display = 'block';
+					errorState.textContent = data.message || 'Aucun médecin disponible.';
+				}
+			} catch(e) {
+				loadingState.style.display = 'none';
+				errorState.style.display = 'block';
+				errorState.textContent = 'Erreur de connexion au serveur.';
+				console.error('[LOG] Erreur téléconsultation:', e);
+			}
+		});
+	</script>
+</body>
+</html>

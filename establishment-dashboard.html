@@ -525,7 +525,7 @@
       async function loadAppointments() {
         try {
           const response = await secureFetch(
-            `/api/establishment/${establishmentId}/appointments`,
+            `/api/establishments/${establishmentId}/requests`,
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("establishment_token")}`,
@@ -535,7 +535,45 @@
           );
           const data = await response.json();
           if (data.success) {
-            allAppointments = data.data || [];
+            const rows = data.data || [];
+            allAppointments = rows.map((r) => {
+              const when = r.scheduledDateTime || r.createdAt || new Date().toISOString();
+              const dt = new Date(when);
+              const date = dt.toISOString().slice(0,10);
+              const time = dt.toTimeString().slice(0,5);
+
+              const statusMap = {
+                PENDING: 'pending',
+                CONFIRMED: 'confirmed',
+                REJECTED: 'cancelled',
+                MODIFIED: 'confirmed',
+                pending: 'pending',
+                confirmed: 'confirmed',
+                cancelled: 'cancelled'
+              };
+
+              const normalizedStatus = statusMap[(r.status || '').toString()] || (r.status || 'pending');
+
+              return {
+                id: r.id,
+                appointmentNumber: r.appointmentNumber,
+                fullName: r.fullName || r.patientName || r.patient || 'Patient',
+                email: r.email || r.patientEmail || '',
+                phone: r.phone || '',
+                service: r.appointmentType || r.service || '',
+                serviceType: r.appointmentType || r.service || '',
+                mode: r.mode || '',
+                date,
+                time,
+                notes: r.notes || '',
+                doctorId: r.doctorId || null,
+                facilityId: r.facilityId || null,
+                status: normalizedStatus,
+                createdAt: r.createdAt,
+                when: when,
+              };
+            });
+
             updateStats();
             displayAppointments(allAppointments);
           } else {
@@ -650,21 +688,21 @@
       async function confirmAppointment(id) {
         if (!confirm("Confirmer ce rendez-vous ?")) return;
         try {
-          const response = await secureFetch(`/api/appointments/${id}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("establishment_token")}`,
-            },
-            body: JSON.stringify({ status: "confirmed" }),
-          }, "Accès interdit ou session expirée lors de la confirmation.");
-          const data = await response.json();
-          if (data.success) {
-            alert("Rendez-vous confirmé !");
-            loadAppointments();
-          } else {
-            alert("Erreur lors de la confirmation");
-          }
+          const response = await secureFetch(`/api/establishments/requests/${id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("establishment_token")}`,
+              },
+              body: JSON.stringify({ action: 'confirm' }),
+            }, "Accès interdit ou session expirée lors de la confirmation.");
+            const data = await response.json();
+            if (data.success) {
+              alert("Rendez-vous confirmé !");
+              loadAppointments();
+            } else {
+              alert(data.message || "Erreur lors de la confirmation");
+            }
         } catch (error) {
           if (error.message !== "Déconnecté") {
             console.error("Erreur:", error);
@@ -678,21 +716,21 @@
         const reason = prompt("Raison de l'annulation (facultatif) :");
         if (reason === null) return;
         try {
-          const response = await secureFetch(`/api/appointments/${id}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("establishment_token")}`,
-            },
-            body: JSON.stringify({ status: "cancelled", cancellationReason: reason }),
-          }, "Accès interdit ou session expirée lors de l'annulation.");
-          const data = await response.json();
-          if (data.success) {
-            alert("Rendez-vous annulé");
-            loadAppointments();
-          } else {
-            alert("Erreur lors de l'annulation");
-          }
+          const response = await secureFetch(`/api/establishments/requests/${id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("establishment_token")}`,
+              },
+              body: JSON.stringify({ action: 'reject', note: reason }),
+            }, "Accès interdit ou session expirée lors de l'annulation.");
+            const data = await response.json();
+            if (data.success) {
+              alert("Rendez-vous annulé");
+              loadAppointments();
+            } else {
+              alert(data.message || "Erreur lors de l'annulation");
+            }
         } catch (error) {
           if (error.message !== "Déconnecté") {
             console.error("Erreur:", error);
@@ -737,20 +775,20 @@
       // Fonction helper pour mettre à jour date/heure
       async function updateAppointmentDateTime(id, date, time) {
         try {
-          const response = await secureFetch(`/api/appointments/${id}`, {
+          const response = await secureFetch(`/api/establishments/requests/${id}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${localStorage.getItem("establishment_token")}`,
             },
-            body: JSON.stringify({ date, time, status: "confirmé" }),
+            body: JSON.stringify({ action: 'modify', newDate: date, newTime: time }),
           }, "Accès interdit ou session expirée lors de la modification.");
           const data = await response.json();
           if (data.success) {
             alert(`Rendez-vous modifié !\nNouvelle date: ${date} à ${time}`);
             loadAppointments();
           } else {
-            alert("Erreur lors de la modification");
+            alert(data.message || "Erreur lors de la modification");
           }
         } catch (error) {
           if (error.message !== "Déconnecté") {

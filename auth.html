@@ -101,7 +101,8 @@
           transform: translateY(0);
         }
       }
-      .auth-card input {
+      .auth-card input,
+      .auth-card select {
         max-width: 420px;
         width: 100%;
         margin-left: auto;
@@ -117,10 +118,15 @@
         box-sizing: border-box;
         transition: border-color 0.2s, box-shadow 0.2s;
         font-family: "Space Grotesk", sans-serif;
+        appearance: none;
       }
-      .auth-card input:focus {
+      .auth-card input:focus,
+      .auth-card select:focus {
         border-color: #2056ae;
         box-shadow: 0 0 0 3px rgba(32, 86, 174, 0.1);
+      }
+      .auth-card select {
+        cursor: pointer;
       }
       .auth-card button[type="submit"] {
         background: #2056ae;
@@ -269,10 +275,11 @@
         <form id="register-doctor-form">
           <input
             type="text"
-            id="doctor-name"
-            placeholder="Nom complet"
+            id="doctor-firstname"
+            placeholder="Prénom"
             required
           />
+          <input type="text" id="doctor-lastname" placeholder="Nom" required />
           <input
             type="email"
             id="doctor-email"
@@ -281,16 +288,42 @@
           />
           <input
             type="text"
-            id="doctor-license"
-            placeholder="Numéro de licence"
-            required
+            id="doctor-phone"
+            placeholder="Téléphone (optionnel)"
           />
           <input
-            type="text"
-            id="doctor-specialization"
-            placeholder="Spécialité"
-            required
+            type="date"
+            id="doctor-birthdate"
+            placeholder="Date de naissance (optionnel)"
           />
+          <select id="doctor-establishment" required>
+            <option value="">Sélectionnez un établissement</option>
+            <!-- Options dynamiques -->
+          </select>
+            <select id="doctor-specialty" required>
+              <option value="" disabled selected hidden>Sélectionnez une spécialité médicale</option>
+              <option value="Médecine générale">Médecine générale</option>
+              <option value="Cardiologie">Cardiologie</option>
+              <option value="Dermatologie">Dermatologie</option>
+              <option value="Pédiatrie">Pédiatrie</option>
+              <option value="Gynécologie">Gynécologie</option>
+              <option value="Ophtalmologie">Ophtalmologie</option>
+              <option value="ORL">ORL</option>
+              <option value="Neurologie">Neurologie</option>
+              <option value="Psychiatrie">Psychiatrie</option>
+              <option value="Chirurgie">Chirurgie</option>
+              <option value="Orthopédie">Orthopédie</option>
+              <option value="Gastro-entérologie">Gastro-entérologie</option>
+              <option value="Pneumologie">Pneumologie</option>
+              <option value="Rhumatologie">Rhumatologie</option>
+              <option value="Urologie">Urologie</option>
+              <option value="Endocrinologie">Endocrinologie</option>
+              <option value="Hématologie">Hématologie</option>
+              <option value="Néphrologie">Néphrologie</option>
+              <option value="Oncologie">Oncologie</option>
+              <option value="Autre">Autre</option>
+            </select>
+          </select>
           <input
             type="password"
             id="doctor-password"
@@ -452,9 +485,19 @@
               body: JSON.stringify({ email, password }),
             });
             const result = await res.json();
-
-            if (result.success) {
-              window.location.href = `index-dashbord.html?genidocId=${result.genidocId}`;
+            if (
+              result.success &&
+              result.data &&
+              (result.data.role === "PATIENT" || result.data.role === "patient")
+            ) {
+              localStorage.setItem(
+                "genidocId",
+                result.genidocId || result.data.genidocId || ""
+              );
+              localStorage.setItem("role", "PATIENT");
+              window.location.href = `index-dashbord.html?genidocId=${
+                result.genidocId || result.data.genidocId
+              }`;
             } else {
               alert(result.message || "Identifiants invalides");
             }
@@ -463,22 +506,123 @@
           }
         });
 
-      // Inscription Médecin (sera implémenté plus tard avec endpoints backend spécifiques)
+
+      // --- Populate establishments for doctor registration ---
+      async function populateEstablishmentsDropdown() {
+        const select = document.getElementById("doctor-establishment");
+        select.innerHTML =
+          '<option value="">Sélectionnez un établissement</option>';
+        try {
+          const res = await fetch("/api/establishments");
+          const result = await res.json();
+          if (result.success && Array.isArray(result.data)) {
+            result.data.forEach((est) => {
+              const opt = document.createElement("option");
+              opt.value = est.id;
+              opt.textContent = `${est.nom} (${est.ville})`;
+              select.appendChild(opt);
+            });
+          }
+        } catch (err) {
+          // Optionally show error
+        }
+      }
+
+
+      // --- Removed populateSpecialtiesDropdown function ---
+
+      // Show establishments when doctor form is shown
+      const origShowScreen = showScreen;
+      showScreen = function (screenName) {
+        origShowScreen(screenName);
+        if (screenName === "doctorForm") {
+          populateEstablishmentsDropdown();
+        }
+      };
+
+      // Inscription Médecin
       document
         .getElementById("register-doctor-form")
-        .addEventListener("submit", function (e) {
+        .addEventListener("submit", async function (e) {
           e.preventDefault();
-          alert(
-            "L'inscription médecin sera disponible prochainement. Contactez l'administration GeniDoc."
-          );
+          const data = {
+            firstName: document.getElementById("doctor-firstname").value.trim(),
+            lastName: document.getElementById("doctor-lastname").value.trim(),
+            email: document.getElementById("doctor-email").value.trim(),
+            phone: document.getElementById("doctor-phone").value.trim(),
+            birthdate: document.getElementById("doctor-birthdate").value,
+            establishmentId: document.getElementById("doctor-establishment").value,
+            specialty: document.getElementById("doctor-specialty").value.trim(),
+            password: document.getElementById("doctor-password").value,
+          };
+          if (!data.establishmentId) {
+            alert("Veuillez sélectionner un établissement.");
+            return;
+          }
+          try {
+            const res = await fetch("/api/doctor/register", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data),
+            });
+            const result = await res.json();
+            if (result.success) {
+              // Stock doctorId (toujours fourni) dans localStorage et URL
+              if (result.doctorId) {
+                localStorage.setItem("doctorId", result.doctorId);
+                window.location.href = `dashboard-medecin.html?doctorId=${result.doctorId}`;
+              } else if (result.doctorUserId) {
+                // fallback legacy
+                localStorage.setItem("doctorId", result.doctorUserId);
+                window.location.href = `dashboard-medecin.html?doctorId=${result.doctorUserId}`;
+              } else {
+                alert("Inscription médecin réussie ! Connectez-vous.");
+                showScreen("loginDoctor");
+              }
+            } else {
+              alert(result.message || "Erreur lors de l'inscription médecin");
+            }
+          } catch (err) {
+            alert("Erreur réseau. Veuillez réessayer.");
+          }
         });
 
       // Connexion Médecin (sera implémenté plus tard)
       document
         .getElementById("doctor-login-form")
-        .addEventListener("submit", function (e) {
+        .addEventListener("submit", async function (e) {
           e.preventDefault();
-          alert("La connexion médecin sera disponible prochainement.");
+          // Connexion Médecin (exemple basique, à adapter selon backend)
+          const email = document
+            .getElementById("doctor-login-email")
+            .value.trim();
+          const password = document.getElementById(
+            "doctor-login-password"
+          ).value;
+          try {
+            const res = await fetch("/api/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email, password }),
+            });
+            const result = await res.json();
+            if (
+              result.success &&
+              result.data &&
+              result.data.role === "DOCTOR"
+            ) {
+              localStorage.setItem("userId", result.data.userId || "");
+              localStorage.setItem("role", "DOCTOR");
+              window.location.href = `dashboard-medecin.html?doctorId=${result.data.userId}`;
+            } else {
+              alert(
+                result.message ||
+                  "Identifiants invalides ou accès non autorisé."
+              );
+            }
+          } catch {
+            alert("Erreur réseau");
+          }
         });
 
       // Afficher l'écran de sélection au chargement

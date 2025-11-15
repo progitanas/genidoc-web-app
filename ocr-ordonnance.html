@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Analyse d’ordonnances — GeniDoc</title>
+    <link rel="icon" type="image/png" href="/static/ong_GeniDoc1preview.png" />
+    <style>
+      body {
+        font-family: "Space Grotesk", "Segoe UI", Tahoma, Geneva, Verdana,
+          sans-serif;
+        background: #f5f7fa;
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .container {
+        max-width: 600px;
+        margin: 48px auto;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(32, 86, 174, 0.08);
+        padding: 40px 32px 32px 32px;
+      }
+      h1 {
+        color: #2056ae;
+        font-size: 2em;
+        margin-bottom: 8px;
+        text-align: center;
+      }
+      .subtitle {
+        color: #6a7a8a;
+        font-size: 1.1em;
+        margin-bottom: 32px;
+        text-align: center;
+      }
+      .upload-box {
+        border: 2px dashed #2056ae;
+        border-radius: 16px;
+        box-sizing: border-box;
+        padding: 32px 16px;
+        text-align: center;
+        background: #f9fafb;
+        margin-bottom: 24px;
+        cursor: pointer;
+        transition: border-color 0.2s;
+        width: 100%;
+        min-height: 180px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        outline: none;
+      }
+      .upload-box.dragover {
+        border-color: #174080;
+        background: #eaf1fb;
+      }
+      .upload-box input[type="file"] {
+        display: none;
+      }
+      .upload-icon {
+        font-size: 2.5em;
+        color: #2056ae;
+        margin-bottom: 8px;
+      }
+      .results {
+        margin-top: 32px;
+        background: #f5f7fa;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 8px rgba(32, 86, 174, 0.06);
+      }
+      .results h2 {
+        color: #2056ae;
+        font-size: 1.2em;
+        margin-bottom: 12px;
+      }
+      .med-list {
+        margin: 0 0 16px 0;
+        padding: 0;
+        list-style: none;
+      }
+      .med-list li {
+        background: #eaf1fb;
+        margin-bottom: 8px;
+        padding: 8px 12px;
+        border-radius: 6px;
+        color: #174080;
+        font-weight: 600;
+      }
+      .alert {
+        background: #fff3cd;
+        color: #856404;
+        border-radius: 6px;
+        padding: 10px 14px;
+        margin-bottom: 12px;
+        font-size: 0.98em;
+        border: 1px solid #ffeeba;
+      }
+      .loading {
+        text-align: center;
+        color: #2056ae;
+        font-size: 1.1em;
+        margin-top: 24px;
+      }
+      .back-btn {
+        display: inline-block;
+        margin-bottom: 24px;
+        color: #2056ae;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 1em;
+        transition: color 0.2s;
+      }
+      .back-btn:hover {
+        color: #174080;
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a href="index-dashbord.html" class="back-btn"
+        >← Retour au tableau de bord</a
+      >
+      <h1>Analyse d’ordonnances</h1>
+      <div class="subtitle">
+        Déposez une ordonnance : extraction automatique des médicaments,
+        posologies et alertes via IA/OCR.
+      </div>
+      <form id="ordonnanceForm">
+        <label class="upload-box" id="uploadBox">
+          <div class="upload-icon">
+            <img
+              src="/ordonnance.png"
+              alt="Ordonnance"
+              style="height: 60px; width: auto; opacity: 0.85"
+            />
+          </div>
+          <div id="uploadText">
+            Cliquez ou glissez-déposez une ordonnance (image ou PDF)
+          </div>
+          <input
+            type="file"
+            id="ordonnanceFile"
+            accept="image/*,application/pdf"
+            required
+          />
+        </label>
+        <button
+          type="submit"
+          style="
+            width: 100%;
+            background: #2056ae;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 0;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+          "
+        >
+          Analyser l’ordonnance
+        </button>
+      </form>
+      <div class="loading" id="loading" style="display: none">
+        Analyse en cours, veuillez patienter...
+      </div>
+      <div class="results" id="results" style="display: none"></div>
+    </div>
+    <script>
+      const form = document.getElementById("ordonnanceForm");
+      const fileInput = document.getElementById("ordonnanceFile");
+      const uploadBox = document.getElementById("uploadBox");
+      const uploadText = document.getElementById("uploadText");
+      const loading = document.getElementById("loading");
+      const results = document.getElementById("results");
+
+      // Drag & drop
+      uploadBox.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        uploadBox.classList.add("dragover");
+      });
+      uploadBox.addEventListener("dragleave", (e) => {
+        e.preventDefault();
+        uploadBox.classList.remove("dragover");
+      });
+      uploadBox.addEventListener("drop", (e) => {
+        e.preventDefault();
+        uploadBox.classList.remove("dragover");
+        if (e.dataTransfer.files.length > 0) {
+          fileInput.files = e.dataTransfer.files;
+          uploadText.textContent = e.dataTransfer.files[0].name;
+        }
+      });
+      fileInput.addEventListener("change", (e) => {
+        if (fileInput.files.length > 0) {
+          uploadText.textContent = fileInput.files[0].name;
+        } else {
+          uploadText.textContent =
+            "Cliquez ou glissez-déposez une ordonnance (image ou PDF)";
+        }
+      });
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!fileInput.files.length) return;
+        loading.style.display = "block";
+        results.style.display = "none";
+        results.innerHTML = "";
+        const formData = new FormData();
+        formData.append("ordonnance", fileInput.files[0]);
+        try {
+          const res = await fetch("/api/ocr-ordonnance", {
+            method: "POST",
+            body: formData,
+          });
+          const data = await res.json();
+          loading.style.display = "none";
+          if (data.success) {
+            let html = "";
+            if (data.medicaments && data.medicaments.length > 0) {
+              html += '<h2>Médicaments détectés</h2><ul class="med-list">';
+              data.medicaments.forEach((med) => {
+                html += `<li>${med.nom} <span style="font-weight:400;">${
+                  med.posologie ? "— " + med.posologie : ""
+                }</span></li>`;
+              });
+              html += "</ul>";
+            } else {
+              html += '<div class="alert">Aucun médicament détecté.</div>';
+            }
+            if (data.alertes && data.alertes.length > 0) {
+              html += "<h2>Alertes</h2>";
+              data.alertes.forEach((alert) => {
+                html += `<div class="alert">⚠️ ${alert}</div>`;
+              });
+            }
+            if (data.texte) {
+              html +=
+                '<h2>Texte extrait</h2><div style="white-space:pre-wrap; background:#fff; border-radius:8px; padding:12px; margin-bottom:8px;">' +
+                data.texte +
+                "</div>";
+            }
+            results.innerHTML = html;
+            results.style.display = "block";
+          } else {
+            results.innerHTML = `<div class="alert">${
+              data.message || "Erreur lors de l’analyse."
+            }</div>`;
+            results.style.display = "block";
+          }
+        } catch (err) {
+          loading.style.display = "none";
+          results.innerHTML = `<div class="alert">Erreur lors de l’analyse. Veuillez réessayer.</div>`;
+          results.style.display = "block";
+        }
+      });
+    </script>
+  </body>
+</html>

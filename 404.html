@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page introuvable — GeniDoc</title>
+  <style>
+    body { background: #f5f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; }
+    .container { max-width: 420px; margin: 80px auto; background: #fff; border-radius: 18px; box-shadow: 0 8px 32px #4d3aff22; padding: 36px 28px; text-align: center; }
+    h1 { color: #2056AE; font-size: 2em; margin-bottom: 18px; }
+    .desc { color: #444; margin-bottom: 24px; font-size: 1.1em; }
+    .btn { background: #2056AE; color: #fff; border: none; border-radius: 12px; padding: 14px 0; width: 100%; font-size: 1.1em; font-weight: 700; cursor: pointer; margin-top: 18px; }
+    .btn:hover { background: #174080; }
+    .search-box { display: flex; gap: 0.5rem; margin-top: 24px; }
+    .search-box input { flex: 1; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid #ccc; font-size: 1em; }
+    .search-box button { padding: 0.5rem 1.5rem; border-radius: 8px; background: #4D3AFF; color: #fff; border: none; font-weight: 600; cursor: pointer; }
+    .search-results { margin-top: 18px; text-align: left; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Oups !</h1>
+    <div class="desc">Il semble que nous nous sommes perdus.<br>Ne vous inquiétez pas, cliquez ici pour revenir à la page principale.</div>
+    <a href="index.html" class="btn">🏠 Retour à la page principale</a>
+    <div style="margin: 24px 0 8px 0; color:#2056AE;font-weight:600;">Ou trouvez ce que vous cherchez :</div>
+    <form class="search-box" id="searchForm">
+      <input type="text" id="searchInput" placeholder="Rechercher sur GeniDoc..." required />
+      <button type="submit">Rechercher</button>
+    </form>
+    <div class="search-results" id="searchResults"></div>
+  </div>
+  <script>
+    // Simple client-side search (HTML file names)
+    const pages = [
+      { name: 'Accueil', file: 'index.html' },
+      { name: 'Dashboard', file: 'index-dashbord.html' },
+      { name: 'Pharmacie', file: 'pharmacie.html' },
+      { name: 'Prendre un rendez-vous', file: 'appintment.html' },
+      { name: 'Consultation à distance', file: 'consultation-distance.html' },
+      { name: 'Carte Vitale', file: 'index-dashbord.html#vitaleCard' },
+      { name: 'GeniDoc Map', file: 'genidoc-map.html' },
+      { name: 'Téléconsultation', file: 'teleconsultation.html' },
+      { name: 'Alertes', file: 'alertes.html' },
+      { name: 'Transport', file: 'transport.html' },
+      { name: 'Accessibilité', file: 'accessibilite.html' },
+      { name: 'Urgences', file: 'urgences.html' },
+      { name: 'Analyse d’ordonnances', file: 'ocr-ordonnance.html' }
+    ];
+    document.getElementById('searchForm').onsubmit = function(e) {
+      e.preventDefault();
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      const results = pages.filter(p => p.name.toLowerCase().includes(q));
+      const resDiv = document.getElementById('searchResults');
+      if (!results.length) {
+        resDiv.innerHTML = '<em>Aucun résultat trouvé.</em>';
+      } else {
+        resDiv.innerHTML = results.map(p => `<a href="${p.file}" style="display:block;padding:6px 0;color:#2056AE;text-decoration:underline;">${p.name}</a>`).join('');
+      }
+    };
+  </script>
+</body>
+</html>

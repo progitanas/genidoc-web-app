@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Patient — GeniDoc</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; margin: 0; }
+    .container { max-width: 1100px; margin: 40px auto; background: #fff; border-radius: 18px; box-shadow: 0 8px 32px #4d3aff22; padding: 36px 28px; }
+    h1 { color: #2056AE; font-size: 2em; margin-bottom: 18px; }
+    .section-title { color: #2056AE; font-size: 1.2em; margin: 32px 0 16px 0; font-weight: 700; }
+    .meds-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
+    .med-card { background: #f8f9fa; border-radius: 14px; box-shadow: 0 2px 8px #0001; padding: 18px; display: flex; flex-direction: column; align-items: center; transition: box-shadow 0.2s; }
+    .med-card:hover { box-shadow: 0 6px 24px #2056ae22; }
+    .med-img { width: 80px; height: 80px; object-fit: contain; border-radius: 10px; background: #fff; border: 1px solid #eee; margin-bottom: 10px; }
+    .med-title { font-weight: 700; color: #2056AE; font-size: 1.08em; text-align: center; }
+    .med-forme { color: #444; font-size: 0.98em; margin-bottom: 6px; text-align: center; }
+    .med-links { display: flex; gap: 0.7em; margin-top: 8px; }
+    .med-links a { color: #2056ae; text-decoration: underline; font-size: 0.98em; }
+    .med-history { margin-top: 18px; background: #eaf1fb; border-radius: 8px; padding: 10px 14px; font-size: 0.97em; color: #2056AE; }
+    .section { margin-bottom: 32px; }
+    @media (max-width: 700px) { .container { padding: 10px; } .meds-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Mon espace santé GeniDoc</h1>
+    <div class="section">
+      <div class="section-title">Mes actions et traçabilité</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;margin-bottom:32px;">
+        <div style="background:#eaf1fb;border-radius:12px;padding:18px;">
+          <strong>Rendez-vous</strong>
+          <div id="rdv-history" style="margin-top:8px;font-size:0.97em;color:#2056AE;">Chargement...</div>
+          <a href="../../appintment.html" style="display:inline-block;margin-top:10px;color:#2056AE;text-decoration:underline;">Prendre un rendez-vous</a>
+        </div>
+        <div style="background:#eaf1fb;border-radius:12px;padding:18px;">
+          <strong>Médicaments</strong>
+          <div id="meds-history" style="margin-top:8px;font-size:0.97em;color:#2056AE;">Chargement...</div>
+          <a href="../../pharmacie.html" style="display:inline-block;margin-top:10px;color:#2056AE;text-decoration:underline;">Gérer mes médicaments</a>
+        </div>
+        <div style="background:#eaf1fb;border-radius:12px;padding:18px;">
+          <strong>Téléconsultations</strong>
+          <div id="tele-history" style="margin-top:8px;font-size:0.97em;color:#2056AE;">Chargement...</div>
+          <a href="../../teleconsultation.html" style="display:inline-block;margin-top:10px;color:#2056AE;text-decoration:underline;">Réserver une téléconsultation</a>
+        </div>
+      </div>
+      <div class="section-title">Accès rapide</div>
+      <div style="display:flex;flex-wrap:wrap;gap:18px;margin-bottom:24px;">
+        <a href="../../index-dashbord.html" class="btn" style="background:#2056AE;color:#fff;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;">Tableau de bord global</a>
+        <a href="../../pharmacie.html" class="btn" style="background:#4D3AFF;color:#fff;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;">Pharmacie</a>
+        <a href="../../appintment.html" class="btn" style="background:#27ae60;color:#fff;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;">Prendre RDV</a>
+        <a href="../../teleconsultation.html" class="btn" style="background:#f39c12;color:#fff;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;">Téléconsultation</a>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Historique prise médicaments (localStorage)
+    async function renderMedsHistory(){
+      console.log('[LOG] Appel renderMedsHistory (API)');
+      const params = new URLSearchParams(window.location.search);
+      const genidocId = params.get("genidocId");
+      let html = '';
+      try {
+        let res = await fetch(`/api/medications?genidocId=${genidocId}`);
+        let data = await res.json();
+        console.log('[LOG] API /api/medications:', data);
+        if(data.success && data.data && data.data.length) {
+          html += '<div style="margin-bottom:8px;"><b>Médicaments prescrits :</b></div><ul>' + data.data.map(m=>`<li>${m.date || ''} <b>${m.name || m.med}</b> (${m.qty||1} unité(s))${m.status ? ` <span style='color:#888'>(statut: ${m.status})</span>` : ''}</li>`).join('') + '</ul>';
+        } else {
+          html += '<div>Aucun médicament prescrit.</div>';
+        }
+      } catch(e) {
+        console.warn('[LOG] Erreur API /api/medications, fallback localStorage', e);
+        let history = JSON.parse(localStorage.getItem('medsIntakeHistory')||'[]');
+        let demandes = JSON.parse(localStorage.getItem('medsDemandes')||'[]');
+        if(history.length){
+          html += '<div style="margin-bottom:8px;"><b>Prises enregistrées :</b></div><ul>' + history.map(h=>`<li>${h.date} : ${h.med} à ${h.time} — ${h.qty} unité(s)</li>`).join('') + '</ul>';
+        } else {
+          html += '<div>Aucune prise enregistrée.</div>';
+        }
+        if(demandes.length){
+          html += '<div style="margin:10px 0 4px 0;"><b>Médicaments demandés :</b></div><ul>' + demandes.map(m=>`<li>${m.date} : <b>${m.med}</b> (${m.qty||1} unité(s))${m.status ? ` <span style='color:#888'>(statut: ${m.status})</span>` : ''}</li>`).join('') + '</ul>';
+        } else {
+          html += '<div>Aucune demande de médicament.</div>';
+        }
+      }
+      document.getElementById('meds-history').innerHTML = html;
+      console.log('[LOG] Fin renderMedsHistory');
+    }
+    // Historique rendez-vous (localStorage ou API)
+    async function renderRDVHistory(){
+      console.log('[LOG] Appel renderRDVHistory (API)');
+      const params = new URLSearchParams(window.location.search);
+      const genidocId = params.get("genidocId");
+      let html = '';
+      try {
+        let res = await fetch(`/api/appointments?genidocId=${genidocId}`);
+        let data = await res.json();
+        console.log('[LOG] API /api/appointments:', data);
+        if(data.success && data.data && data.data.length) {
+          html += '<ul>' + data.data.slice(0, 14).map((r, idx) => {
+            return `<li><strong>#${idx+1}</strong> ${r.date ? new Date(r.date).toLocaleDateString('fr-FR') : ''} : <b>${r.type || r.service || 'Consultation'}</b> avec <b>${r.docteur||r.doctor||'médecin'}</b> à <b>${r.heure||r.time||''}</b>${r.status ? ` <span style='color:#888'>(statut: ${r.status})</span>` : ''}</li>`;
+          }).join('') + '</ul>';
+          if(data.data.length > 14) html += `<div style='color:#2056AE;font-size:0.95em;margin-top:6px;'>+${data.data.length-14} autres rendez-vous...</div>`;
+        } else {
+          html += '<div>Aucun rendez-vous.</div>';
+        }
+      } catch(e) {
+        console.warn('[LOG] Erreur API /api/appointments, fallback localStorage', e);
+        let rdvs = JSON.parse(localStorage.getItem('rdvHistory')||'[]');
+        if(!rdvs.length){
+          document.getElementById('rdv-history').innerHTML = "Aucun rendez-vous.";
+          console.log('[LOG] Aucun rendez-vous trouvé');
+          return;
+        }
+        let html = '<ul>' + rdvs.slice(0, 14).map((r, idx) => {
+          return `<li><strong>#${idx+1}</strong> ${r.date} : <b>${r.type}</b> avec <b>${r.docteur||'médecin'}</b> à <b>${r.heure}</b>${r.status ? ` <span style='color:#888'>(statut: ${r.status})</span>` : ''}</li>`;
+        }).join('') + '</ul>';
+        if(rdvs.length > 14) html += `<div style='color:#2056AE;font-size:0.95em;margin-top:6px;'>+${rdvs.length-14} autres rendez-vous...</div>`;
+      }
+      document.getElementById('rdv-history').innerHTML = html;
+      console.log('[LOG] Fin renderRDVHistory');
+    }
+    // Historique téléconsultations (localStorage ou API)
+    function renderTeleHistory(){
+      console.log('[LOG] Appel renderTeleHistory');
+      let tele = JSON.parse(localStorage.getItem('teleHistory')||'[]');
+      console.log('[LOG] teleHistory:', tele);
+      if(!tele.length){
+        document.getElementById('tele-history').innerHTML = "Aucune téléconsultation.";
+        console.log('[LOG] Aucune téléconsultation trouvée');
+        return;
+      }
+      document.getElementById('tele-history').innerHTML = '<ul>'+tele.map(t=>`<li>${t.date} : ${t.sujet||'Consultation'} avec ${t.docteur||'médecin'} à ${t.heure}</li>`).join('')+'</ul>';
+      console.log('[LOG] Fin renderTeleHistory');
+    }
+    console.log('[LOG] Initialisation dashboard patient');
+    renderMedsHistory();
+    renderRDVHistory();
+    renderTeleHistory();
+    console.log('[LOG] Dashboard patient prêt');
+  </script>
+</body>
+</html>

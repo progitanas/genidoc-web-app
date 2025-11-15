@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeniDoc Yallah 1.0 – IA Santé Augmentée</title>
+  <link rel="icon" type="image/png" href="/static/ong_GeniDoc1preview.png" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">
+  <style>
+    :root {
+      /* Design Tokens - Modern AI Chat */
+      --color-bg: #f7f8fa;
+      --color-bg-dark: #181a1b;
+      --color-primary: #2563eb;
+      --color-primary-dark: #1749b1;
+      --color-accent: #60a5fa;
+      --color-sidebar: #f4f6fb;
+      --color-sidebar-dark: #23272a;
+      --color-header: #fff;
+      --color-header-dark: #23272a;
+      --color-chat-user: #2563eb;
+      --color-chat-user-dark: #60a5fa;
+      --color-chat-assistant: #f3f4f6;
+      --color-chat-assistant-dark: #23272a;
+      --color-border: #e5e7eb;
+      --color-border-dark: #2d3236;
+      --color-text: #23272a;
+      --color-text-dark: #f7f8fa;
+      --radius: 10px;
+      --sidebar-width: 300px;
+      --header-height: 56px;
+      --transition: 0.18s cubic-bezier(.4,0,.2,1);
+      --font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      --focus-outline: 2px solid var(--color-accent);
+      --shadow: 0 2px 12px rgba(0,0,0,0.06);
+      --font-size-base: 15px;
+      --font-size-chat: 15px;
+      --font-size-meta: 12px;
+      --font-size-header: 18px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-bg: var(--color-bg-dark);
+        --color-sidebar: var(--color-sidebar-dark);
+        --color-header: var(--color-header-dark);
+        --color-chat-user: var(--color-chat-user-dark);
+        --color-chat-assistant: var(--color-chat-assistant-dark);
+        --color-border: var(--color-border-dark);
+        --color-text: var(--color-text-dark);
+      }
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-size: var(--font-size-base);
+      transition: background var(--transition), color var(--transition);
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+      .gd-root {
+        display: flex;
+        height: 100vh;
+        width: 100vw;
+        background: var(--color-bg);
+      }
+      .gd-sidebar {
+        width: var(--sidebar-width);
+        background: var(--color-sidebar);
+        border-right: 1px solid var(--color-border);
+        display: flex;
+        flex-direction: column;
+        padding: 0 0.5rem;
+        transition: background var(--transition);
+        box-shadow: var(--shadow);
+      }
+      .gd-sidebar-header {
+        font-weight: 600;
+        font-size: 1.2rem;
+        padding: 1.5rem 1rem 1rem 1rem;
+        color: var(--color-primary);
+        letter-spacing: 0.01em;
+      }
+      .gd-sidebar-list {
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 1rem;
+      }
+      .gd-sidebar-item {
+        padding: 0.75rem 1rem;
+        border-radius: var(--radius);
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        transition: background var(--transition), color var(--transition);
+        outline: none;
+      }
+      .gd-sidebar-item.active, .gd-sidebar-item:focus {
+        background: var(--color-primary);
+        color: #fff;
+        outline: var(--focus-outline);
+      }
+      .gd-sidebar-footer {
+        padding: 1rem;
+        font-size: 0.95rem;
+        color: #888;
+        border-top: 1px solid var(--color-border);
+      }
+      .gd-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        background: var(--color-bg);
+      }
+      .gd-header {
+        height: var(--header-height);
+        background: var(--color-header);
+        border-bottom: 1px solid var(--color-border);
+        display: flex;
+        align-items: center;
+        padding: 0 1.2rem;
+        font-size: var(--font-size-header);
+        font-weight: 600;
+        color: var(--color-primary);
+        letter-spacing: 0.01em;
+        z-index: 2;
+        box-shadow: var(--shadow);
+      }
+      .gd-chat {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1.2rem 0 0.7rem 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.7rem;
+        background: var(--color-bg);
+      }
+      .gd-chat-message {
+        display: flex;
+        flex-direction: column;
+        max-width: 700px;
+        margin: 0 auto;
+      }
+      .gd-chat-message.user {
+        align-items: flex-end;
+      }
+      .gd-chat-bubble {
+        padding: 0.7rem 1rem;
+        border-radius: var(--radius);
+        background: var(--color-chat-assistant);
+        color: var(--color-text);
+        font-size: var(--font-size-chat);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+        word-break: break-word;
+        transition: background var(--transition), color var(--transition);
+        border: 1px solid var(--color-border);
+        line-height: 1.5;
+        max-width: 95%;
+      }
+      .gd-chat-message.user .gd-chat-bubble {
+        background: var(--color-chat-user);
+        color: #fff;
+        align-self: flex-end;
+        border: 1px solid var(--color-primary-dark);
+      }
+      .gd-chat-bubble:focus {
+        outline: var(--focus-outline);
+      }
+      .gd-chat-meta {
+        font-size: var(--font-size-meta);
+        color: #888;
+        margin-top: 0.18rem;
+        text-align: right;
+      }
+      .gd-input-area {
+        position: sticky;
+        bottom: 0;
+        background: var(--color-header);
+        border-top: 1px solid var(--color-border);
+        padding: 0.7rem 1.2rem;
+        display: flex;
+        gap: 0.7rem;
+        z-index: 3;
+        box-shadow: 0 -2px 8px rgba(0,0,0,0.03);
+      }
+      .gd-input {
+        flex: 1;
+        padding: 0.6rem 1rem;
+        border-radius: var(--radius);
+        border: 1px solid var(--color-border);
+        font-size: var(--font-size-chat);
+        outline: none;
+        transition: border var(--transition);
+        background: var(--color-bg);
+        color: var(--color-text);
+      }
+      .gd-input:focus {
+        border: 1.5px solid var(--color-primary);
+        outline: var(--focus-outline);
+      }
+      .gd-send-btn {
+        background: var(--color-primary);
+        color: #fff;
+        border: none;
+        border-radius: var(--radius);
+        padding: 0 1.5rem;
+        font-size: 1.08rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background var(--transition);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      }
+      .gd-send-btn:active, .gd-send-btn:focus {
+        background: var(--color-primary-dark);
+        outline: var(--focus-outline);
+      }
+      /* Responsive Design */
+      @media (max-width: 900px) {
+        .gd-root {
+          flex-direction: column;
+        }
+        .gd-sidebar {
+          width: 100vw;
+          min-height: 60px;
+          flex-direction: row;
+          border-right: none;
+          border-bottom: 1px solid var(--color-border);
+          padding: 0;
+          box-shadow: none;
+        }
+        .gd-sidebar-header, .gd-sidebar-footer {
+          display: none;
+        }
+        .gd-sidebar-list {
+          flex-direction: row;
+          display: flex;
+          width: 100vw;
+          overflow-x: auto;
+          margin-bottom: 0;
+        }
+        .gd-sidebar-item {
+          margin-bottom: 0;
+          margin-right: 0.5rem;
+        }
+      }
+      @media (max-width: 600px) {
+        .gd-header {
+          font-size: 1.05rem;
+          padding: 0 1rem;
+        }
+        .gd-input-area {
+          padding: 0.7rem 0.5rem;
+        }
+        .gd-chat {
+          padding: 1rem 0 0.5rem 0;
+        }
+      }
+      /* Accessibility: focus visible for keyboard navigation */
+      .gd-sidebar-item:focus-visible,
+      .gd-send-btn:focus-visible,
+      .gd-input:focus-visible {
+        outline: var(--focus-outline);
+      }
+    </style>
+  
+</head>
+<body>
+  <div class="genidoc-chat-container">
+    <aside class="sidebar">
+      <button class="btn-new-chat">+ Nouveau chat</button>
+      <nav class="chat-history">
+        <h3>Conversations récentes</h3>
+        <!-- Chat items -->
+      </nav>
+    </aside>
+    <main class="main-content">
+      <header class="header">
+        <div style="display:flex;align-items:center;">
+          <img src="/static/ong_GeniDoc1preview.png" alt="GeniDoc" style="width:32px;height:32px;" />
+          <h1>GeniDoc Pro</h1>
+          <div class="status-online"></div>
+        </div>
+        <div class="user-menu">
+          <span title="Notifications">🔔</span>
+          <span title="Paramètres">⚙️</span>
+          <span title="Profil">👤</span>
+        </div>
+      </header>
+      <div class="messages-container" id="messages-container">
+        <!-- Messages will be injected here -->
+      </div>
+      <div class="input-area">
+        <button class="btn-attach" title="Joindre un fichier">📎</button>
+        <textarea class="input-message" placeholder="Écrivez votre message... (Shift+Entrée pour nouvelle ligne)"></textarea>
+        <button class="btn-voice" title="Dictée vocale">🎤</button>
+        <button class="btn-send" title="Envoyer">➤</button>
+      </div>
+    </main>
+  </div>
+  <!-- Advanced Chat Logic: Claude/Perplexity Style -->
+  <script>
+    // DOM references
+    const chatArea = document.querySelector('.gd-chat');
+    const input = document.querySelector('.gd-input');
+    const sendBtn = document.querySelector('.gd-send-btn');
+    const sidebarList = document.querySelector('.gd-sidebar-list');
+    let chatHistory = [];
+    let sidebarHistory = [];
+
+    // Add message to chat
+    function addMessage(role, text, meta) {
+      const msg = document.createElement('div');
+      msg.className = 'gd-chat-message ' + role;
+      const bubble = document.createElement('div');
+      bubble.className = 'gd-chat-bubble';
+      bubble.tabIndex = 0;
+      bubble.innerHTML = text;
+      msg.appendChild(bubble);
+      if (meta) {
+        const metaDiv = document.createElement('div');
+        metaDiv.className = 'gd-chat-meta';
+        metaDiv.textContent = meta;
+        msg.appendChild(metaDiv);
+      }
+      chatArea.appendChild(msg);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    // Add to sidebar history
+    function addSidebarItem(prompt) {
+      // ...existing code for new chat UI logic...
+    content.innerHTML = text;
+    msgDiv.appendChild(content);
+  }
+  messagesContainer.appendChild(msgDiv);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function showTypingIndicator() {
+  const typing = document.createElement('div');
+  typing.className = 'typing-indicator';
+  typing.innerHTML = '<span></span><span></span><span></span>';
+  typing.id = 'typing-indicator';
+  messagesContainer.appendChild(typing);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+function removeTypingIndicator() {
+  const typing = document.getElementById('typing-indicator');
+  if (typing) typing.remove();
+}
+
+function sendMessage() {
+  const text = input.value.trim();
+  if (!text) return;
+  renderMessage('user', text, 'Vous');
+  chatHistory.push({ role: 'user', content: text });
+  input.value = '';
+  input.focus();
+  showTypingIndicator();
+  // Simulate AI response (replace with real API call)
+  setTimeout(() => {
+    removeTypingIndicator();
+    const aiReply = simulateAI(text, chatHistory);
+    renderMessage('assistant', aiReply, 'Dr. Telemis');
+    chatHistory.push({ role: 'assistant', content: aiReply });
+  }, 1200);
+}
+
+function simulateAI(userText, history) {
+  // Simple demo: echo, or basic medical info
+  if (/diab(è|e)te/i.test(userText)) {
+    return 'Le diabète peut être caractérisé par une soif excessive, des urines fréquentes, une fatigue inhabituelle, et une perte de poids inexpliquée. <br><span style="font-size:12px;color:#6B7280;">Sources: OMS, PubMed</span>';
+  }
+  if (/assurance|amo|cnss/i.test(userText)) {
+    return 'Pour toute question sur l’AMO ou la CNSS, veuillez fournir votre numéro d’adhérent ou consulter le portail officiel. <br><span style="font-size:12px;color:#6B7280;">Source: cnss.ma</span>';
+  }
+  if (/ordonnance|prescription/i.test(userText)) {
+    return 'Je peux générer un modèle d’ordonnance ou vous expliquer comment la remplir. Voulez-vous un exemple ?';
+  }
+  if (/bonjour|salut|hello/i.test(userText)) {
+    return 'Bonjour ! Je suis Dr. Telemis, votre assistant IA santé. Posez-moi une question médicale ou administrative.';
+  }
+  return 'Merci pour votre question. Je vais analyser et vous répondre avec des informations fiables et adaptées à votre contexte. <br><span style="font-size:12px;color:#6B7280;">(Démo IA – réponse simulée)</span>';
+}
+
+input.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+sendBtn.onclick = sendMessage;
+
+// Accessibility: focus input on load
+window.onload = () => {
+  input.focus();
+};
+</script>
+</html>
+ 

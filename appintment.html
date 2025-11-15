@@ -502,12 +502,22 @@
         "
       >
         <a href="/" class="upload-btn" style="width: auto">Accueil</a>
-        <a
-          href="/logout"
+        <button
+          id="btn-logout"
+          type="button"
           class="upload-btn"
           style="width: auto; background-color: #e74c3c"
-          >Deconnexion</a
         >
+          Deconnexion
+        </button>
+        <script>
+          // Déconnexion patient : efface le localStorage et redirige
+          document
+            .getElementById("btn-logout")
+            .addEventListener("click", function () {
+              forceLogout();
+            });
+        </script>
       </div>
 
       <div class="card">
@@ -891,19 +901,14 @@
       // ========== SÉCURITÉ SESSION ========== //
       function forceLogout(msg) {
         localStorage.clear();
-        alert(
-          msg || "Session expirée ou accès interdit. Veuillez vous reconnecter."
-        );
+        // Session expired logic removed as requested
         window.location.href = "auth.html";
       }
 
       async function secureFetch(url, options = {}, errorMsg) {
         const res = await fetch(url, options);
         if (res.status === 401 || res.status === 403) {
-          forceLogout(
-            errorMsg ||
-              "Session expirée ou accès interdit. Veuillez vous reconnecter."
-          );
+          forceLogout();
           throw new Error("Déconnecté");
         }
         return res;
@@ -1069,78 +1074,77 @@
             const statusClass = apt.status.replace(" ", "-");
             const statusText =
               apt.status.charAt(0).toUpperCase() + apt.status.slice(1);
-
             return `
-                <div class="appointment-item ${statusClass}">
-                    <div class="appointment-header">
-                        <div class="appointment-title">${
-                          apt.service || "Consultation"
-                        }</div>
-                        <span class="appointment-status ${statusClass}">${statusText}</span>
-                    </div>
-                    <div class="appointment-details">
-                        <div class="appointment-detail">
-                            <strong>📅 Date:</strong> ${new Date(
-                              apt.date
-                            ).toLocaleDateString("fr-FR")}
-                        </div>
-                        <div class="appointment-detail">
-                            <strong>🕐 Heure:</strong> ${apt.time}
-                        </div>
-                        <div class="appointment-detail">
-                            <strong>🏥 Lieu:</strong> ${
-                              apt.establishment_name ||
-                              apt.location ||
-                              "Non spécifié"
-                            }
-                        </div>
-                        <div class="appointment-detail">
-                            <strong>📍 Ville:</strong> ${
-                              apt.establishment_ville || "Non spécifié"
-                            }
-                        </div>
-                        <div class="appointment-detail">
-                            <strong>🩺 Mode:</strong> ${
-                              apt.mode || "Présentiel"
-                            }
-                        </div>
-                        ${
-                          apt.consultationType
-                            ? `
-                        <div class="appointment-detail">
-                            <strong>💉 Type:</strong> ${apt.consultationType}
-                        </div>
-                        `
-                            : ""
-                        }
-                    </div>
-                    ${
-                      apt.notes
-                        ? `
-                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ddd;">
-                            <strong>📝 Notes:</strong> ${apt.notes}
-                        </div>
-                    `
-                        : ""
-                    }
-                    ${
-                      apt.status === "annulé" && apt.cancellationReason
-                        ? `
-                        <div style="margin-top: 10px; padding: 10px; background: #fff3cd; border-radius: 4px;">
-                            <strong>⚠️ Raison d'annulation:</strong> ${apt.cancellationReason}
-                        </div>
-                    `
-                        : ""
-                    }
-                    <div style="margin-top: 12px; font-size: 0.85em; color: #999;">
-                        Créé le ${new Date(apt.createdAt).toLocaleDateString(
-                          "fr-FR"
-                        )} à ${new Date(apt.createdAt).toLocaleTimeString(
+        <div class="appointment-item ${statusClass}">
+          <div class="appointment-header">
+            <div class="appointment-title">${
+              apt.service || "Consultation"
+            }</div>
+            <span class="appointment-status ${statusClass}">${statusText}</span>
+          </div>
+          <div class="appointment-details">
+            <div class="appointment-detail">
+              <strong><svg width="18" height="18" style="vertical-align:middle;" fill="none" stroke="#2056ae" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> Date:</strong> ${new Date(
+                apt.date
+              ).toLocaleDateString("fr-FR")}
+            </div>
+            <div class="appointment-detail">
+              <strong><svg width="18" height="18" style="vertical-align:middle;" fill="none" stroke="#2056ae" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Heure:</strong> ${
+                apt.time
+              }
+            </div>
+            <div class="appointment-detail">
+              <strong><svg width="18" height="18" style="vertical-align:middle;" fill="none" stroke="#2056ae" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C7.03 2 2.5 6.03 2.5 11c0 5.25 7.5 11 9.5 11s9.5-5.75 9.5-11C21.5 6.03 16.97 2 12 2z"/><circle cx="12" cy="11" r="3"/></svg> Lieu:</strong> ${
+                apt.establishment_name && apt.establishment_name.trim() !== ""
+                  ? apt.establishment_name
+                  : "Non spécifié"
+              }
+            </div>
+            <div class="appointment-detail">
+              <strong><svg width="18" height="18" style="vertical-align:middle;" fill="none" stroke="#2056ae" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657A8 8 0 1 0 7.05 7.05a8 8 0 0 0 10.607 9.607z"/><circle cx="12" cy="12" r="3"/></svg> Ville:</strong> ${
+                apt.establishment_ville || "Non spécifié"
+              }
+            </div>
+            <div class="appointment-detail">
+              <strong><svg width="18" height="18" style="vertical-align:middle;" fill="none" stroke="#2056ae" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 2v4M16 2v4"/></svg> Mode:</strong> ${
+                apt.mode || "Présentiel"
+              }
+            </div>
+            ${
+              apt.consultationType
+                ? `
+            <div class="appointment-detail">
+              <strong><svg width="18" height="18" style="vertical-align:middle;" fill="none" stroke="#2056ae" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg> Type:</strong> ${apt.consultationType}
+            </div>
+            `
+                : ""
+            }
+          </div>
+          ${
+            apt.notes
+              ? `
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ddd;">
+              <strong><svg width="18" height="18" style="vertical-align:middle;" fill="none" stroke="#2056ae" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h4"/></svg> Notes:</strong> ${apt.notes}
+            </div>
+          `
+              : ""
+          }
+          ${
+            apt.status === "annulé" && apt.cancellationReason
+              ? `
+            <div style="margin-top: 10px; padding: 10px; background: #fff3cd; border-radius: 4px;">
+              <strong><svg width="18" height="18" style="vertical-align:middle;" fill="none" stroke="#e67e22" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg> Raison d'annulation:</strong> ${apt.cancellationReason}
+            </div>
+          `
+              : ""
+          }
+          <div style="margin-top: 12px; font-size: 0.85em; color: #999;">
+            Créé le ${new Date(apt.createdAt).toLocaleDateString(
               "fr-FR"
-            )}
-                    </div>
-                </div>
-            `;
+            )} à ${new Date(apt.createdAt).toLocaleTimeString("fr-FR")}
+          </div>
+        </div>
+      `;
           })
           .join("");
       }
@@ -1264,17 +1268,13 @@
         try {
           showToast("Envoi en cours...", "info");
 
-          const response = await secureFetch(
-            "/api/appointments",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(data),
+          const response = await secureFetch("/api/appointments", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
             },
-            "Accès interdit ou session expirée lors de la prise de rendez-vous."
-          );
+            body: JSON.stringify(data),
+          });
           const result = await response.json();
           if (!response.ok) {
             throw new Error(

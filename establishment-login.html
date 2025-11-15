@@ -229,72 +229,122 @@
         errorMessage.style.display = "none";
 
         try {
-          // Tentative login admin
+          // Try admin login first. If the account is a platform admin but is also
+          // linked to an establishment, we'll redirect to the establishment dashboard.
           const adminRes = await fetch("/api/admin/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password }),
           });
-          const adminData = await adminRes.json();
-          if (adminData.success && adminData.data) {
-            // Stocker l'admin dans localStorage avec id et role
-            localStorage.setItem(
-              "user",
-              JSON.stringify({
-                ...adminData.data,
-                id: adminData.adminId,
-                role: "admin",
-              })
-            );
-            // Rediriger vers le dashboard admin
-            window.location.href = "admin-dashboard.html";
-            return;
+
+          if (adminRes.ok) {
+            const aData = await adminRes.json();
+            if (aData.success) {
+              // store token + user
+              const token = aData.token || "";
+              localStorage.setItem(
+                "user",
+                JSON.stringify({
+                  ...aData.data,
+                  id: aData.adminId,
+                  role: "admin",
+                })
+              );
+              localStorage.setItem("establishment_token", token);
+
+              // Check whether this admin user has an establishment linked.
+              try {
+                const checkRes = await fetch(
+                  `/api/establishments/admin/${aData.adminId}`,
+                  {
+                    headers: { Authorization: `Bearer ${token}` },
+                  }
+                );
+                if (checkRes.ok) {
+                  const checkData = await checkRes.json();
+                  if (checkData.success && checkData.data) {
+                    // It's an establishment admin: save establishment info and go to establishment dashboard
+                    localStorage.setItem("establishment_id", checkData.data.id);
+                    localStorage.setItem(
+                      "establishment_name",
+                      checkData.data.name || ""
+                    );
+                    localStorage.setItem(
+                      "establishment_email",
+                      checkData.data.email || email
+                    );
+                    window.location.href = "/establishment-dashboard.html";
+                    return;
+                  }
+                }
+              } catch (err) {
+                // ignore and fallback to admin dashboard
+              }
+
+              // Otherwise go to admin dashboard
+              window.location.href = "admin-dashboard.html";
+              return;
+            }
           }
-          // Sinon, tentative login établissement classique
-          const response = await fetch("/api/establishment/login", {
+
+          // If admin login failed (not ok), try establishment login as fallback
+          const estRes = await fetch("/api/establishment/login", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password }),
           });
-          const data = await response.json();
-          if (data.success) {
-            localStorage.setItem("establishment_token", data.token);
-            localStorage.setItem("establishment_id", data.establishment.id);
-            localStorage.setItem("establishment_name", data.establishment.nom);
-            localStorage.setItem("establishment_email", email);
-            // Récupérer les infos admin complètes pour settings.html
-            fetch(`/api/admin/${data.establishment.id}`, {
-              headers: {
-                "X-User-Role": "admin",
-                "X-User-Id": data.establishment.id,
-              },
-            })
-              .then((r) => r.json())
-              .then((adminRes) => {
-                if (adminRes.success && adminRes.data) {
-                  localStorage.setItem(
-                    "user",
-                    JSON.stringify({ ...adminRes.data, role: "admin" })
-                  );
-                } else {
-                  // fallback minimal
-                  localStorage.setItem(
-                    "user",
-                    JSON.stringify({
-                      id: data.establishment.id,
-                      email: email,
-                      username: data.establishment.nom,
-                      role: "admin",
-                    })
-                  );
-                }
-                window.location.href = "/establishment-dashboard.html";
-              });
-          } else {
-            showError(data.message || "Email ou mot de passe incorrect");
+
+          if (!estRes.ok) {
+            const txt = await estRes.text().catch(() => "");
+            showError(
+              `Erreur serveur (${estRes.status}): ${txt || estRes.statusText}`
+            );
+            return;
           }
+
+          const estData = await estRes.json();
+          if (!estData.success) {
+            showError(estData.message || "Email ou mot de passe incorrect.");
+            return;
+          }
+
+          const facility = estData.establishment || estData.data || estData;
+          const token = estData.token || "";
+
+          // Save token and basic establishment info
+          localStorage.setItem("establishment_token", token);
+          localStorage.setItem("establishment_id", facility.id);
+          localStorage.setItem(
+            "establishment_name",
+            facility.name || facility.nom || ""
+          );
+          localStorage.setItem("establishment_email", facility.email || email);
+
+          // Try to fetch admin details for richer user object (settings)
+          fetch(`/api/admin/${facility.id}`)
+            .then((r) => r.json())
+            .then((adminRes) => {
+              if (adminRes.success && adminRes.data) {
+                localStorage.setItem(
+                  "user",
+                  JSON.stringify({ ...adminRes.data, role: "admin" })
+                );
+              } else {
+                localStorage.setItem(
+                  "user",
+                  JSON.stringify({
+                    id: facility.id,
+                    email: facility.email || email,
+                    username: facility.name || facility.nom || "",
+                    role: "admin",
+                  })
+                );
+              }
+              window.location.href = "/establishment-dashboard.html";
+            })
+            .catch(() => {
+              window.location.href = "/establishment-dashboard.html";
+            });
         } catch (error) {
           console.error("Erreur:", error);
           showError("Erreur de connexion au serveur");

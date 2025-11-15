@@ -16,11 +16,251 @@
 </head>
 <body>
   <div class="container">
+        <div style="margin-bottom:1.5rem;">
+          <label for="country-select" style="font-weight:600;">Pays&nbsp;:</label>
+          <select id="country-select" style="width:100%;padding:0.6rem 0.5rem;border-radius:8px;border:1px solid #ccc;margin-top:0.5rem;">
+            <option value="fr">France</option>
+            <option value="us">États-Unis</option>
+            <option value="uk">Royaume-Uni</option>
+            <option value="de">Allemagne</option>
+            <option value="es">Espagne</option>
+            <option value="it">Italie</option>
+            <option value="ca">Canada</option>
+            <option value="ma">Maroc</option>
+            <option value="dz">Algérie</option>
+            <option value="tn">Tunisie</option>
+            <option value="be">Belgique</option>
+            <option value="ch">Suisse</option>
+            <option value="sn">Sénégal</option>
+            <option value="cm">Cameroun</option>
+            <option value="ci">Côte d'Ivoire</option>
+            <option value="ng">Nigéria</option>
+            <option value="in">Inde</option>
+            <option value="br">Brésil</option>
+            <option value="ru">Russie</option>
+            <option value="cn">Chine</option>
+            <option value="jp">Japon</option>
+            <option value="tr">Turquie</option>
+            <option value="sa">Arabie Saoudite</option>
+            <option value="ae">Émirats Arabes Unis</option>
+            <option value="za">Afrique du Sud</option>
+            <option value="eg">Égypte</option>
+            <option value="au">Australie</option>
+            <option value="mx">Mexique</option>
+            <option value="ar">Argentine</option>
+            <option value="kr">Corée du Sud</option>
+            <option value="se">Suède</option>
+            <option value="nl">Pays-Bas</option>
+            <option value="pl">Pologne</option>
+            <option value="pt">Portugal</option>
+            <option value="gr">Grèce</option>
+            <option value="ro">Roumanie</option>
+            <option value="ua">Ukraine</option>
+            <option value="at">Autriche</option>
+            <option value="cz">Tchéquie</option>
+            <option value="hu">Hongrie</option>
+            <option value="fi">Finlande</option>
+            <option value="no">Norvège</option>
+            <option value="dk">Danemark</option>
+            <option value="ie">Irlande</option>
+            <option value="il">Israël</option>
+            <option value="sg">Singapour</option>
+            <option value="th">Thaïlande</option>
+            <option value="id">Indonésie</option>
+            <option value="ph">Philippines</option>
+            <option value="my">Malaisie</option>
+            <option value="vn">Vietnam</option>
+            <option value="cl">Chili</option>
+            <option value="co">Colombie</option>
+            <option value="pe">Pérou</option>
+            <option value="ve">Venezuela</option>
+            <option value="pk">Pakistan</option>
+            <option value="bd">Bangladesh</option>
+            <option value="lk">Sri Lanka</option>
+            <option value="nz">Nouvelle-Zélande</option>
+            <option value="other">Autre</option>
+          </select>
+        </div>
     <h1>Pharmacie numérique</h1>
-    <div class="desc">Gérez vos ordonnances, suivez vos stocks de médicaments et trouvez la pharmacie la plus proche.</div>
-    <button class="btn" onclick="alert('Gestion des stocks à venir !')">Gérer mes médicaments</button>
-    <button class="btn" style="background:#4D3AFF;margin-top:12px;" onclick="alert('Recherche de pharmacie à venir !')">Trouver une pharmacie</button>
+    <div class="desc">Gérez vos ordonnances, suivez vos stocks de médicaments, trouvez une pharmacie proche et achetez vos médicaments en ligne.</div>
+    <div style="margin-bottom:1.5rem;">
+      <label for="med-category" style="font-weight:600;">Choisissez une catégorie&nbsp;:</label>
+      <select id="med-category" style="width:100%;padding:0.6rem 0.5rem;border-radius:8px;border:1px solid #ccc;margin-top:0.5rem;">
+        <option value="">-- Sélectionner --</option>
+        <option value="douleur">Douleur / Fièvre</option>
+        <option value="rhume">Rhume / Allergie</option>
+        <option value="digestif">Digestion / Estomac</option>
+        <option value="peau">Peau / Dermatologie</option>
+        <option value="sommeil">Sommeil / Stress</option>
+        <option value="vitamines">Vitamines / Minéraux</option>
+        <option value="autres">Autres</option>
+      </select>
+    </div>
+    <div id="meds-suggestions" style="margin-bottom:1.5rem;"></div>
+    <div id="meds-intake" style="margin-bottom:1.5rem;"></div>
+    <div style="margin-bottom:1.5rem;text-align:center;">
+      <button class="btn" onclick="window.location.href='https://www.doctipharma.fr/?lang=fr'" style="background:#4D3AFF;margin-top:0;">🛒 Accéder à la pharmacie en ligne</button>
+    </div>
     <div style="margin-top:28px;text-align:center;"><a href="index.html" style="color:#2056AE;text-decoration:underline;">&larr; Retour à l'accueil</a></div>
+    <script>
+        // APIs publiques par pays (exemples)
+        const countryApis = {
+          fr: { api: 'https://open-medicaments.fr/api/v1/medicaments?query=', name: 'Open Medicaments France', lang: 'fr', shop: 'https://www.doctipharma.fr/search?q=' },
+          us: { api: 'https://api.fda.gov/drug/label.json?search=openfda.brand_name:', name: 'FDA US', lang: 'en', shop: 'https://www.goodrx.com/search?query=' },
+          uk: { api: 'https://www.medicines.org.uk/emc/search?q=', name: 'EMC UK', lang: 'en', shop: 'https://www.pharmacy2u.co.uk/search?term=' },
+          de: { api: 'https://api.pharmazie.com/de/search?q=', name: 'Pharmazie DE', lang: 'de', shop: 'https://www.shop-apotheke.com/search?search=' },
+          es: { api: 'https://cima.aemps.es/cima/rest/medicamento?nombre=', name: 'CIMA ES', lang: 'es', shop: 'https://www.promofarma.com/search/?q=' },
+          it: { api: 'https://www.farmaci.it/api/search?q=', name: 'Farmaci IT', lang: 'it', shop: 'https://www.farmacia.it/search/?q=' },
+          ca: { api: 'https://health-products.canada.ca/api/drug/search?q=', name: 'Canada Drug', lang: 'fr', shop: 'https://www.pharmaprix.ca/fr/search?searchTerm=' },
+          ma: { api: '', name: 'Maroc', lang: 'fr', shop: 'https://www.santeplus.ma/search?q=' },
+          dz: { api: '', name: 'Algérie', lang: 'fr', shop: 'https://www.pharmnet-dz.com/search?q=' },
+          tn: { api: '', name: 'Tunisie', lang: 'fr', shop: 'https://www.pharmaplus.tn/search?q=' },
+          // ... autres pays (exemples, certains fictifs)
+          other: { api: '', name: 'Global', lang: 'en', shop: 'https://www.google.com/search?q=acheter+' }
+        };
+        const countrySelect = document.getElementById('country-select');
+        let selectedCountry = countrySelect.value;
+        countrySelect.addEventListener('change', function() {
+          selectedCountry = countrySelect.value;
+          medCategory.dispatchEvent(new Event('change'));
+        });
+    // Suggestions par catégorie (créatif, UX guidée)
+    const medCategories = {
+      douleur: [
+        { nom: "Paracétamol", forme: "Comprimé 500mg", image: "https://www.vidal.fr/media/medicaments/Paracetamol.jpg" },
+        { nom: "Ibuprofène", forme: "Comprimé 200mg", image: "https://www.vidal.fr/media/medicaments/Ibuprofene.jpg" },
+        { nom: "Efferalgan", forme: "Poudre pour solution", image: "https://www.vidal.fr/media/medicaments/Efferalgan.jpg" }
+      ],
+      rhume: [
+        { nom: "Humex Rhume", forme: "Capsule", image: "https://www.vidal.fr/media/medicaments/Humex.jpg" },
+        { nom: "Dolirhume", forme: "Comprimé", image: "https://www.vidal.fr/media/medicaments/Dolirhume.jpg" },
+        { nom: "Actifed", forme: "Sirop", image: "https://www.vidal.fr/media/medicaments/Actifed.jpg" }
+      ],
+      digestif: [
+        { nom: "Smecta", forme: "Poudre", image: "https://www.vidal.fr/media/medicaments/Smecta.jpg" },
+        { nom: "Imodium", forme: "Capsule", image: "https://www.vidal.fr/media/medicaments/Imodium.jpg" },
+        { nom: "Maalox", forme: "Comprimé à croquer", image: "https://www.vidal.fr/media/medicaments/Maalox.jpg" }
+      ],
+      peau: [
+        { nom: "Bepanthen", forme: "Crème", image: "https://www.vidal.fr/media/medicaments/Bepanthen.jpg" },
+        { nom: "Cicalfate", forme: "Crème", image: "https://www.vidal.fr/media/medicaments/Cicalfate.jpg" },
+        { nom: "Cicatridine", forme: "Pommade", image: "https://www.vidal.fr/media/medicaments/Cicatridine.jpg" }
+      ],
+      sommeil: [
+        { nom: "Donormyl", forme: "Comprimé", image: "https://www.vidal.fr/media/medicaments/Donormyl.jpg" },
+        { nom: "Euphytose", forme: "Comprimé", image: "https://www.vidal.fr/media/medicaments/Euphytose.jpg" },
+        { nom: "Melatonine", forme: "Comprimé", image: "https://www.vidal.fr/media/medicaments/Melatonine.jpg" }
+      ],
+      vitamines: [
+        { nom: "Vitamine C", forme: "Comprimé", image: "https://www.vidal.fr/media/medicaments/VitamineC.jpg" },
+        { nom: "Magnésium B6", forme: "Comprimé", image: "https://www.vidal.fr/media/medicaments/MagnesiumB6.jpg" },
+        { nom: "Berocca", forme: "Comprimé effervescent", image: "https://www.vidal.fr/media/medicaments/Berocca.jpg" }
+      ],
+      autres: [
+        { nom: "Dafalgan", forme: "Comprimé", image: "https://www.vidal.fr/media/medicaments/Dafalgan.jpg" },
+        { nom: "Spasfon", forme: "Comprimé", image: "https://www.vidal.fr/media/medicaments/Spasfon.jpg" },
+        { nom: "Strepsils", forme: "Pastille", image: "https://www.vidal.fr/media/medicaments/Strepsils.jpg" }
+      ]
+    };
+    const medCategory = document.getElementById('med-category');
+    const medsSuggestions = document.getElementById('meds-suggestions');
+    const medsIntake = document.getElementById('meds-intake');
+    let currentMed = null;
+
+    medCategory.addEventListener('change', function() {
+      const cat = medCategory.value;
+      medsIntake.innerHTML = '';
+      if (!cat || !medCategories[cat]) {
+        medsSuggestions.innerHTML = '';
+        return;
+      }
+      const countryApi = countryApis[selectedCountry] || countryApis['fr'];
+      Promise.all(medCategories[cat].map(async med => {
+        let details = '';
+        let imageUrl = med.image;
+        // API enrichissement selon le pays
+        if (countryApi.api) {
+          try {
+            let apiUrl = countryApi.api + encodeURIComponent(med.nom);
+            if (selectedCountry === 'us') apiUrl += '*';
+            const res = await fetch(apiUrl);
+            const data = await res.json();
+            if (selectedCountry === 'fr' && data && data[0]) {
+              details = `<div style='font-size:0.95em;color:#444;margin-top:0.3em;'>${data[0].formePharmaceutique || ''} ${data[0].titulaires ? '· ' + data[0].titulaires.join(', ') : ''}</div>`;
+            } else if (selectedCountry === 'us' && data.results && data.results[0]) {
+              details = `<div style='font-size:0.95em;color:#444;margin-top:0.3em;'>${data.results[0].openfda.generic_name ? data.results[0].openfda.generic_name.join(', ') : ''} ${data.results[0].purpose ? '· ' + data.results[0].purpose.join(', ') : ''}</div>`;
+            } else if (selectedCountry === 'es' && data && data[0]) {
+              details = `<div style='font-size:0.95em;color:#444;margin-top:0.3em;'>${data[0].nombre || ''} ${data[0].laboratorio ? '· ' + data[0].laboratorio : ''}</div>`;
+            }
+            // TODO: autres pays, autres structures
+          } catch {}
+        }
+        // Fallback image si erreur
+        function imgError(e){ e.target.src='https://via.placeholder.com/64?text=Med'; e.target.onerror=null; }
+        return `
+        <div style="padding:1rem;margin-bottom:1rem;background:#f8f9fa;border-radius:8px;box-shadow:0 1px 4px #0001;display:flex;align-items:center;gap:1.2rem;">
+          <img src="${imageUrl}" alt="${med.nom}" style="width:64px;height:64px;object-fit:contain;border-radius:8px;background:#fff;border:1px solid #eee;" onerror="this.onerror=null;this.src='https://via.placeholder.com/64?text=Med';">
+          <div style="flex:1;">
+            <strong style="font-size:1.1em;">${med.nom}</strong><br>
+            <span style="font-size:0.98em;color:#555">${med.forme}</span>
+            ${details}
+            <div style="margin-top:0.5em;display:flex;gap:0.7em;align-items:center;">
+              <button onclick='selectMed("${encodeURIComponent(JSON.stringify(med))}")' style="padding:0.4rem 1rem;border-radius:6px;background:#28a745;color:#fff;border:none;font-weight:600;">Prendre</button>
+              <a href='${countryApi.shop}${encodeURIComponent(med.nom)}${countryApi.lang ? `&lang=${countryApi.lang}` : ''}' target='_blank' style='color:#2056ae;text-decoration:underline;font-size:0.98em;'>🛒 Acheter</a>
+              <a href='https://www.vidal.fr/medicaments/${encodeURIComponent(med.nom.replace(/ /g,"-").toLowerCase())}.html' target='_blank' style='color:#4D3AFF;text-decoration:underline;font-size:0.98em;'>ℹ️ Détails</a>
+            </div>
+          </div>
+        </div>
+        `;
+      })).then(htmls => {
+        medsSuggestions.innerHTML = htmls.join('');
+      });
+    });
+
+    window.selectMed = (medStr) => {
+      const med = JSON.parse(decodeURIComponent(medStr));
+      currentMed = med;
+      medsIntake.innerHTML = `
+        <h3>Prise de Médicament : ${med.nom}</h3>
+        <form id='intake-form' style='margin-top:1rem;'>
+          <label>Heure de prise : <input type='time' id='intake-time' required style='margin-left:0.5rem;'/></label><br><br>
+          <label>Quantité : <input type='number' id='intake-qty' min='1' value='1' required style='width:60px;margin-left:0.5rem;'/></label><br><br>
+          <button type='submit' class='btn' style='padding:0.4rem 1.2rem;width:auto;'>Enregistrer la prise</button>
+        </form>
+        <div id='intake-history' style='margin-top:1.5rem;'></div>
+      `;
+      document.getElementById('intake-form').onsubmit = (e) => {
+        e.preventDefault();
+        const time = document.getElementById('intake-time').value;
+        const qty = document.getElementById('intake-qty').value;
+        if (!time || !qty) return;
+        let history = JSON.parse(localStorage.getItem('medsIntakeHistory')||'[]');
+        const entry = {
+          med: med.nom,
+          time,
+          qty,
+          date: new Date().toLocaleDateString()
+        };
+        history.push(entry);
+        localStorage.setItem('medsIntakeHistory', JSON.stringify(history));
+        console.log('[LOG] Médicament ajouté à l\'historique:', entry);
+        showIntakeHistory(med.nom);
+      };
+      showIntakeHistory(med.nom);
+    };
+
+    function showIntakeHistory(medName) {
+      let history = JSON.parse(localStorage.getItem('medsIntakeHistory')||'[]');
+      history = history.filter(h => h.med === medName);
+      const el = document.getElementById('intake-history');
+      if (!history.length) {
+        el.innerHTML = '<em>Aucune prise enregistrée.</em>';
+        return;
+      }
+      el.innerHTML = '<strong>Historique des prises :</strong><ul style="margin-top:0.5rem;">' +
+        history.map(h => `<li>${h.date} à ${h.time} — ${h.qty} unité(s)</li>`).join('') + '</ul>';
+    }
+    </script>
   </div>
 </body>
 </html>

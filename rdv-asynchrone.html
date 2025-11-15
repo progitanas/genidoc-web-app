@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rendez-vous asynchrones — GeniDoc</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; margin: 0; }
+    .container { max-width: 600px; margin: 40px auto; background: #fff; border-radius: 18px; box-shadow: 0 8px 32px #4d3aff22; padding: 36px 28px; }
+    h1 { color: #2056AE; font-size: 1.5em; margin-bottom: 18px; }
+    .desc { color: #444; margin-bottom: 24px; }
+    .history { margin-top: 24px; }
+    .msg { background: #eaf1fb; border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+    .msg.me { background: #d4edda; }
+    .msg.audio { background: #fff3cd; }
+    .form-group { margin-bottom: 18px; }
+    .btn { background: #2056AE; color: #fff; border: none; border-radius: 8px; padding: 10px 22px; font-size: 1em; font-weight: 700; cursor: pointer; }
+    .btn:hover { background: #174080; }
+    .audio-controls { display: flex; gap: 10px; align-items: center; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Rendez-vous asynchrones</h1>
+    <div class="desc">Envoyez une question texte ou audio à un médecin, recevez une réponse différée. Notifications intégrées.</div>
+    <form id="async-form">
+      <div class="form-group">
+        <label for="question">Votre question (texte)</label>
+        <textarea id="question" rows="2" style="width:100%;border-radius:8px;padding:8px;"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Ou enregistrez un message audio :</label>
+        <div class="audio-controls">
+          <button type="button" id="record-btn" class="btn">🎤 Enregistrer</button>
+          <button type="button" id="stop-btn" class="btn" disabled>⏹️ Stop</button>
+          <audio id="audio-preview" controls style="display:none;"></audio>
+        </div>
+      </div>
+      <button type="submit" class="btn">Envoyer</button>
+    </form>
+    <div class="history" id="history"></div>
+  </div>
+  <script>
+    // --- Audio recording (Web Audio API) ---
+    let mediaRecorder, audioChunks = [], audioBlob = null;
+    const recordBtn = document.getElementById('record-btn');
+    const stopBtn = document.getElementById('stop-btn');
+    const audioPreview = document.getElementById('audio-preview');
+    recordBtn.onclick = async function() {
+      audioChunks = [];
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.start();
+      recordBtn.disabled = true;
+      stopBtn.disabled = false;
+      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+      mediaRecorder.onstop = () => {
+        audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        audioPreview.src = URL.createObjectURL(audioBlob);
+        audioPreview.style.display = 'block';
+        recordBtn.disabled = false;
+        stopBtn.disabled = true;
+      };
+    };
+    stopBtn.onclick = function() {
+      if (mediaRecorder) mediaRecorder.stop();
+    };
+    // --- Form submit ---
+    document.getElementById('async-form').onsubmit = async function(e) {
+      e.preventDefault();
+      const question = document.getElementById('question').value.trim();
+      let formData = new FormData();
+      if (question) formData.append('question', question);
+      if (audioBlob) formData.append('audio', audioBlob, 'audio.webm');
+      // Appel API (à implémenter côté backend)
+      // await fetch('/api/async-appointments', { method: 'POST', body: formData });
+      // Pour la démo, on stocke localement
+      let history = JSON.parse(localStorage.getItem('asyncHistory')||'[]');
+      if (question) history.push({ type: 'text', content: question, date: new Date().toISOString() });
+      if (audioBlob) history.push({ type: 'audio', content: audioPreview.src, date: new Date().toISOString() });
+      localStorage.setItem('asyncHistory', JSON.stringify(history));
+      document.getElementById('question').value = '';
+      audioPreview.src = '';
+      audioPreview.style.display = 'none';
+      audioBlob = null;
+      renderHistory();
+      // Simuler notification
+      setTimeout(()=>alert('Réponse du médecin disponible (démo)'), 2000);
+    };
+    function renderHistory() {
+      let history = JSON.parse(localStorage.getItem('asyncHistory')||'[]');
+      const el = document.getElementById('history');
+      if (!history.length) { el.innerHTML = '<em>Aucun message envoyé.</em>'; return; }
+      el.innerHTML = history.map(msg => {
+        if (msg.type === 'text') return `<div class='msg me'><b>Vous :</b> ${msg.content}<br><span style='font-size:0.9em;color:#888;'>${new Date(msg.date).toLocaleString('fr-FR')}</span></div>`;
+        if (msg.type === 'audio') return `<div class='msg audio'><b>Vous (audio) :</b><br><audio src='${msg.content}' controls style='width:100%;'></audio><br><span style='font-size:0.9em;color:#888;'>${new Date(msg.date).toLocaleString('fr-FR')}</span></div>`;
+        if (msg.type === 'reply') return `<div class='msg'><b>Médecin :</b> ${msg.content}<br><span style='font-size:0.9em;color:#888;'>${new Date(msg.date).toLocaleString('fr-FR')}</span></div>`;
+      }).join('');
+    }
+    renderHistory();
+  </script>
+</body>
+</html>

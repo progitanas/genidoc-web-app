@@ -609,6 +609,234 @@
     </style>
   </head>
   <body>
+    <!-- Sidebar Chatbot Professionnel -->
+    <div
+      id="chatbotSidebar"
+      style="
+        position: fixed;
+        top: 0;
+        left: -340px;
+        width: 320px;
+        height: 100vh;
+        background: #fff;
+        box-shadow: 2px 0 16px rgba(32, 86, 174, 0.1);
+        z-index: 999;
+        transition: left 0.3s;
+        display: flex;
+        flex-direction: column;
+      "
+    >
+      <div
+        style="
+          background: #2056ae;
+          color: #fff;
+          padding: 18px 20px 12px 20px;
+          font-size: 1.15em;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        "
+      >
+        <svg
+          width="28"
+          height="28"
+          fill="none"
+          stroke="#fff"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+        </svg>
+        Chatbot Professionnel
+        <button
+          onclick="closeChatbotSidebar()"
+          style="
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5em;
+            cursor: pointer;
+          "
+        >
+          &times;
+        </button>
+      </div>
+      <div style="padding: 18px; flex: 1; overflow-y: auto">
+        <div
+          style="
+            font-size: 1em;
+            color: #2056ae;
+            font-weight: 600;
+            margin-bottom: 10px;
+          "
+        >
+          Posez vos questions médicales, administratives ou techniques à notre
+          assistant IA professionnel.
+        </div>
+        <div style="font-size: 0.98em; color: #444; margin-bottom: 12px">
+          Disponible 24/7 pour&nbsp;:
+          <ul style="margin: 8px 0 0 18px; padding: 0">
+            <li>Conseils médicaux personnalisés</li>
+            <li>Support administratif</li>
+            <li>Aide à la prise de rendez-vous</li>
+            <li>Explications sur vos documents</li>
+            <li>Orientation vers un professionnel</li>
+          </ul>
+        </div>
+        <div style="text-align: center; margin-bottom: 12px">
+          <a
+            href="/genidocyallah1.0.html"
+            target="_blank"
+            style="
+              background: #2056ae;
+              color: #fff;
+              padding: 8px 14px;
+              border-radius: 10px;
+              text-decoration: none;
+              font-weight: 700;
+              box-shadow: 0 2px 8px rgba(32, 86, 174, 0.12);
+            "
+            >Ouvrir la page complète GeniDoc Yallah 1.0</a
+          >
+        </div>
+        <div
+          id="chatbotMessages"
+          style="
+            height: 220px;
+            overflow-y: auto;
+            background: #f5f7fa;
+            border-radius: 8px;
+            padding: 10px 8px 10px 8px;
+            margin-bottom: 12px;
+            border: 1px solid #e5e7eb;
+          "
+        ></div>
+        <form id="chatbotForm" style="display: flex; gap: 8px">
+          <input
+            id="chatbotInput"
+            type="text"
+            placeholder="Écrivez votre question..."
+            style="
+              flex: 1;
+              padding: 8px 12px;
+              border-radius: 8px;
+              border: 1px solid #ccc;
+              font-size: 1em;
+            "
+            autocomplete="off"
+          />
+          <button
+            type="submit"
+            style="
+              background: #2056ae;
+              color: #fff;
+              border: none;
+              border-radius: 8px;
+              padding: 8px 16px;
+              font-weight: 700;
+              cursor: pointer;
+            "
+          >
+            Envoyer
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Flèche UI pour ouvrir la sidebar -->
+
+    <!-- Bouton à droite pour ouvrir genidocyallah1.0.html -->
+    <button
+      id="openYallahBtn"
+      title="Afficher GeniDoc Yallah 1.0"
+      style="
+        position: fixed;
+        top: 120px;
+        right: 0;
+        z-index: 1000;
+        background: #2056ae;
+        color: #fff;
+        border: none;
+        border-radius: 16px 0 0 16px;
+        padding: 14px 18px 14px 12px;
+        box-shadow: -2px 2px 12px rgba(32, 86, 174, 0.1);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: right 0.2s;
+      "
+    >
+      <span style="font-size: 1.08em; font-weight: 600">Afficher</span>
+      <svg
+        width="22"
+        height="22"
+        fill="none"
+        stroke="#fff"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+      >
+        <path d="M15 6l6 6-6 6" />
+      </svg>
+    </button>
+    <script>
+      document.getElementById("openYallahBtn").onclick = function () {
+        window.open("genidocyallah1.0.html", "_blank");
+      };
+    </script>
+
+    <script>
+      // Sidebar open/close logic
+      const sidebar = document.getElementById("chatbotSidebar");
+      const openBtn = document.getElementById("openChatbotSidebarBtn");
+      function openChatbotSidebar() {
+        sidebar.style.left = "0";
+      }
+      function closeChatbotSidebar() {
+        sidebar.style.left = "-340px";
+      }
+      openBtn.onclick = openChatbotSidebar;
+      // Chatbot form logic (demo only)
+      document.getElementById("chatbotForm").onsubmit = function (e) {
+        e.preventDefault();
+        const input = document.getElementById("chatbotInput");
+        const messages = document.getElementById("chatbotMessages");
+        const userMsg = input.value.trim();
+        if (userMsg) {
+          const msg = document.createElement("div");
+          msg.textContent = "👤 " + userMsg;
+          msg.style.marginBottom = "6px";
+          messages.appendChild(msg);
+          messages.scrollTop = messages.scrollHeight;
+          input.value = "";
+          // Appel API /api/chat demo
+          fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: userMsg }),
+          })
+            .then((r) => r.json())
+            .then((data) => {
+              const bot = document.createElement("div");
+              bot.textContent = data.success ? data.response : "Erreur IA";
+              bot.style.color = "#2056ae";
+              bot.style.marginBottom = "10px";
+              messages.appendChild(bot);
+              messages.scrollTop = messages.scrollHeight;
+            })
+            .catch(() => {
+              const bot = document.createElement("div");
+              bot.textContent = "Erreur de connexion au serveur IA";
+              bot.style.color = "red";
+              messages.appendChild(bot);
+              messages.scrollTop = messages.scrollHeight;
+            });
+        }
+      };
+    </script>
     <!-- Header -->
     <!-- Header -->
     <header class="dashboard-header">
@@ -659,7 +887,6 @@
           class="profile-btn"
           id="settingsBtn"
           title="Paramètres"
-          onclick="window.location.href='settings.html'"
           style="
             background: none;
             border: none;
@@ -674,6 +901,18 @@
             style="width: 26px; height: 26px; vertical-align: middle"
           />
         </button>
+        <script>
+          // Always open settings.html with genidocId in URL
+          document.getElementById("settingsBtn").onclick = function () {
+            const params = new URLSearchParams(window.location.search);
+            const genidocId = params.get("genidocId");
+            if (genidocId) {
+              window.location.href = `settings.html?genidocId=${genidocId}`;
+            } else {
+              window.location.href = "settings.html";
+            }
+          };
+        </script>
       </div>
 
       <!-- Dropdown notifications -->
@@ -712,6 +951,63 @@
 
     <!-- Contenu principal -->
     <main class="main-content">
+            <div style="display:flex;justify-content:center;margin-bottom:18px;">
+              <button id="btn-patient-dashboard" style="background:#2056AE;color:#fff;padding:10px 22px;border-radius:10px;font-weight:700;border:none;cursor:pointer;font-size:1em;box-shadow:0 2px 8px #2056ae22;">Mon espace patient</button>
+            </div>
+            <script>
+              document.getElementById('btn-patient-dashboard').onclick = function() {
+                console.log('[LOG] Bouton Mon espace patient cliqué');
+                const params = new URLSearchParams(window.location.search);
+                const genidocId = params.get("genidocId");
+                let url = "patients/dashboard-patient.html";
+                if (genidocId) {
+                  url += `?genidocId=${genidocId}`;
+                  console.log('[LOG] genidocId trouvé:', genidocId);
+                } else {
+                  console.warn('[LOG] Aucun genidocId trouvé dans l\'URL');
+                }
+                console.log('[LOG] Redirection vers:', url);
+                window.location.href = url;
+              };
+            </script>
+            <!-- Bouton dashboard patient : redirige avec genidocId -->
+            <script>
+              document.getElementById('btn-patient-dashboard').onclick = function() {
+                console.log('[DEBUG] Bouton Mon espace patient cliqué');
+                const params = new URLSearchParams(window.location.search);
+                const genidocId = params.get("genidocId");
+                let url = "patients/dashboard-patient.html";
+                if (genidocId) {
+                  url += `?genidocId=${genidocId}`;
+                  console.log('[DEBUG] genidocId trouvé:', genidocId);
+                } else {
+                  console.warn('[DEBUG] Aucun genidocId trouvé dans l\'URL');
+                }
+                console.log('[DEBUG] Redirection vers:', url);
+                window.location.href = url;
+              };
+            </script>
+      <!-- Annonce GeniDoc GPT -->
+      <div
+        style="
+          background: linear-gradient(90deg, #2056ae 60%, #4f8cff 100%);
+          color: #fff;
+          padding: 18px 24px;
+          border-radius: 14px;
+          margin-bottom: 28px;
+          box-shadow: 0 2px 12px rgba(32, 86, 174, 0.1);
+          font-size: 1.15em;
+          text-align: center;
+          font-weight: 600;
+          letter-spacing: 0.5px;
+        "
+      >
+        🚀 <span style="font-weight: 700">Bientôt&nbsp;:</span>
+        <span style="font-weight: 700; letter-spacing: 1px"
+          >GeniDoc Yallah 1.0</span
+        >
+        — Nouvelle génération de santé connectée&nbsp;!
+      </div>
       <!-- Section Carte Vitale -->
       <section class="vitale-section">
         <button class="vitale-btn" id="vitaleBtn">
@@ -763,6 +1059,120 @@
 
       <!-- Grille des modules/fonctionnalités -->
       <section class="modules-grid">
+        <!-- MODULE: Consultation à distance (Dashboard global) -->
+        <div
+          class="module-card"
+          onclick="window.location.href='consultation-distance.html'"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+              <path
+                d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
+              />
+            </svg>
+          </div>
+          <h3>Consultation à distance</h3>
+          <div
+            style="
+              margin-top: 12px;
+              display: flex;
+              flex-wrap: wrap;
+              gap: 8px;
+              justify-content: center;
+              font-size: 0.98em;
+              font-weight: 500;
+            "
+          >
+            <span
+              style="
+                background: #2056ae;
+                color: #fff;
+                padding: 6px 16px;
+                border-radius: 16px;
+              "
+              >Téléconsultation</span
+            >
+            <span
+              style="
+                background: #4f8cff;
+                color: #fff;
+                padding: 6px 16px;
+                border-radius: 16px;
+              "
+              >Téléexpertise</span
+            >
+            <span
+              style="
+                background: #27ae60;
+                color: #fff;
+                padding: 6px 16px;
+                border-radius: 16px;
+              "
+              >Téléassistance</span
+            >
+            <span
+              style="
+                background: #f39c12;
+                color: #fff;
+                padding: 6px 16px;
+                border-radius: 16px;
+              "
+              >Télésoin</span
+            >
+            <span
+              style="
+                background: #e74c3c;
+                color: #fff;
+                padding: 6px 16px;
+                border-radius: 16px;
+              "
+              >Télémonitoring</span
+            >
+            <span
+              style="
+                background: #8e44ad;
+                color: #fff;
+                padding: 6px 16px;
+                border-radius: 16px;
+              "
+              >E-prescription</span
+            >
+            <span
+              style="
+                background: #16a085;
+                color: #fff;
+                padding: 6px 16px;
+                border-radius: 16px;
+              "
+              >Gestion RDV & facturation</span
+            >
+            <span
+              style="
+                background: #fd79a8;
+                color: #fff;
+                padding: 6px 16px;
+                border-radius: 16px;
+              "
+              >Modules IA avancés</span
+            >
+            <span
+              style="
+                background: #222f3e;
+                color: #fff;
+                padding: 6px 16px;
+                border-radius: 16px;
+              "
+              >Sécurité Blockchain</span
+            >
+          </div>
+        </div>
         <div class="module-card" onclick="redirectToPage('appintment.html')">
           <div class="icon">
             <svg
@@ -777,6 +1187,75 @@
           </div>
           <h3>Prendre un rendez-vous</h3>
           <p>Réservez une consultation ou un service santé en 1 clic.</p>
+        </div>
+
+        <!-- MODULE: Analyse automatique d’ordonnances (OCR + IA) -->
+        <div
+          class="module-card"
+          onclick="window.location.href='ocr-ordonnance.html'"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="4" />
+              <path d="M8 8h8M8 12h6M8 16h4" />
+            </svg>
+          </div>
+          <h3>Analyse d’ordonnances</h3>
+          <p>
+            Déposez une ordonnance : extraction automatique des médicaments,
+            posologies et alertes via IA/OCR.
+          </p>
+        </div>
+
+        <!-- MODULE: Rendez-vous asynchrones (audio/texte différé) -->
+        <div
+          class="module-card"
+          onclick="window.location.href='rdv-asynchrone.html'"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 6v6l4 2" />
+            </svg>
+          </div>
+          <h3>Rendez-vous asynchrones</h3>
+          <p>
+            Envoyez une question audio ou texte à un médecin, recevez une
+            réponse différée, notifications intégrées.
+          </p>
+        </div>
+
+        <!-- MODULE: Carte Vitale Numérique GeniDoc -->
+        <div
+          class="module-card"
+          onclick="document.getElementById('vitaleBtn').click()"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <rect x="2" y="3" width="20" height="14" rx="2" />
+              <path d="M8 21h8M12 17v4" />
+            </svg>
+          </div>
+          <h3>Carte Vitale Numérique</h3>
+          <p>
+            Accédez à votre carte vitale GeniDoc, QR code, historique,
+            intégration avec les modules santé.
+          </p>
         </div>
 
         <div class="module-card" onclick="redirectToPage('genidoc-map.html')">
@@ -813,7 +1292,12 @@
             </svg>
           </div>
           <h3>Téléconsultation</h3>
-          <p>Consultez un médecin en visio, sans vous déplacer.</p>
+          <p>
+            Consultation vidéo sécurisée avec Jitsi Meet SDK, prise de
+            rendez-vous, salle privée, chiffrement bout-en-bout,
+            authentification JWT, Consultez un médecin en visio, sans vous
+            déplacer.
+          </p>
         </div>
 
         <div class="module-card" onclick="window.location.href='alertes.html'">
@@ -874,7 +1358,21 @@
             </svg>
           </div>
           <h3>Pharmacie numérique</h3>
-          <p>Gérez vos ordonnances et stocks de médicaments en ligne.</p>
+          <p>
+            Gérez vos ordonnances, suivez vos stocks de médicaments, trouvez une
+            pharmacie proche et accédez à l'achat de médicaments en ligne.<br />
+            <a
+              href="pharmacie.html"
+              style="
+                display: inline-block;
+                margin-top: 8px;
+                color: #2056ae;
+                font-weight: 600;
+                text-decoration: underline;
+              "
+              >Accéder à la pharmacie</a
+            >
+          </p>
         </div>
 
         <div

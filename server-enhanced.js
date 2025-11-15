@@ -1,22 +1,594 @@
-
-
-
 const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
+const app = express();
 const multer = require("multer");
-const sharp = require("sharp");
-const { v4: uuidv4 } = require("uuid");
-const moment = require("moment");
 const path = require("path");
 const fs = require("fs");
+const bcrypt = require("bcryptjs");
+const moment = require("moment");
+const { v4: uuidv4 } = require("uuid");
+const jwt = require("jsonwebtoken");
+const sqlite3 = require("sqlite3").verbose();
 
-require("dotenv").config();
+// In-memory data stores (legacy / development mode)
+// Ensure these exist so API routes can safely read/write during runtime.
+let patients = [];
+let doctors = [];
+let medicalFacilities = [];
+let localAlerts = [];
+let users = []; // For admin users
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+// --- SQLite DB (lightweight persistence for users/patients) ---
+const DB_FILE = path.join(__dirname, "genidoc.sqlite");
+const db = new sqlite3.Database(DB_FILE);
+// Promise that resolves when DB schema migrations/rebuilds are finished
+let migrationsReady = Promise.resolve();
+let _resolveMigrations = null;
 
-// Configuration multer pour l'upload d'images
+function initDatabase(recreate = false) {
+  // --- MIGRATION: Ensure 'establishmentId' column exists in doctors table ---
+  db.all("PRAGMA table_info(doctors)", [], (docErr, docCols) => {
+    if (docErr) {
+      console.error("Failed to read doctors table info", docErr);
+      return;
+    }
+    const docNames = (docCols || []).map((c) => c.name);
+    if (!docNames.includes("establishmentId")) {
+      console.log(
+        "[DB MIGRATION] Adding missing 'establishmentId' column to doctors"
+      );
+      db.run(
+        `ALTER TABLE doctors ADD COLUMN establishmentId TEXT`,
+        (addErr) => {
+          if (addErr) {
+            console.error(
+              "Failed to add 'establishmentId' column to doctors:",
+              addErr
+            );
+          } else {
+            console.log(
+              "Migration applied: 'establishmentId' column added to doctors."
+            );
+          }
+        }
+      );
+    }
+  });
+  // --- MIGRATION: Ensure 'birthdate' column exists in doctors table ---
+  db.all("PRAGMA table_info(doctors)", [], (docErr, docCols) => {
+    if (docErr) {
+      console.error("Failed to read doctors table info", docErr);
+      return;
+    }
+    const docNames = (docCols || []).map((c) => c.name);
+    if (!docNames.includes("birthdate")) {
+      console.log(
+        "[DB MIGRATION] Adding missing 'birthdate' column to doctors"
+      );
+      db.run(`ALTER TABLE doctors ADD COLUMN birthdate TEXT`, (addErr) => {
+        if (addErr) {
+          console.error("Failed to add 'birthdate' column to doctors:", addErr);
+        } else {
+          console.log(
+            "Migration applied: 'birthdate' column added to doctors."
+          );
+        }
+      });
+    }
+  });
+  // --- MIGRATION: Ensure 'phone' column exists in users table ---
+  db.all("PRAGMA table_info(users)", [], (userErr, userCols) => {
+    if (userErr) {
+      console.error("Failed to read users table info", userErr);
+      return;
+    }
+    const userNames = (userCols || []).map((c) => c.name);
+    if (!userNames.includes("phone")) {
+      console.log("[DB MIGRATION] Adding missing 'phone' column to users");
+      db.run(`ALTER TABLE users ADD COLUMN phone TEXT`, (addErr) => {
+        if (addErr) {
+          console.error("Failed to add 'phone' column to users:", addErr);
+        } else {
+          console.log("Migration applied: 'phone' column added to users.");
+        }
+      });
+    }
+  });
+  const mode = recreate ? "RECREATE" : "INIT";
+  // Create users and patients tables if missing
+  db.serialize(() => {
+    if (recreate) {
+      db.run(`DROP TABLE IF EXISTS patients`);
+      db.run(`DROP TABLE IF EXISTS users`);
+    }
+
+    db.run(`
+      CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY,
+        email TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        firstName TEXT,
+        lastName TEXT,
+        role TEXT DEFAULT 'PATIENT',
+        createdAt TEXT
+      )
+    `);
+
+    db.run(`
+      CREATE TABLE IF NOT EXISTS patients (
+        id TEXT PRIMARY KEY,
+        userId TEXT UNIQUE,
+        genidocId TEXT UNIQUE,
+        birthdate TEXT,
+        createdAt TEXT,
+        FOREIGN KEY(userId) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    db.run(`
+      CREATE TABLE IF NOT EXISTS doctors (
+        id TEXT PRIMARY KEY,
+        userId TEXT UNIQUE,
+        firstName TEXT,
+        lastName TEXT,
+        phone TEXT,
+        licenseNumber TEXT UNIQUE,
+        specialty TEXT,
+        bio TEXT,
+        createdAt TEXT,
+        birthdate TEXT,
+        establishmentId TEXT,
+        FOREIGN KEY(userId) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY(establishmentId) REFERENCES establishments(id) ON DELETE SET NULL
+      )
+    `);
+
+    db.run(`
+      CREATE TABLE IF NOT EXISTS appointments (
+        id TEXT PRIMARY KEY,
+        appointmentNumber TEXT UNIQUE,
+        fullName TEXT,
+        email TEXT,
+        phone TEXT,
+        service TEXT,
+        consultationType TEXT,
+        date TEXT,
+        time TEXT,
+        mode TEXT,
+        notes TEXT,
+        status TEXT,
+        patientId TEXT,
+        doctorId TEXT,
+        userId TEXT,
+        facilityId TEXT,
+        appointmentType TEXT,
+        scheduledDateTime TEXT,
+        establishment_id TEXT,
+        establishment_name TEXT,
+        establishment_ville TEXT,
+        establishment_specialite TEXT,
+        genidocId TEXT,
+        createdAt TEXT,
+        updatedAt TEXT,
+        FOREIGN KEY(patientId) REFERENCES patients(id) ON DELETE SET NULL,
+        FOREIGN KEY(doctorId) REFERENCES doctors(id) ON DELETE SET NULL,
+        FOREIGN KEY(userId) REFERENCES users(id) ON DELETE SET NULL,
+        FOREIGN KEY(facilityId) REFERENCES establishments(id) ON DELETE SET NULL
+      )
+    `);
+
+    // --- MIGRATION: Ensure 'specialite' column exists in establishments table ---
+    db.all("PRAGMA table_info(establishments)", [], (estErr, estCols) => {
+      if (estErr) {
+        console.error("Failed to read establishments table info", estErr);
+        return;
+      }
+      const estNames = (estCols || []).map((c) => c.name);
+      if (!estNames.includes("specialite")) {
+        console.log(
+          "[DB MIGRATION] Adding missing 'specialite' column to establishments"
+        );
+        db.run(
+          `ALTER TABLE establishments ADD COLUMN specialite TEXT`,
+          (addErr) => {
+            if (addErr) {
+              console.error(
+                "Failed to add 'specialite' column to establishments:",
+                addErr
+              );
+            } else {
+              console.log(
+                "Migration applied: 'specialite' column added to establishments."
+              );
+            }
+          }
+        );
+      }
+    });
+
+    // Migration: if appointments table was created previously without certain columns,
+    // ensure the schema includes newer columns added during development.
+    db.all("PRAGMA table_info(appointments)", [], (piErr, cols) => {
+      if (piErr)
+        return console.error("Failed to read appointments table info", piErr);
+      const names = (cols || []).map((c) => c.name);
+      const columnsToEnsure = [
+        { name: "appointmentNumber", definition: "TEXT" },
+        { name: "fullName", definition: "TEXT" },
+        { name: "email", definition: "TEXT" },
+        { name: "phone", definition: "TEXT" },
+        { name: "service", definition: "TEXT" },
+        { name: "consultationType", definition: "TEXT" },
+        { name: "date", definition: "TEXT" },
+        { name: "time", definition: "TEXT" },
+        { name: "mode", definition: "TEXT" },
+        { name: "notes", definition: "TEXT" },
+        { name: "status", definition: "TEXT" },
+        { name: "patientId", definition: "TEXT" },
+        { name: "doctorId", definition: "TEXT" },
+        { name: "userId", definition: "TEXT" },
+        { name: "facilityId", definition: "TEXT" },
+        { name: "appointmentType", definition: "TEXT" },
+        { name: "scheduledDateTime", definition: "TEXT" },
+        { name: "establishment_id", definition: "TEXT" },
+        { name: "establishment_name", definition: "TEXT" },
+        { name: "establishment_ville", definition: "TEXT" },
+        { name: "establishment_specialite", definition: "TEXT" },
+        { name: "genidocId", definition: "TEXT" },
+        { name: "createdAt", definition: "TEXT" },
+        { name: "updatedAt", definition: "TEXT" },
+      ];
+
+      const missing = columnsToEnsure.filter(
+        ({ name }) => !names.includes(name)
+      );
+      if (missing.length > 0) {
+        console.log(
+          "[DB MIGRATION] Missing columns in appointments:",
+          missing.map((m) => m.name)
+        );
+      }
+      missing.forEach(({ name, definition }) => {
+        console.log(
+          `Applying DB migration: adding '${name}' column to appointments`
+        );
+        db.run(
+          `ALTER TABLE appointments ADD COLUMN ${name} ${definition}`,
+          (aErr) => {
+            if (aErr)
+              console.error(
+                `Failed to add ${name} column to appointments:`,
+                aErr
+              );
+            else
+              console.log(
+                `Migration applied: ${name} column added to appointments.`
+              );
+          }
+        );
+      });
+
+      // If table structure still doesn't match our canonical schema (order, NOT NULLs,
+      // or column types), do a safe table rebuild: create a new table with the
+      // canonical columns, copy existing data into it (mapping existing columns),
+      // then swap tables. This handles historical schema drift that ALTER TABLE
+      // can't fix (like removing NOT NULL constraints or reordering columns).
+      // We expose a migrationsReady promise to signal completion so the server
+      // can wait before accepting inserts.
+      migrationsReady = new Promise((resolve) => {
+        _resolveMigrations = resolve;
+      });
+      (async () => {
+        try {
+          const current = await new Promise((resolve, reject) =>
+            db.all("PRAGMA table_info(appointments)", [], (e, rows) => {
+              if (e) reject(e);
+              else resolve(rows || []);
+            })
+          );
+          const currentNames = (current || []).map((c) => c.name);
+
+          const canonical = [
+            { name: "id", type: "TEXT" },
+            { name: "appointmentNumber", type: "TEXT" },
+            { name: "fullName", type: "TEXT" },
+            { name: "email", type: "TEXT" },
+            { name: "phone", type: "TEXT" },
+            { name: "service", type: "TEXT" },
+            { name: "consultationType", type: "TEXT" },
+            { name: "date", type: "TEXT" },
+            { name: "time", type: "TEXT" },
+            { name: "mode", type: "TEXT" },
+            { name: "notes", type: "TEXT" },
+            { name: "status", type: "TEXT" },
+            { name: "patientId", type: "TEXT" },
+            { name: "doctorId", type: "TEXT" },
+            { name: "userId", type: "TEXT" },
+            { name: "facilityId", type: "TEXT" },
+            { name: "appointmentType", type: "TEXT" },
+            { name: "scheduledDateTime", type: "TEXT" },
+            { name: "establishment_id", type: "TEXT" },
+            { name: "establishment_name", type: "TEXT" },
+            { name: "establishment_ville", type: "TEXT" },
+            { name: "establishment_specialite", type: "TEXT" },
+            { name: "genidocId", type: "TEXT" },
+            { name: "createdAt", type: "TEXT NOT NULL" },
+            { name: "updatedAt", type: "TEXT" },
+          ];
+
+          // Decide if rebuild is necessary: missing canonical names or NOT NULL mismatch
+          const missingAny = canonical.some(
+            (c) => !currentNames.includes(c.name)
+          );
+          const createdAtCol = current.find((c) => c.name === "createdAt");
+          const createdAtNotNull = createdAtCol
+            ? createdAtCol.notnull === 1
+            : false;
+
+          // If createdAt exists but is not NOT NULL, or missing columns exist, rebuild
+          if (missingAny || !createdAtNotNull) {
+            console.log(
+              "[DB MIGRATION] appointments table schema drift detected; rebuilding table to canonical schema."
+            );
+
+            const temp = "appointments_new";
+            const colDefs = canonical
+              .map((c) => `${c.name} ${c.type}`)
+              .join(",\n  ");
+
+            await new Promise((res, rej) =>
+              db.run(
+                `CREATE TABLE IF NOT EXISTS ${temp} (\n  ${colDefs},\n  PRIMARY KEY(id),\n  UNIQUE(appointmentNumber)\n)`,
+                (e) => (e ? rej(e) : res())
+              )
+            );
+
+            // Build select list: use existing column if present, otherwise NULL as col
+            const selectList = canonical
+              .map((c) =>
+                currentNames.includes(c.name) ? c.name : `NULL AS ${c.name}`
+              )
+              .join(", ");
+
+            const insertCols = canonical.map((c) => c.name).join(", ");
+
+            await new Promise((res, rej) =>
+              db.run(
+                `INSERT INTO ${temp} (${insertCols}) SELECT ${selectList} FROM appointments`,
+                (e) => (e ? rej(e) : res())
+              )
+            );
+
+            await new Promise((res, rej) =>
+              db.run(`DROP TABLE appointments`, (e) => (e ? rej(e) : res()))
+            );
+
+            await new Promise((res, rej) =>
+              db.run(`ALTER TABLE ${temp} RENAME TO appointments`, (e) =>
+                e ? rej(e) : res()
+              )
+            );
+
+            console.log(
+              "[DB MIGRATION] appointments table rebuilt successfully."
+            );
+          } else {
+            console.log(
+              "[DB MIGRATION] appointments schema looks ok (no rebuild needed)."
+            );
+          }
+          // signal that migrations/rebuild is complete
+          if (_resolveMigrations) _resolveMigrations();
+        } catch (rebuildErr) {
+          console.error(
+            "Failed to rebuild appointments table schema:",
+            rebuildErr
+          );
+          if (_resolveMigrations) _resolveMigrations();
+        }
+      })();
+    });
+
+    db.run(`
+      CREATE TABLE IF NOT EXISTS notifications (
+        id TEXT PRIMARY KEY,
+        userId TEXT,
+        type TEXT,
+        title TEXT,
+        message TEXT,
+        isRead INTEGER DEFAULT 0,
+        createdAt TEXT,
+        FOREIGN KEY(userId) REFERENCES users(id) ON DELETE CASCADE
+      )
+        `);
+
+    db.run(`
+      CREATE TABLE IF NOT EXISTS payments (
+        id TEXT PRIMARY KEY,
+        transactionId TEXT UNIQUE,
+        appointmentId TEXT,
+        userId TEXT,
+        amount REAL,
+        currency TEXT,
+        status TEXT,
+        createdAt TEXT
+      )
+    `);
+
+    db.run(`
+      CREATE TABLE IF NOT EXISTS blacklisted_tokens (
+        id TEXT PRIMARY KEY,
+        token TEXT UNIQUE,
+        userId TEXT,
+        expiresAt TEXT,
+        createdAt TEXT
+      )
+    `);
+
+    db.run(`
+      CREATE TABLE IF NOT EXISTS establishments (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        email TEXT UNIQUE,
+        city TEXT,
+        address TEXT,
+        phone TEXT,
+        adminUserId TEXT,
+        createdAt TEXT,
+        FOREIGN KEY(adminUserId) REFERENCES users(id) ON DELETE SET NULL
+      )
+    `);
+
+    // Seed a default admin if none exists
+    db.get(`SELECT id FROM users WHERE role = 'ADMIN' LIMIT 1`, (err, row) => {
+      if (err) return console.error("DB seed error", err);
+      if (!row) {
+        const adminId = uuidv4();
+        const hashed = bcrypt.hashSync("AdminGeniDoc2025!", 10);
+        db.run(
+          `INSERT INTO users (id, email, password, firstName, lastName, role, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [
+            adminId,
+            "admin@genidoc.ma",
+            hashed,
+            "Admin",
+            "GeniDoc",
+            "ADMIN",
+            new Date().toISOString(),
+          ],
+          (e) => {
+            if (e) console.error("Failed to seed admin", e);
+            else
+              console.log(
+                "Seeded default admin: admin@genidoc.ma / AdminGeniDoc2025!"
+              );
+          }
+        );
+      }
+    });
+  });
+}
+
+// Initialize DB on startup (do not recreate by default)
+initDatabase(false);
+
+// --- Add a column to all tables if not exists (SQLite) ---
+function alterAllTablesAddColumn(columnName, columnType) {
+  db.all("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'", [], (err, tables) => {
+    if (err) {
+      console.error("Failed to list tables:", err);
+      return;
+    }
+    tables.forEach((t) => {
+      const table = t.name;
+      db.all(`PRAGMA table_info(${table})`, [], (err2, cols) => {
+        if (err2) return;
+        const colNames = cols.map((c) => c.name);
+        if (!colNames.includes(columnName)) {
+          db.run(`ALTER TABLE ${table} ADD COLUMN ${columnName} ${columnType}`, (err3) => {
+            if (err3) {
+              console.warn(`Could not alter ${table}:`, err3.message);
+            } else {
+              console.log(`Added column ${columnName} to ${table}`);
+            }
+          });
+        }
+      });
+    });
+  });
+}
+
+// Example usage: add 'updated_at' column to all tables
+alterAllTablesAddColumn('updated_at', 'TEXT');
+
+// Seed establishments and admin users from credentials file
+function seedEstablishmentsFromFile() {
+  const credsPath = path.join(__dirname, "establishments-credentials.txt");
+
+  if (!fs.existsSync(credsPath)) {
+    console.log("No establishments credentials file found, skipping seeding.");
+    return;
+  }
+  // (If you have seeding logic, it goes here)
+}
+
+// Run seeding after DB init
+seedEstablishmentsFromFile();
+
+// Helper: generate unique GeniDoc ID (GD-XXXXXX)
+function generateGenidocId() {
+  // Simple random 6-digit generator. In production, ensure uniqueness against DB.
+  return `GD-${Math.floor(100000 + Math.random() * 900000)}`;
+}
+
+function mapAppointmentRow(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    appointmentNumber: row.appointmentNumber,
+    fullName: row.fullName,
+    email: row.email,
+    phone: row.phone,
+    service: row.service,
+    consultationType: row.consultationType,
+    date: row.date,
+    time: row.time,
+    mode: row.mode,
+    notes: row.notes,
+    status: row.status,
+    doctorId: row.doctorId,
+    facilityId: row.facilityId,
+    appointmentType: row.appointmentType,
+    scheduledDateTime: row.scheduledDateTime,
+    genidocId: row.genidocId,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+    establishment_id: row.establishment_id,
+    establishment_name: row.establishment_name,
+    establishment_ville: row.establishment_ville,
+    establishment_specialite: row.establishment_specialite,
+  };
+}
+
+function dbGet(sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.get(sql, params, (err, row) => {
+      if (err) reject(err);
+      else resolve(row);
+    });
+  });
+}
+
+function dbAll(sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.all(sql, params, (err, rows) => {
+      if (err) reject(err);
+      else resolve(rows || []);
+    });
+  });
+}
+
+function dbRun(sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.run(sql, params, function (err) {
+      if (err) {
+        // Enhanced logging for constraint and SQL errors to aid debugging
+        try {
+          console.error("DB RUN ERROR:", {
+            message: err && err.message ? err.message : err,
+            code: err && err.code ? err.code : undefined,
+            sql: sql,
+            params: params,
+          });
+        } catch (loggingErr) {
+          console.error("Failed to log DB error details", loggingErr);
+        }
+        reject(err);
+      } else resolve(this);
+    });
+  });
+}
+
+// --- CONFIGURATION MULTER ---
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const uploadPath = "./uploads";
@@ -26,15 +598,14 @@ const storage = multer.diskStorage({
     cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
-    const uniqueName = `${Date.now()}-${uuidv4()}${path.extname(file.originalname)}`;
+    const uniqueName = `${Date.now()}-${file.originalname}`;
     cb(null, uniqueName);
   },
 });
+
 const upload = multer({
   storage: storage,
-  limits: {
-    fileSize: parseInt(process.env.MAX_FILE_SIZE) || 5 * 1024 * 1024, // 5MB
-  },
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith("image/")) {
       cb(null, true);
@@ -45,57 +616,649 @@ const upload = multer({
 });
 
 // Middleware
-app.use(cors());
-app.use(bodyParser.json());
-app.use("/static", express.static(path.join(__dirname, "static")));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use(express.json());
 
-// --- AUTHENTIFICATION ---
-app.post("/api/register", (req, res) => {
-  const { email, password, birthdate } = req.body;
-  if (!email || !password || !birthdate) {
-    return res.status(400).json({ success: false, message: "Champs manquants" });
-  }
-  if (patients.find((p) => p.email === email)) {
-    return res.status(409).json({ success: false, message: "Email déjà utilisé" });
-  }
-  const genidocId = generateGenidocId();
-  const patient = {
-    genidocId,
-    email,
-    password, // Plain (legacy)
-    birthdate,
-    createdAt: new Date().toISOString(),
-  };
-  patients.push(patient);
-  res.json({ success: true, genidocId });
+// Simple request logger to help debug auth flow and status codes
+app.use((req, res, next) => {
+  const { authorization, ...restHeaders } = req.headers;
+  const hasAuth = Boolean(authorization);
+  console.log(
+    `GeniDoc: Incoming ${req.method} ${req.url} - headers: ${JSON.stringify({
+      ...restHeaders,
+      authorization: hasAuth ? "[redacted]" : undefined,
+    })}`
+  );
+  next();
 });
 
-app.post("/api/login", (req, res) => {
+// --- AUTHENTIFICATION ADMIN ---
+// Admin login endpoint
+app.post("/api/admin/login", async (req, res) => {
+  const body = req.body || {};
+  const email = body.email;
+  const password = body.password;
+  console.log(`GeniDoc: /api/admin/login attempt for ${email || "unknown"}`);
+  if (!email || !password) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Champs manquants" });
+  }
+
+  // Lookup admin user in SQLite
+  db.get(
+    `SELECT * FROM users WHERE email = ? AND role = 'ADMIN' LIMIT 1`,
+    [email],
+    async (err, userRow) => {
+      if (err) {
+        console.error("GeniDoc: DB error during admin login", err);
+        return res.status(500).json({ success: false, message: "Erreur DB" });
+      }
+      if (!userRow)
+        return res
+          .status(401)
+          .json({ success: false, message: "Admin non trouvé" });
+
+      const ok = await bcrypt.compare(password, userRow.password);
+      if (!ok)
+        return res
+          .status(401)
+          .json({ success: false, message: "Mot de passe incorrect" });
+
+      // generate token
+      const token = generateToken(userRow.id, "ADMIN");
+
+      // respond with admin info
+      res.json({
+        success: true,
+        adminId: userRow.id,
+        data: {
+          email: userRow.email,
+          firstName: userRow.firstName,
+          lastName: userRow.lastName,
+          role: userRow.role,
+        },
+        token,
+      });
+    }
+  );
+});
+
+// --- AUTHENTIFICATION ÉTABLISSEMENT ---
+// Route de connexion pour les établissements
+app.post("/api/facility-login", async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    return res.status(400).json({ success: false, message: "Champs manquants" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Champs manquants" });
   }
-  const patient = patients.find((p) => (p.email === email) && p.password === password);
-  if (!patient) {
-    return res.status(401).json({ success: false, message: "Identifiants invalides" });
-  }
-  res.json({ success: true, genidocId: patient.genidocId, data: patient });
+  // Look up user in SQLite users table (admins are establishment accounts)
+  db.get(
+    `SELECT * FROM users WHERE email = ? AND role = 'ADMIN' LIMIT 1`,
+    [email],
+    (err, userRow) => {
+      if (err) {
+        return res.status(500).json({ success: false, message: "Erreur DB" });
+      }
+      if (!userRow) {
+        return res.status(404).json({
+          success: false,
+          message: "Établissement ou administrateur non trouvé",
+        });
+      }
+      // Check password
+      bcrypt.compare(password, userRow.password, (err, ok) => {
+        if (err) {
+          return res.status(500).json({ success: false, message: "Erreur DB" });
+        }
+        if (!ok) {
+          return res
+            .status(401)
+            .json({ success: false, message: "Mot de passe incorrect" });
+        }
+        db.get(
+          `SELECT * FROM establishments WHERE adminUserId = ? LIMIT 1`,
+          [userRow.id],
+          (e, estRow) => {
+            if (e) {
+              console.error("GeniDoc: DB error fetching establishment", e);
+              return res
+                .status(500)
+                .json({ success: false, message: "Erreur DB" });
+            }
+            if (!estRow)
+              return res.status(404).json({
+                success: false,
+                message:
+                  "Aucun établissement n'est associé à ce compte administrateur. Veuillez contacter le support ou créer un établissement.",
+                email: userRow.email,
+              });
+
+            // Build safe establishment object (no sensitive fields)
+            const facility = {
+              id: estRow.id,
+              name: estRow.name,
+              email: estRow.email,
+              city: estRow.city,
+              address: estRow.address,
+              phone: estRow.phone,
+              adminUserId: estRow.adminUserId,
+              createdAt: estRow.createdAt,
+            };
+
+            console.log(`GeniDoc: Établissement connecté: ${facility.email}`);
+            const token = generateToken(userRow.id, "ADMIN");
+            return res.json({ success: true, data: facility, token });
+          }
+        );
+      });
+    }
+  );
+
+  // (end of /api/facility-login handler)
 });
 
-app.get("/api/patient/:genidocId", (req, res) => {
-  const patient = patients.find((p) => p.genidocId === req.params.genidocId);
-  if (!patient) {
-    return res.status(404).json({ success: false, message: "Patient non trouvé" });
+// Note: /api/establishment/login is implemented later (DB-backed) to avoid routing hacks
+
+// --- AUTHENTIFICATION ---
+// Inscription admin + établissement
+app.post("/api/admin/register", async (req, res) => {
+  try {
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      establishmentName,
+      city,
+      address,
+      phone,
+      specialite,
+    } = req.body;
+    if (!firstName || !email || !password || !establishmentName) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Champs obligatoires manquants" });
+    }
+    // Vérifier email unique
+    const existing = await dbGet(`SELECT id FROM users WHERE email = ?`, [
+      email,
+    ]);
+    if (existing) {
+      return res
+        .status(409)
+        .json({ success: false, message: "Email déjà utilisé" });
+    }
+    const adminId = uuidv4();
+    const hashed = await bcrypt.hash(password, 10);
+    const createdAt = new Date().toISOString();
+    // Créer l'utilisateur admin
+    await dbRun(
+      `INSERT INTO users (id, email, password, firstName, lastName, role, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [adminId, email, hashed, firstName, lastName || "", "ADMIN", createdAt]
+    );
+    // Créer l'établissement lié
+    const estId = uuidv4();
+    await dbRun(
+      `INSERT INTO establishments (id, name, email, city, address, phone, adminUserId, specialite, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        estId,
+        establishmentName,
+        email,
+        city || "",
+        address || "",
+        phone || "",
+        adminId,
+        specialite || "",
+        createdAt,
+      ]
+    );
+    return res.json({ success: true, adminId, establishmentId: estId });
+  } catch (err) {
+    console.error("Erreur inscription admin:", err);
+    return res.status(500).json({ success: false, message: "Erreur interne" });
   }
-  res.json({ success: true, data: patient });
+});
+
+// Inscription médecin (choix établissement)
+app.post("/api/doctor/register", async (req, res) => {
+  try {
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      establishmentId,
+      specialty,
+      phone,
+      birthdate,
+    } = req.body;
+    if (!firstName || !email || !password || !establishmentId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Champs obligatoires manquants" });
+    }
+    // Vérifier email unique
+    const existing = await dbGet(`SELECT id FROM users WHERE email = ?`, [
+      email,
+    ]);
+    if (existing) {
+      return res
+        .status(409)
+        .json({ success: false, message: "Email déjà utilisé" });
+    }
+    // Vérifier que l'établissement existe
+    const est = await dbGet(`SELECT id FROM establishments WHERE id = ?`, [
+      establishmentId,
+    ]);
+    if (!est) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Établissement non trouvé" });
+    }
+    const doctorUserId = uuidv4();
+    const hashed = await bcrypt.hash(password, 10);
+    const createdAt = new Date().toISOString();
+    // Créer l'utilisateur médecin
+    await dbRun(
+      `INSERT INTO users (id, email, password, firstName, lastName, role, phone, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        doctorUserId,
+        email,
+        hashed,
+        firstName,
+        lastName || "",
+        "DOCTOR",
+        phone || "",
+        createdAt,
+      ]
+    );
+    // Créer la fiche médecin enrichie
+    const doctorId = uuidv4();
+    await dbRun(
+      `INSERT INTO doctors (id, userId, firstName, lastName, phone, specialty, createdAt, birthdate, establishmentId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        doctorId,
+        doctorUserId,
+        firstName,
+        lastName || "",
+        phone || "",
+        specialty || "",
+        createdAt,
+        birthdate || null,
+        establishmentId,
+      ]
+    );
+    // (Optionnel) Lier le médecin à l'établissement (si table de liaison, à ajouter)
+    // Ici, on suppose que l'établissement référence les médecins via d'autres endpoints
+    return res.json({ success: true, doctorUserId, doctorId });
+  } catch (err) {
+    console.error("Erreur inscription médecin:", err);
+    return res.status(500).json({ success: false, message: "Erreur interne" });
+  }
+});
+// Patient registration (stored in SQLite users + patients tables)
+app.post("/api/register", async (req, res) => {
+  try {
+    const { username, email, password, birthdate } = req.body;
+    if (!username || !email || !password || !birthdate) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Champs manquants" });
+    }
+
+    db.get(
+      `SELECT id FROM users WHERE email = ?`,
+      [email],
+      async (err, row) => {
+        if (err)
+          return res.status(500).json({ success: false, message: "Erreur DB" });
+        if (row)
+          return res
+            .status(409)
+            .json({ success: false, message: "Email déjà utilisé" });
+
+        const userId = uuidv4();
+        const hashed = await bcrypt.hash(password, 10);
+        const createdAt = new Date().toISOString();
+        const genidocId = generateGenidocId();
+
+        db.run(
+          `INSERT INTO users (id, email, password, firstName, lastName, role, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [userId, email, hashed, username, "", "PATIENT", createdAt],
+          function (uErr) {
+            if (uErr)
+              return res.status(500).json({
+                success: false,
+                message: "Erreur création utilisateur",
+              });
+
+            const patientId = uuidv4();
+            db.run(
+              `INSERT INTO patients (id, userId, genidocId, birthdate, createdAt) VALUES (?, ?, ?, ?, ?)`,
+              [patientId, userId, genidocId, birthdate, createdAt],
+              function (pErr) {
+                if (pErr)
+                  return res.status(500).json({
+                    success: false,
+                    message: "Erreur création patient",
+                  });
+                return res.json({ success: true, genidocId });
+              }
+            );
+          }
+        );
+      }
+    );
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Erreur interne" });
+  }
+});
+
+// Patient login (SQLite)
+app.post("/api/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password)
+      return res
+        .status(400)
+        .json({ success: false, message: "Champs manquants" });
+
+    db.get(
+      `SELECT * FROM users WHERE email = ?`,
+      [email],
+      async (err, user) => {
+        if (err)
+          return res.status(500).json({ success: false, message: "Erreur DB" });
+        if (!user)
+          return res
+            .status(401)
+            .json({ success: false, message: "Identifiants invalides" });
+
+        const ok = await bcrypt.compare(password, user.password);
+        if (!ok)
+          return res
+            .status(401)
+            .json({ success: false, message: "Identifiants invalides" });
+
+        db.get(
+          `SELECT genidocId FROM patients WHERE userId = ?`,
+          [user.id],
+          (pErr, patient) => {
+            if (pErr)
+              return res
+                .status(500)
+                .json({ success: false, message: "Erreur DB" });
+            const safeUser = {
+              id: user.id,
+              email: user.email,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              role: user.role,
+            };
+            const token = generateToken(user.id, user.role || "PATIENT");
+            return res.json({
+              success: true,
+              genidocId: patient ? patient.genidocId : null,
+              data: safeUser,
+              token,
+            });
+          }
+        );
+      }
+    );
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Erreur interne" });
+  }
+});
+
+function authenticateToken(req, res, next) {
+  const auth = req.headers["authorization"];
+  if (!auth)
+    return res.status(401).json({ success: false, message: "Token manquant" });
+  const parts = auth.split(" ");
+  if (parts.length !== 2)
+    return res
+      .status(401)
+      .json({ success: false, message: "Format token invalide" });
+  const token = parts[1];
+
+  // Check blacklist
+  db.get(
+    `SELECT id FROM blacklisted_tokens WHERE token = ?`,
+    [token],
+    (err, row) => {
+      if (err)
+        return res.status(500).json({ success: false, message: "Erreur DB" });
+      if (row)
+        return res
+          .status(401)
+          .json({ success: false, message: "Token révoqué" });
+
+      const secret = process.env.JWT_SECRET || "dev-secret";
+      jwt.verify(token, secret, (e, payload) => {
+        if (e)
+          return res
+            .status(401)
+            .json({ success: false, message: "Token invalide" });
+        req.user = payload;
+        next();
+      });
+    }
+  );
+}
+
+// Logout (blacklist token)
+app.post("/api/logout", authenticateToken, (req, res) => {
+  const auth = req.headers["authorization"];
+  const token = auth.split(" ")[1];
+  const id = uuidv4();
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1h default
+  db.run(
+    `INSERT INTO blacklisted_tokens (id, token, userId, expiresAt, createdAt) VALUES (?, ?, ?, ?, ?)`,
+    [id, token, req.user.userId || null, expiresAt, new Date().toISOString()],
+    (err) => {
+      if (err)
+        return res.status(500).json({ success: false, message: "Erreur DB" });
+      // Also clear local in-memory session if any
+      return res.json({ success: true, message: "Déconnecté" });
+    }
+  );
+});
+
+// Patient profile endpoint (fetch from SQLite)
+app.get("/api/patient/:genidocId", (req, res) => {
+  const genidocId = req.params.genidocId;
+  db.get(
+    `SELECT p.genidocId, p.birthdate, p.createdAt as patientCreatedAt, u.id as userId, u.email, u.firstName, u.lastName, u.role
+     FROM patients p JOIN users u ON p.userId = u.id WHERE p.genidocId = ?`,
+    [genidocId],
+    (err, row) => {
+      if (err)
+        return res.status(500).json({ success: false, message: "Erreur DB" });
+      if (!row)
+        return res
+          .status(404)
+          .json({ success: false, message: "Patient non trouvé" });
+
+      const safe = {
+        genidocId: row.genidocId,
+        email: row.email,
+        username: row.firstName,
+        fullName: `${row.firstName || ""} ${row.lastName || ""}`.trim(),
+        birthdate: row.birthdate,
+        role: row.role,
+        createdAt: row.patientCreatedAt,
+      };
+
+      res.json({ success: true, data: safe });
+    }
+  );
+});
+
+// Patient profile update endpoint (PUT)
+app.put("/api/patient/:genidocId", async (req, res) => {
+  console.log(`[API] PUT /api/patient/${genidocId} - body:`, req.body);
+  const genidocId = req.params.genidocId;
+  const { username, lastName, email, telephone, birthdate, photo } =
+    req.body || {};
+  try {
+    // Find patient and user
+    const row = await dbGet(
+      `SELECT p.id as patientId, u.id as userId FROM patients p JOIN users u ON p.userId = u.id WHERE p.genidocId = ?`,
+      [genidocId]
+    );
+    if (!row) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Patient non trouvé" });
+    }
+    // Update users table (firstName, lastName, email, photo)
+    if (username || lastName || email || photo) {
+      await dbRun(
+        `UPDATE users SET firstName = COALESCE(?, firstName), lastName = COALESCE(?, lastName), email = COALESCE(?, email), photo = COALESCE(?, photo) WHERE id = ?`,
+        [username, lastName, email, photo, row.userId]
+      );
+    }
+    // Update patients table (birthdate)
+    if (birthdate) {
+      await dbRun(`UPDATE patients SET birthdate = ? WHERE id = ?`, [
+        birthdate,
+        row.patientId,
+      ]);
+    }
+      if (telephone) {
+      await dbRun(`UPDATE users SET phone = ? WHERE id = ?`, [
+        telephone,
+        row.userId,
+      ]);
+    }
+    const updated = await dbGet(
+      `SELECT p.genidocId, p.birthdate, p.createdAt as patientCreatedAt, u.id as userId, u.email, u.firstName, u.lastName, u.role, u.photo
+       FROM patients p JOIN users u ON p.userId = u.id WHERE p.genidocId = ?`,
+      [genidocId]
+    );
+    const safe = updated
+      ? {
+          genidocId: updated.genidocId,
+          email: updated.email,
+          username: updated.firstName,
+          lastName: updated.lastName,
+          fullName: `${updated.firstName || ""} ${
+            updated.lastName || ""
+          }`.trim(),
+          birthdate: updated.birthdate,
+          role: updated.role,
+          createdAt: updated.patientCreatedAt,
+          photo: updated.photo,
+        }
+      : null;
+    return res.json({
+      success: true,
+      message: "Profil patient mis à jour",
+      data: safe,
+    });
+  } catch (err) {
+    console.error("Erreur update patient:", err);
+    return res.status(500).json({ success: false, message: "Erreur interne" });
+  }
+});
+
+// Admin profile update endpoint (PUT)
+app.put("/api/admin/:userId", async (req, res) => {
+  const userId = req.params.userId;
+  const { username, lastName, email, telephone, photo } = req.body || {};
+  try {
+    // Only allow update if user exists and is admin
+    const user = await dbGet(
+      `SELECT * FROM users WHERE id = ? AND role = 'ADMIN'`,
+      [userId]
+    );
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Admin non trouvé" });
+    }
+    await dbRun(
+      `UPDATE users SET firstName = COALESCE(?, firstName), lastName = COALESCE(?, lastName), email = COALESCE(?, email), phone = COALESCE(?, phone), photo = COALESCE(?, photo) WHERE id = ?`,
+      [username, lastName, email, telephone, photo, userId]
+    );
+    return res.json({ success: true, message: "Profil admin mis à jour" });
+  } catch (err) {
+    console.error("Erreur update admin:", err);
+    return res.status(500).json({ success: false, message: "Erreur interne" });
+  }
+});
+
+// Doctor profile update endpoint (PUT)
+app.put("/api/doctor/:userId", async (req, res) => {
+  const userId = req.params.userId;
+  const { username, lastName, email, telephone, specialty, birthdate, photo } =
+    req.body || {};
+  try {
+    // Find doctor and user
+    const row = await dbGet(
+      `SELECT d.id as doctorId, u.id as userId FROM doctors d JOIN users u ON d.userId = u.id WHERE u.id = ?`,
+      [userId]
+    );
+    if (!row) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Médecin non trouvé" });
+    }
+    // Update users table (firstName, email, phone)
+    await dbRun(
+      `UPDATE users SET firstName = COALESCE(?, firstName), lastName = COALESCE(?, lastName), email = COALESCE(?, email), phone = COALESCE(?, phone), photo = COALESCE(?, photo) WHERE id = ?`,
+      [username, lastName, email, telephone, photo, userId]
+    );
+    // Update doctors table (specialty)
+    if (specialty) {
+      await dbRun(`UPDATE doctors SET specialty = ? WHERE id = ?`, [
+        specialty,
+        row.doctorId,
+      ]);
+    }
+    // Optionally update birthdate if present in doctors table
+    if (birthdate) {
+      await dbRun(`UPDATE doctors SET birthdate = ? WHERE id = ?`, [
+        birthdate,
+        row.doctorId,
+      ]);
+    }
+    return res.json({ success: true, message: "Profil médecin mis à jour" });
+  } catch (err) {
+    console.error("Erreur update doctor:", err);
+    return res.status(500).json({ success: false, message: "Erreur interne" });
+  }
+});
+
+// DB reset endpoint (use with caution). Require header X-RESET-SECRET matching env or allow if ALLOW_DB_RESET=true
+app.post("/api/db/reset", (req, res) => {
+  const secret = req.headers["x-reset-secret"];
+  if (
+    process.env.ALLOW_DB_RESET !== "true" &&
+    process.env.RESET_SECRET &&
+    process.env.RESET_SECRET !== secret
+  ) {
+    return res.status(403).json({ success: false, message: "Forbidden" });
+  }
+
+  initDatabase(true);
+  return res.json({ success: true, message: "Database reinitialized" });
 });
 
 // --- UPLOAD & OCR (Tesseract.js simulation) ---
 const Tesseract = require("tesseract.js");
+// === OCR ordonnance API (modulaire)
+const ocrOrdonnanceApi = require("./ocr-ordonnance-api");
+app.use("/api", ocrOrdonnanceApi);
 app.post("/api/upload", upload.single("file"), async (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ success: false, message: "Aucun fichier envoyé" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Aucun fichier envoyé" });
   }
   try {
     // Simuler OCR (en vrai: await Tesseract.recognize...)
@@ -111,7 +1274,9 @@ const NodeGeocoder = require("node-geocoder");
 const geocoder = NodeGeocoder({ provider: "openstreetmap" });
 app.post("/api/genidoc-map", upload.single("image"), async (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ success: false, message: "Aucune image envoyée" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Aucune image envoyée" });
   }
   try {
     // Simuler OCR et géocodage
@@ -127,137 +1292,88 @@ app.post("/api/genidoc-map", upload.single("image"), async (req, res) => {
 app.get("/api/rag-search", (req, res) => {
   const q = req.query.q || "";
   // Simuler une recherche vectorielle
-  res.json({ success: true, data: [{ doc: "Document simulé", score: 0.95, query: q }] });
+  res.json({
+    success: true,
+    data: [{ doc: "Document simulé", score: 0.95, query: q }],
+  });
 });
 
 // --- GEMINI CHAT (simulation) ---
 app.post("/api/chat", (req, res) => {
   const { message } = req.body;
-  if (!message) return res.status(400).json({ success: false, message: "Message manquant" });
+  if (!message)
+    return res
+      .status(400)
+      .json({ success: false, message: "Message manquant" });
   // Simuler une réponse AI
   res.json({ success: true, response: `Réponse simulée à: ${message}` });
 });
 
-// --- EMBEDDING CONFIG (simulation) ---
-let embeddingConfig = { model: "gemini-pro", dimension: 768 };
-app.get("/api/embedding-config", (req, res) => {
-  res.json({ success: true, config: embeddingConfig });
-});
-app.post("/api/embedding-config", (req, res) => {
-  embeddingConfig = { ...embeddingConfig, ...req.body };
-  res.json({ success: true, config: embeddingConfig });
-});
-doctors = [
-  {
-    id: uuidv4(),
-    name: "Dr. Marie Dubois",
-    specialty: "Cardiologue",
-    email: "marie.dubois@genidoc.fr",
-    phone: "+33123456789",
-    facilityId: null,
-    schedule: {
-      monday: ["09:00", "17:00"],
-      tuesday: ["09:00", "17:00"],
-      wednesday: ["09:00", "17:00"],
-      thursday: ["09:00", "17:00"],
-      friday: ["09:00", "17:00"],
-      saturday: ["09:00", "13:00"],
-      sunday: [],
-    },
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: uuidv4(),
-    name: "Dr. Jean Martin",
-    specialty: "Médecin généraliste",
-    email: "jean.martin@genidoc.fr",
-    phone: "+33123456790",
-    facilityId: null,
-    schedule: {
-      monday: ["08:00", "18:00"],
-      tuesday: ["08:00", "18:00"],
-      wednesday: ["08:00", "18:00"],
-      thursday: ["08:00", "18:00"],
-      friday: ["08:00", "18:00"],
-      saturday: [],
-      sunday: [],
-    },
-    createdAt: new Date().toISOString(),
-  },
-];
-
-// Données de test pour les établissements
-medicalFacilities = [
-  {
-    id: uuidv4(),
-    name: "Hôpital Central",
-    type: "hôpital",
-    address: "123 Rue de la Santé, 75001 Paris",
-    phone: "+33145678901",
-    email: "contact@hopital-central.fr",
-    services: ["Urgences", "Cardiologie", "Chirurgie", "Maternité"],
-    coordinates: { lat: 48.8566, lng: 2.3522 },
-    image: null,
-    verified: true,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: uuidv4(),
-    name: "Cabinet Médical Voltaire",
-    type: "cabinet",
-    address: "45 Avenue Voltaire, 75011 Paris",
-    phone: "+33143567890",
-    email: "contact@cabinet-voltaire.fr",
-    services: ["Consultation générale", "Dermatologie"],
-    coordinates: { lat: 48.8566, lng: 2.3722 },
-    image: null,
-    verified: false,
-    createdAt: new Date().toISOString(),
-  },
-];
-
-// Routes pour servir les pages
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
-
-app.get("/admin", (req, res) => {
-  res.sendFile(path.join(__dirname, "admin.html"));
-});
-
-app.get("/doctors", (req, res) => {
-  res.sendFile(path.join(__dirname, "doctors.html"));
-});
-
-app.get("/facilities", (req, res) => {
-  res.sendFile(path.join(__dirname, "facilities.html"));
-});
-
-// API Routes - Rendez-vous (existantes)
-app.get("/api/appointments", (req, res) => {
-  res.json({
-    success: true,
-    data: appointments,
-    total: appointments.length,
-  });
-});
-
-app.get("/api/appointments/:id", (req, res) => {
-  const appointment = appointments.find((a) => a.id === req.params.id);
-  if (!appointment) {
-    return res.status(404).json({
-      success: false,
-      message: "Rendez-vous non trouvé",
-    });
-  }
-  res.json({
-    success: true,
-    data: appointment,
-  });
-});
-
-app.post("/api/appointments", (req, res) => {
+// API Routes - Rendez-vous (SQLite)
+app.get("/api/appointments", async (req, res) => {
   try {
+    // Prise en charge des filtres doctorId, genidocId, facilityId, establishment_id
+    const { doctorId, genidocId, facilityId, establishment_id } = req.query;
+    let rows;
+    if (doctorId) {
+      rows = await dbAll(
+        `SELECT * FROM appointments WHERE doctorId = ? ORDER BY datetime(COALESCE(updatedAt, createdAt)) DESC`,
+        [doctorId]
+      );
+    } else if (genidocId) {
+      rows = await dbAll(
+        `SELECT * FROM appointments WHERE genidocId = ? ORDER BY datetime(COALESCE(updatedAt, createdAt)) DESC`,
+        [genidocId]
+      );
+    } else if (facilityId || establishment_id) {
+      const id = facilityId || establishment_id;
+      rows = await dbAll(
+        `SELECT * FROM appointments WHERE facilityId = ? OR establishment_id = ? ORDER BY datetime(COALESCE(updatedAt, createdAt)) DESC`,
+        [id, id]
+      );
+    } else {
+      rows = await dbAll(
+        `SELECT * FROM appointments ORDER BY datetime(COALESCE(updatedAt, createdAt)) DESC`
+      );
+    }
+    const data = rows.map(mapAppointmentRow);
+    res.json({ success: true, data, total: data.length });
+  } catch (error) {
+    console.error("Erreur lors de la récupération des rendez-vous:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Erreur interne du serveur" });
+  }
+});
+
+app.get("/api/appointments/:id", async (req, res) => {
+  try {
+    const row = await dbGet(`SELECT * FROM appointments WHERE id = ?`, [
+      req.params.id,
+    ]);
+    if (!row) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Rendez-vous non trouvé" });
+    }
+    res.json({ success: true, data: mapAppointmentRow(row) });
+  } catch (error) {
+    console.error("Erreur lors de la récupération du rendez-vous:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Erreur interne du serveur" });
+  }
+});
+
+app.post("/api/appointments", async (req, res) => {
+  try {
+    // Ensure DB migrations/rebuilds are finished before attempting inserts
+    try {
+      await migrationsReady;
+    } catch (mrErr) {
+      console.warn("migrationsReady rejection (continuing):", mrErr);
+    }
+    const body = req.body || {};
     const {
       fullName,
       email,
@@ -269,10 +1385,22 @@ app.post("/api/appointments", (req, res) => {
       mode,
       notes,
       doctorId,
-      facilityId,
-    } = req.body;
+    } = body;
+    const facilityRaw = body.facilityId || body.location || null;
+    const facilityId = facilityRaw ? String(facilityRaw).trim() : null;
 
-    // Validation des champs obligatoires
+    console.log("GeniDoc: incoming appointment payload", {
+      fullName,
+      email,
+      phone,
+      service,
+      consultationType,
+      date,
+      time,
+      mode,
+      facilityId,
+    });
+
     const required = [
       "fullName",
       "email",
@@ -282,10 +1410,10 @@ app.post("/api/appointments", (req, res) => {
       "time",
       "mode",
     ];
-    const missing = required.filter(
-      (field) => !req.body[field] || String(req.body[field]).trim() === ""
-    );
-
+    const missing = required.filter((field) => {
+      const value = body ? body[field] : undefined;
+      return !value || String(value).trim() === "";
+    });
     if (missing.length > 0) {
       return res.status(400).json({
         success: false,
@@ -293,145 +1421,389 @@ app.post("/api/appointments", (req, res) => {
       });
     }
 
-    // Vérifier si le médecin existe
-    if (doctorId) {
-      const doctor = doctors.find((d) => d.id === doctorId);
-      if (!doctor) {
-        return res.status(400).json({
-          success: false,
-          message: "Médecin non trouvé",
-        });
-      }
+    const appointmentMoment = moment(`${date} ${time}`, "YYYY-MM-DD HH:mm");
+    if (!appointmentMoment.isValid()) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Date ou heure invalide" });
     }
 
-    // Vérifier si l'établissement existe
+    const normalizedEmail = email.trim().toLowerCase();
+    const selectedDoctor = doctorId
+      ? doctors.find((d) => d.id === doctorId)
+      : null;
+    if (doctorId && !selectedDoctor) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Médecin non trouvé" });
+    }
+
+    let establishmentRow = null;
+    let establishmentNameForInsert = null;
     if (facilityId) {
-      const facility = medicalFacilities.find((f) => f.id === facilityId);
-      if (!facility) {
+      establishmentRow = await dbGet(
+        `SELECT id, name, city, adminUserId, email, specialite FROM establishments WHERE id = ?`,
+        [facilityId]
+      );
+      if (establishmentRow) {
+        establishmentNameForInsert = establishmentRow.name;
+      } else {
+        // If facilityId is provided but not found, reject the request
         return res.status(400).json({
           success: false,
-          message: "Établissement non trouvé",
+          message: "Établissement sélectionné invalide. Veuillez réessayer.",
         });
       }
     }
 
-    // Vérifier disponibilité du créneau
-    const appointmentDateTime = moment(`${date} ${time}`, "YYYY-MM-DD HH:mm");
-    const conflictingAppointment = appointments.find((apt) => {
-      const existingDateTime = moment(
-        `${apt.date} ${apt.time}`,
-        "YYYY-MM-DD HH:mm"
+    if (doctorId) {
+      const conflict = await dbGet(
+        `SELECT id FROM appointments WHERE doctorId = ? AND date = ? AND time = ? LIMIT 1`,
+        [doctorId, date, time]
       );
-      const sameDoctor = doctorId && apt.doctorId === doctorId;
-      const timeDiff = Math.abs(
-        existingDateTime.diff(appointmentDateTime, "minutes")
-      );
-      return sameDoctor && timeDiff < 30;
-    });
-
-    if (conflictingAppointment) {
-      return res.status(409).json({
-        success: false,
-        message: "Ce créneau n'est pas disponible pour ce médecin",
-      });
+      if (conflict) {
+        return res.status(409).json({
+          success: false,
+          message: "Ce créneau n'est pas disponible pour ce médecin",
+        });
+      }
     }
 
-    const newAppointment = {
-      id: uuidv4(),
-      fullName: fullName.trim(),
-      email: email.trim().toLowerCase(),
-      phone: phone.trim(),
-      service: service.trim(),
-      consultationType: consultationType || service,
-      date,
-      time,
-      mode,
-      notes: notes || "",
-      doctorId: doctorId || null,
-      facilityId: facilityId || null,
-      status: "confirmé",
-      createdAt: new Date().toISOString(),
-      when: appointmentDateTime.toISOString(),
-    };
+    const patientRow = await dbGet(
+      `SELECT p.id as patientId, p.genidocId, u.id as userId
+       FROM patients p
+       JOIN users u ON p.userId = u.id
+       WHERE lower(u.email) = ?
+       LIMIT 1`,
+      [normalizedEmail]
+    );
 
-    appointments.push(newAppointment);
+    const apptId = uuidv4();
+    const createdAt = new Date().toISOString();
+    const scheduledDateTime = appointmentMoment.toISOString();
+
+    // Read and log the current appointments table schema to help diagnose
+    // NOT NULL / column-order mismatches (will show cid, name, type, notnull).
+    try {
+      const tableInfo = await dbAll("PRAGMA table_info(appointments)");
+      console.log("[DB SCHEMA] appointments table info:", tableInfo);
+    } catch (schemaErr) {
+      console.warn("Failed to read appointments table schema:", schemaErr);
+    }
+
+    // Try inserting the appointment; if the generated appointmentNumber collides
+    // with the UNIQUE constraint, retry a few times with a new number.
+    let appointmentNumber = null;
+    const maxAttempts = 5;
+    let lastInsertErr = null;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      appointmentNumber = `APT-${Math.random()
+        .toString(36)
+        .substring(2, 10)
+        .toUpperCase()}`;
+
+      try {
+        // Build params array explicitly here so we can map them to actual
+        // table columns for debugging if needed.
+        const paramsToInsert = [
+          apptId, // id
+          appointmentNumber, // appointmentNumber
+          fullName.trim(), // fullName
+          normalizedEmail, // email
+          phone.trim(), // phone
+          service.trim(), // service
+          (consultationType || service).trim(), // consultationType
+          date, // date
+          time, // time
+          mode, // mode
+          notes || "", // notes
+          "en attente", // status
+          patientRow ? patientRow.patientId : null, // patientId
+          doctorId || null, // doctorId
+          patientRow ? patientRow.userId : null, // userId
+          facilityId || null, // facilityId
+          mode || null, // appointmentType
+          scheduledDateTime, // scheduledDateTime
+          patientRow ? patientRow.genidocId : null, // genidocId
+          createdAt, // createdAt
+          null, // updatedAt
+          establishmentRow ? establishmentRow.id : null,
+          establishmentRow ? establishmentRow.name : null,
+          establishmentRow ? establishmentRow.city : null,
+          establishmentRow ? establishmentRow.specialite : null,
+        ];
+        try {
+          const insertColumns = [
+            "id",
+            "appointmentNumber",
+            "fullName",
+            "email",
+            "phone",
+            "service",
+            "consultationType",
+            "date",
+            "time",
+            "mode",
+            "notes",
+            "status",
+            "patientId",
+            "doctorId",
+            "userId",
+            "facilityId",
+            "appointmentType",
+            "scheduledDateTime",
+            "establishment_id",
+            "establishment_name",
+            "establishment_ville",
+            "establishment_specialite",
+            "genidocId",
+            "createdAt",
+            "updatedAt",
+          ];
+          console.log("[DB INSERT DEBUG] INSERT column->value mapping:");
+          insertColumns.forEach((n, i) => {
+            console.log(`  ${i}: ${n} =>`, paramsToInsert[i]);
+          });
+        } catch (mapErr) {
+          // non-fatal
+          console.warn("Could not map insertColumns to params:", mapErr);
+        }
+
+        await dbRun(
+          `INSERT INTO appointments (
+            id,
+            appointmentNumber,
+            fullName,
+            email,
+            phone,
+            service,
+            consultationType,
+            date,
+            time,
+            mode,
+            notes,
+            status,
+            patientId,
+            doctorId,
+            userId,
+            facilityId,
+            appointmentType,
+            scheduledDateTime,
+            genidocId,
+            createdAt,
+            updatedAt,
+            establishment_id,
+            establishment_name,
+            establishment_ville,
+            establishment_specialite
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          paramsToInsert
+        );
+        lastInsertErr = null;
+        break;
+      } catch (err) {
+        lastInsertErr = err;
+        const msg = err && err.message ? err.message : "";
+        const isApptNumConflict =
+          err &&
+          err.code === "SQLITE_CONSTRAINT" &&
+          (msg.includes("appointmentNumber") ||
+            msg.includes("appointments.appointmentNumber") ||
+            msg.includes("UNIQUE"));
+
+        console.warn(`Attempt ${attempt} to insert appointment failed:`, {
+          code: err && err.code,
+          message: err && err.message,
+          isApptNumConflict,
+        });
+
+        if (!isApptNumConflict || attempt === maxAttempts) {
+          throw err;
+        }
+      }
+    }
+
+    const inserted = await dbGet(`SELECT * FROM appointments WHERE id = ?`, [
+      apptId,
+    ]);
+    const responsePayload = mapAppointmentRow(inserted);
+
+    if (establishmentRow && establishmentRow.adminUserId) {
+      const noteId = uuidv4();
+      const title = "Nouvelle demande de rendez-vous";
+      const message = `Demande de RDV pour ${fullName.trim()} le ${date} ${time}`;
+      dbRun(
+        `INSERT INTO notifications (id, userId, type, title, message, isRead, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [
+          noteId,
+          establishmentRow.adminUserId,
+          "APPOINTMENT_REQUEST",
+          title,
+          message,
+          0,
+          new Date().toISOString(),
+        ]
+      ).catch((err) =>
+        console.error(
+          "Failed to insert notification for establishment admin",
+          err
+        )
+      );
+    }
+
+    if (patientRow && patientRow.userId) {
+      const noteId = uuidv4();
+      const title = "Votre demande de rendez-vous a été reçue";
+      const message = `Votre demande pour ${service.trim()} le ${date} ${time} a été envoyée à l'établissement.`;
+      dbRun(
+        `INSERT INTO notifications (id, userId, type, title, message, isRead, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [
+          noteId,
+          patientRow.userId,
+          "APPOINTMENT_CONFIRMATION",
+          title,
+          message,
+          0,
+          new Date().toISOString(),
+        ]
+      ).catch((err) =>
+        console.error("Failed to insert notification for patient", err)
+      );
+    }
 
     res.status(201).json({
       success: true,
       message: "Rendez-vous créé avec succès",
-      data: newAppointment,
+      data: responsePayload,
     });
   } catch (error) {
     console.error("Erreur lors de la création du rendez-vous:", error);
-    res.status(500).json({
-      success: false,
-      message: "Erreur interne du serveur",
-    });
+    res
+      .status(500)
+      .json({ success: false, message: "Erreur interne du serveur" });
   }
 });
 
-app.put("/api/appointments/:id", (req, res) => {
+app.put("/api/appointments/:id", async (req, res) => {
   try {
-    const appointmentIndex = appointments.findIndex(
-      (a) => a.id === req.params.id
-    );
-
-    if (appointmentIndex === -1) {
-      return res.status(404).json({
-        success: false,
-        message: "Rendez-vous non trouvé",
-      });
+    const appointmentId = req.params.id;
+    const existing = await dbGet(`SELECT * FROM appointments WHERE id = ?`, [
+      appointmentId,
+    ]);
+    if (!existing) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Rendez-vous non trouvé" });
     }
 
-    const updatedAppointment = {
-      ...appointments[appointmentIndex],
-      ...req.body,
-      id: req.params.id,
-      updatedAt: new Date().toISOString(),
-    };
+    const nextDoctorId =
+      req.body && req.body.doctorId !== undefined
+        ? req.body.doctorId
+        : existing.doctorId;
+    const nextDate =
+      req.body && req.body.date !== undefined ? req.body.date : existing.date;
+    const nextTime =
+      req.body && req.body.time !== undefined ? req.body.time : existing.time;
 
-    appointments[appointmentIndex] = updatedAppointment;
+    if (nextDoctorId) {
+      const conflict = await dbGet(
+        `SELECT id FROM appointments WHERE doctorId = ? AND date = ? AND time = ? AND id <> ? LIMIT 1`,
+        [nextDoctorId, nextDate, nextTime, appointmentId]
+      );
+      if (conflict) {
+        return res.status(409).json({
+          success: false,
+          message: "Ce créneau n'est pas disponible pour ce médecin",
+        });
+      }
+    }
 
+    let scheduledDateTime = existing.scheduledDateTime;
+    if (nextDate && nextTime) {
+      const nextMoment = moment(`${nextDate} ${nextTime}`, "YYYY-MM-DD HH:mm");
+      if (!nextMoment.isValid()) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Date ou heure invalide" });
+      }
+      scheduledDateTime = nextMoment.toISOString();
+    }
+
+    const allowedFields = [
+      "fullName",
+      "email",
+      "phone",
+      "service",
+      "consultationType",
+      "date",
+      "time",
+      "mode",
+      "notes",
+      "status",
+      "doctorId",
+      "facilityId",
+      "appointmentType",
+    ];
+    const updates = [];
+    const params = [];
+
+    allowedFields.forEach((key) => {
+      if (req.body && req.body[key] !== undefined) {
+        updates.push(`${key} = ?`);
+        params.push(req.body[key]);
+      }
+    });
+
+    updates.push("scheduledDateTime = ?");
+    params.push(scheduledDateTime);
+    updates.push("updatedAt = ?");
+    params.push(new Date().toISOString());
+    params.push(appointmentId);
+
+    await dbRun(
+      `UPDATE appointments SET ${updates.join(", ")} WHERE id = ?`,
+      params
+    );
+
+    const updatedRow = await dbGet(`SELECT * FROM appointments WHERE id = ?`, [
+      appointmentId,
+    ]);
     res.json({
       success: true,
       message: "Rendez-vous mis à jour avec succès",
-      data: updatedAppointment,
+      data: mapAppointmentRow(updatedRow),
     });
   } catch (error) {
-    console.error("Erreur lors de la mise à jour:", error);
-    res.status(500).json({
-      success: false,
-      message: "Erreur interne du serveur",
-    });
+    console.error("Erreur lors de la mise à jour du rendez-vous:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Erreur interne du serveur" });
   }
 });
 
-app.delete("/api/appointments/:id", (req, res) => {
+app.delete("/api/appointments/:id", async (req, res) => {
   try {
-    const appointmentIndex = appointments.findIndex(
-      (a) => a.id === req.params.id
-    );
-
-    if (appointmentIndex === -1) {
-      return res.status(404).json({
-        success: false,
-        message: "Rendez-vous non trouvé",
-      });
+    const appointmentId = req.params.id;
+    const existing = await dbGet(`SELECT * FROM appointments WHERE id = ?`, [
+      appointmentId,
+    ]);
+    if (!existing) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Rendez-vous non trouvé" });
     }
 
-    const deletedAppointment = appointments.splice(appointmentIndex, 1)[0];
-
+    await dbRun(`DELETE FROM appointments WHERE id = ?`, [appointmentId]);
     res.json({
       success: true,
       message: "Rendez-vous supprimé avec succès",
-      data: deletedAppointment,
+      data: mapAppointmentRow(existing),
     });
   } catch (error) {
-    console.error("Erreur lors de la suppression:", error);
-    res.status(500).json({
-      success: false,
-      message: "Erreur interne du serveur",
-    });
+    console.error("Erreur lors de la suppression du rendez-vous:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Erreur interne du serveur" });
   }
 });
 
@@ -635,452 +2007,598 @@ app.post("/api/teleconsultation/request", (req, res) => {
   });
 });
 
-app.delete("/api/doctors/:id", (req, res) => {
-  try {
-    const doctorIndex = doctors.findIndex((d) => d.id === req.params.id);
+// --- EMBEDDING CONFIG (simulation) ---
+let embeddingConfig = { model: "gemini-pro", dimension: 768 };
+app.get("/api/embedding-config", (req, res) => {
+  res.json({ success: true, config: embeddingConfig });
+});
+app.post("/api/embedding-config", (req, res) => {
+  embeddingConfig = { ...embeddingConfig, ...req.body };
+  res.json({ success: true, config: embeddingConfig });
+});
+// Routes pour servir les pages
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
 
-    if (doctorIndex === -1) {
-      return res.status(404).json({
-        success: false,
-        message: "Médecin non trouvé",
-      });
+app.get("/admin", (req, res) => {
+  res.sendFile(path.join(__dirname, "admin.html"));
+});
+
+app.get("/doctors", (req, res) => {
+  res.sendFile(path.join(__dirname, "doctors.html"));
+});
+
+app.get("/facilities", (req, res) => {
+  res.sendFile(path.join(__dirname, "facilities.html"));
+});
+
+// --- ADMINISTRATION ---
+// Middleware to enforce role-based access control
+function enforceRole(role) {
+  return (req, res, next) => {
+    const userRole = req.user && req.user.role;
+    if (userRole !== role && userRole !== "SUPER_ADMIN") {
+      return res.status(403).json({ success: false, message: "Accès refusé" });
     }
-
-    const deletedDoctor = doctors.splice(doctorIndex, 1)[0];
-
-    res.json({
-      success: true,
-      message: "Médecin supprimé avec succès",
-      data: deletedDoctor,
-    });
-  } catch (error) {
-    console.error("Erreur lors de la suppression:", error);
-    res.status(500).json({
-      success: false,
-      message: "Erreur interne du serveur",
-    });
-  }
-});
-
-// API Routes - Établissements médicaux
-app.get("/api/facilities", (req, res) => {
-  res.json({
-    success: true,
-    data: medicalFacilities,
-    total: medicalFacilities.length,
-  });
-});
-
-app.get("/api/facilities/:id", (req, res) => {
-  const facility = medicalFacilities.find((f) => f.id === req.params.id);
-  if (!facility) {
-    return res.status(404).json({
-      success: false,
-      message: "Établissement non trouvé",
-    });
-  }
-  res.json({
-    success: true,
-    data: facility,
-  });
-});
-
-// Fonction de reconnaissance d'image simple (simulation)
-async function analyzeImage(imagePath) {
-  // Ici, vous intégreriez une vraie API de reconnaissance d'image
-  // comme Google Vision API, Azure Computer Vision, etc.
-
-  // Pour la démo, nous simulons la reconnaissance
-  const imageBuffer = await sharp(imagePath).jpeg({ quality: 80 }).toBuffer();
-
-  // Simulation de résultats d'IA
-  const mockResults = [
-    {
-      name: "Hôpital Saint-Louis",
-      type: "hôpital",
-      confidence: 0.85,
-      detected_text: ["HOPITAL", "SAINT-LOUIS", "URGENCES"],
-    },
-    {
-      name: "Cabinet Médical Republique",
-      type: "cabinet",
-      confidence: 0.78,
-      detected_text: ["CABINET", "MEDICAL", "DR", "MARTIN"],
-    },
-    {
-      name: "Clinique du Parc",
-      type: "clinique",
-      confidence: 0.92,
-      detected_text: ["CLINIQUE", "DU", "PARC", "CHIRURGIE"],
-    },
-  ];
-
-  // Retourne un résultat aléatoire pour la démo
-  const randomResult =
-    mockResults[Math.floor(Math.random() * mockResults.length)];
-
-  return {
-    facility_detected: true,
-    facility_name: randomResult.name,
-    facility_type: randomResult.type,
-    confidence: randomResult.confidence,
-    detected_text: randomResult.detected_text,
-    suggested_services:
-      randomResult.type === "hôpital"
-        ? ["Urgences", "Consultation", "Chirurgie", "Radiologie"]
-        : ["Consultation générale", "Vaccination", "Dépistage"],
+    next();
   };
 }
 
-// Upload et analyse d'image pour établissement médical
-app.post(
-  "/api/facilities/upload-image",
-  upload.single("image"),
-  async (req, res) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({
-          success: false,
-          message: "Aucune image fournie",
-        });
-      }
+// Helper function to generate tokens
+function generateToken(userId, role) {
+  const payload = { userId, role };
+  const secret = process.env.JWT_SECRET || "dev-secret";
+  return jwt.sign(payload, secret, { expiresIn: "1h" });
+}
 
-      const imagePath = req.file.path;
+// Establishment login endpoint
+app.post("/api/establishment/login", (req, res) => {
+  const body = req.body || {};
+  const email = body.email;
+  const password = body.password;
+  console.log(
+    `GeniDoc: /api/establishment/login attempt for ${email || "unknown"}`
+  );
+  if (!email || !password)
+    return res
+      .status(400)
+      .json({ success: false, message: "Champs manquants" });
 
-      // Analyser l'image avec l'IA
-      const analysisResult = await analyzeImage(imagePath);
+  db.get(`SELECT * FROM users WHERE email = ?`, [email], async (err, user) => {
+    if (err)
+      return res.status(500).json({ success: false, message: "Erreur DB" });
+    if (!user)
+      return res
+        .status(401)
+        .json({ success: false, message: "Utilisateur non trouvé" });
 
-      if (analysisResult.facility_detected) {
-        // Créer automatiquement l'établissement détecté
-        const newFacility = {
-          id: uuidv4(),
-          name: analysisResult.facility_name,
-          type: analysisResult.facility_type,
-          address: "", // À compléter par l'utilisateur
-          phone: "",
-          email: "",
-          services: analysisResult.suggested_services,
-          coordinates: null,
-          image: `/uploads/${req.file.filename}`,
-          verified: false,
-          confidence: analysisResult.confidence,
-          detected_text: analysisResult.detected_text,
-          createdAt: new Date().toISOString(),
-          createdBy: "ai_detection",
-        };
+    const ok = await bcrypt.compare(password, user.password);
+    if (!ok)
+      return res
+        .status(401)
+        .json({ success: false, message: "Mot de passe incorrect" });
 
-        medicalFacilities.push(newFacility);
+    // Find establishment linked to this admin user (or by email)
+    db.get(
+      `SELECT * FROM establishments WHERE adminUserId = ? OR email = ? LIMIT 1`,
+      [user.id, email],
+      (e, est) => {
+        if (e)
+          return res.status(500).json({ success: false, message: "Erreur DB" });
+        if (!est)
+          return res
+            .status(404)
+            .json({ success: false, message: "Établissement non trouvé" });
 
-        res.json({
+        const token = generateToken(user.id, "ADMIN");
+        return res.json({
           success: true,
-          message: "Établissement détecté et ajouté automatiquement",
-          data: {
-            facility: newFacility,
-            analysis: analysisResult,
-          },
-        });
-      } else {
-        res.json({
-          success: false,
-          message: "Aucun établissement médical détecté dans cette image",
-          data: { analysis: analysisResult },
+          establishment: { id: est.id, name: est.name, email: est.email },
+          token,
         });
       }
-    } catch (error) {
-      console.error("Erreur lors de l'analyse d'image:", error);
-      res.status(500).json({
-        success: false,
-        message: "Erreur lors de l'analyse de l'image",
-      });
-    }
-  }
-);
-
-app.post("/api/facilities", (req, res) => {
-  try {
-    const { name, type, address, phone, email, services, coordinates } =
-      req.body;
-
-    const required = ["name", "type", "address"];
-    const missing = required.filter((field) => !req.body[field]);
-
-    if (missing.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Champs manquants: " + missing.join(", "),
-      });
-    }
-
-    const newFacility = {
-      id: uuidv4(),
-      name: name.trim(),
-      type: type.trim(),
-      address: address.trim(),
-      phone: phone ? phone.trim() : "",
-      email: email ? email.trim().toLowerCase() : "",
-      services: Array.isArray(services) ? services : [],
-      coordinates: coordinates || null,
-      image: null,
-      verified: false,
-      createdAt: new Date().toISOString(),
-      createdBy: "manual",
-    };
-
-    medicalFacilities.push(newFacility);
-
-    res.status(201).json({
-      success: true,
-      message: "Établissement ajouté avec succès",
-      data: newFacility,
-    });
-  } catch (error) {
-    console.error("Erreur lors de l'ajout de l'établissement:", error);
-    res.status(500).json({
-      success: false,
-      message: "Erreur interne du serveur",
-    });
-  }
-});
-
-app.put("/api/facilities/:id", (req, res) => {
-  try {
-    const facilityIndex = medicalFacilities.findIndex(
-      (f) => f.id === req.params.id
     );
-
-    if (facilityIndex === -1) {
-      return res.status(404).json({
-        success: false,
-        message: "Établissement non trouvé",
-      });
-    }
-
-    const updatedFacility = {
-      ...medicalFacilities[facilityIndex],
-      ...req.body,
-      id: req.params.id,
-      updatedAt: new Date().toISOString(),
-    };
-
-    medicalFacilities[facilityIndex] = updatedFacility;
-
-    res.json({
-      success: true,
-      message: "Établissement mis à jour avec succès",
-      data: updatedFacility,
-    });
-  } catch (error) {
-    console.error("Erreur lors de la mise à jour:", error);
-    res.status(500).json({
-      success: false,
-      message: "Erreur interne du serveur",
-    });
-  }
-});
-
-app.delete("/api/facilities/:id", (req, res) => {
-  try {
-    const facilityIndex = medicalFacilities.findIndex(
-      (f) => f.id === req.params.id
-    );
-
-    if (facilityIndex === -1) {
-      return res.status(404).json({
-        success: false,
-        message: "Établissement non trouvé",
-      });
-    }
-
-    const deletedFacility = medicalFacilities.splice(facilityIndex, 1)[0];
-
-    res.json({
-      success: true,
-      message: "Établissement supprimé avec succès",
-      data: deletedFacility,
-    });
-  } catch (error) {
-    console.error("Erreur lors de la suppression:", error);
-    res.status(500).json({
-      success: false,
-      message: "Erreur interne du serveur",
-    });
-  }
-});
-
-// Route pour les créneaux disponibles (mise à jour pour inclure les médecins)
-app.get("/api/available-slots/:date/:doctorId?", (req, res) => {
-  try {
-    const { date, doctorId } = req.params;
-    const requestedDate = moment(date);
-
-    if (!requestedDate.isValid()) {
-      return res.status(400).json({
-        success: false,
-        message: "Format de date invalide",
-      });
-    }
-
-    // Générer les créneaux de base
-    const allSlots = [];
-    for (let hour = 9; hour < 17; hour++) {
-      allSlots.push(`${hour.toString().padStart(2, "0")}:00`);
-      allSlots.push(`${hour.toString().padStart(2, "0")}:30`);
-    }
-
-    // Si un médecin est spécifié, filtrer selon ses horaires
-    if (doctorId) {
-      const doctor = doctors.find((d) => d.id === doctorId);
-      if (doctor) {
-        const dayName = requestedDate.format("dddd").toLowerCase();
-        const doctorSchedule = doctor.schedule[dayName];
-
-        if (!doctorSchedule || doctorSchedule.length === 0) {
-          return res.json({
-            success: true,
-            data: {
-              date,
-              availableSlots: [],
-              bookedSlots: [],
-              message: "Le médecin ne consulte pas ce jour-là",
-            },
-          });
-        }
-      }
-    }
-
-    // Filtrer les créneaux déjà pris
-    const bookedSlots = appointments
-      .filter((apt) => {
-        const sameDate = apt.date === date;
-        const sameDoctor = !doctorId || apt.doctorId === doctorId;
-        return sameDate && sameDoctor;
-      })
-      .map((apt) => apt.time);
-
-    const availableSlots = allSlots.filter(
-      (slot) => !bookedSlots.includes(slot)
-    );
-
-    res.json({
-      success: true,
-      data: {
-        date,
-        doctorId: doctorId || null,
-        availableSlots,
-        bookedSlots,
-      },
-    });
-  } catch (error) {
-    console.error("Erreur lors de la récupération des créneaux:", error);
-    res.status(500).json({
-      success: false,
-      message: "Erreur interne du serveur",
-    });
-  }
-});
-
-// Route pour les statistiques (mise à jour)
-app.get("/api/stats", (req, res) => {
-  try {
-    const today = moment().format("YYYY-MM-DD");
-    const thisWeek = moment().startOf("week");
-    const thisMonth = moment().startOf("month");
-
-    const stats = {
-      appointments: {
-        total: appointments.length,
-        today: appointments.filter((apt) => apt.date === today).length,
-        thisWeek: appointments.filter((apt) =>
-          moment(apt.date).isSameOrAfter(thisWeek)
-        ).length,
-        thisMonth: appointments.filter((apt) =>
-          moment(apt.date).isSameOrAfter(thisMonth)
-        ).length,
-        byService: {},
-        byMode: {},
-      },
-      doctors: {
-        total: doctors.length,
-        bySpecialty: {},
-      },
-      facilities: {
-        total: medicalFacilities.length,
-        verified: medicalFacilities.filter((f) => f.verified).length,
-        aiDetected: medicalFacilities.filter(
-          (f) => f.createdBy === "ai_detection"
-        ).length,
-        byType: {},
-      },
-    };
-
-    // Statistiques par service et mode
-    appointments.forEach((apt) => {
-      stats.appointments.byService[apt.service] =
-        (stats.appointments.byService[apt.service] || 0) + 1;
-      stats.appointments.byMode[apt.mode] =
-        (stats.appointments.byMode[apt.mode] || 0) + 1;
-    });
-
-    doctors.forEach((doc) => {
-      stats.doctors.bySpecialty[doc.specialty] =
-        (stats.doctors.bySpecialty[doc.specialty] || 0) + 1;
-    });
-
-    medicalFacilities.forEach((facility) => {
-      stats.facilities.byType[facility.type] =
-        (stats.facilities.byType[facility.type] || 0) + 1;
-    });
-
-    res.json({
-      success: true,
-      data: stats,
-    });
-  } catch (error) {
-    console.error("Erreur lors du calcul des statistiques:", error);
-    res.status(500).json({
-      success: false,
-      message: "Erreur interne du serveur",
-    });
-  }
-});
-
-// Middleware de gestion d'erreurs global
-app.use((err, req, res, next) => {
-  if (err instanceof multer.MulterError) {
-    if (err.code === "LIMIT_FILE_SIZE") {
-      return res.status(400).json({
-        success: false,
-        message: "Fichier trop volumineux. Taille maximum: 5MB",
-      });
-    }
-  }
-
-  console.error(err.stack);
-  res.status(500).json({
-    success: false,
-    message: "Une erreur inattendue s'est produite",
   });
 });
 
+// GET admin details by establishment id (used by establishment-login.html)
+app.get("/api/admin/:establishmentId", (req, res) => {
+  const establishmentId = req.params.establishmentId;
+  db.get(
+    `SELECT * FROM establishments WHERE id = ?`,
+    [establishmentId],
+    (err, est) => {
+      if (err)
+        return res.status(500).json({ success: false, message: "Erreur DB" });
+      if (!est)
+        return res
+          .status(404)
+          .json({ success: false, message: "Établissement non trouvé" });
 
+      db.get(
+        `SELECT id, email, firstName, lastName, role FROM users WHERE id = ?`,
+        [est.adminUserId],
+        (e, user) => {
+          if (e)
+            return res
+              .status(500)
+              .json({ success: false, message: "Erreur DB" });
+          if (!user)
+            return res
+              .status(404)
+              .json({ success: false, message: "Admin non trouvé" });
 
-// Route générique pour servir tout fichier statique du répertoire racine (HTML, JS, CSS, images, etc.)
-app.get('/:file', (req, res, next) => {
-  const filePath = path.join(__dirname, req.params.file);
+          res.json({
+            success: true,
+            data: {
+              id: user.id,
+              email: user.email,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              role: user.role,
+            },
+          });
+        }
+      );
+    }
+  );
+});
+
+// Get establishment by admin user id (used to decide redirect after admin login)
+app.get("/api/establishments/admin/:userId", authenticateToken, (req, res) => {
+  const userId = req.params.userId;
+  // Only allow the requester if they are the same user or a SUPER_ADMIN
+  if (req.user.userId !== userId && req.user.role !== "SUPER_ADMIN") {
+    return res.status(403).json({ success: false, message: "Accès refusé" });
+  }
+
+  db.get(
+    `SELECT * FROM establishments WHERE adminUserId = ? LIMIT 1`,
+    [userId],
+    (err, est) => {
+      if (err)
+        return res.status(500).json({ success: false, message: "Erreur DB" });
+      if (!est)
+        return res
+          .status(404)
+          .json({ success: false, message: "Aucun établissement lié" });
+
+      res.json({
+        success: true,
+        data: { id: est.id, name: est.name, email: est.email, city: est.city },
+      });
+    }
+  );
+});
+
+// Public: list establishments (used by appointment page to populate "Lieu")
+app.get("/api/establishments", (req, res) => {
+  db.all(
+    `SELECT id, name, email, city, address, phone, adminUserId, createdAt FROM establishments ORDER BY name COLLATE NOCASE`,
+    [],
+    (err, rows) => {
+      if (err)
+        return res.status(500).json({ success: false, message: "Erreur DB" });
+      const data = (rows || []).map((r) => ({
+        id: r.id,
+        nom: r.name || "",
+        ville: r.city || "",
+        email: r.email || "",
+        adresse: r.address || "",
+        telephone: r.phone || "",
+        // keep 'specialite' key for front-end compatibility (may be empty)
+        specialite: r.specialite || "",
+        adminId: r.adminUserId || null,
+        createdAt: r.createdAt || null,
+      }));
+
+      res.json({ success: true, data });
+    }
+  );
+});
+
+// Establishment: list appointment requests (requires token)
+app.get("/api/establishments/:id/requests", authenticateToken, (req, res) => {
+  const estId = req.params.id;
+  // Get the adminUserId for this establishment
+  db.get(
+    `SELECT adminUserId FROM establishments WHERE id = ?`,
+    [estId],
+    (err, est) => {
+      if (err)
+        return res.status(500).json({ success: false, message: "Erreur DB" });
+      if (!est)
+        return res
+          .status(404)
+          .json({ success: false, message: "Établissement non trouvé" });
+      if (
+        req.user.userId !== est.adminUserId &&
+        req.user.role !== "SUPER_ADMIN"
+      ) {
+        return res
+          .status(403)
+          .json({ success: false, message: "Accès refusé" });
+      }
+
+      // JOIN appointments with establishments to always get the name and filter by adminUserId
+      db.all(
+        `SELECT a.*, e.name as establishment_name, e.city as establishment_ville, e.specialite as establishment_specialite
+         FROM appointments a
+         JOIN establishments e ON a.establishment_id = e.id
+         WHERE e.adminUserId = ?
+         ORDER BY a.createdAt DESC`,
+        [est.adminUserId],
+        (aErr, rows) => {
+          if (aErr)
+            return res
+              .status(500)
+              .json({ success: false, message: "Erreur DB" });
+          const data = (rows || []).map(mapAppointmentRow);
+          console.log(
+            `[ADMIN RDV DEBUG] adminUserId ${est.adminUserId} : ${data.length} rendez-vous trouvés`,
+            data
+          );
+          return res.json({ success: true, data });
+        }
+      );
+    }
+  );
+});
+
+// Establishment: act on a request (confirm/reject/modify)
+app.put(
+  "/api/establishments/requests/:appointmentId",
+  authenticateToken,
+  (req, res) => {
+    const appointmentId = req.params.appointmentId;
+    const { action, newDate, newTime, note } = req.body;
+
+    // Fetch appointment and facility (support both facilityId and establishment_id)
+    db.get(
+      `SELECT * FROM appointments WHERE id = ?`,
+      [appointmentId],
+      (err, appt) => {
+        if (err)
+          return res.status(500).json({ success: false, message: "Erreur DB" });
+        if (!appt)
+          return res
+            .status(404)
+            .json({ success: false, message: "Rendez-vous non trouvé" });
+
+        // Cherche l'établissement par facilityId OU establishment_id
+        const establishmentId = appt.facilityId || appt.establishment_id;
+        if (!establishmentId) {
+          return res.status(404).json({
+            success: false,
+            message: "Établissement non trouvé (aucun id lié au RDV)",
+          });
+        }
+        db.get(
+          `SELECT * FROM establishments WHERE id = ?`,
+          [establishmentId],
+          (e, est) => {
+            if (e)
+              return res
+                .status(500)
+                .json({ success: false, message: "Erreur DB" });
+            if (!est)
+              return res
+                .status(404)
+                .json({ success: false, message: "Établissement non trouvé" });
+            if (
+              req.user.userId !== est.adminUserId &&
+              req.user.role !== "SUPER_ADMIN"
+            ) {
+              return res
+                .status(403)
+                .json({ success: false, message: "Accès refusé" });
+            }
+
+            let updates = [];
+            let params = [];
+            let newStatus = appt.status;
+
+            if (action === "confirm") {
+              newStatus = "CONFIRMED";
+              updates.push("status = ?");
+              params.push(newStatus);
+            } else if (action === "reject") {
+              newStatus = "REJECTED";
+              updates.push("status = ?");
+              params.push(newStatus);
+            } else if (action === "modify") {
+              newStatus = "MODIFIED";
+              updates.push("status = ?");
+              params.push(newStatus);
+              if (newDate && newTime) {
+                const newDateTime = moment(
+                  `${newDate} ${newTime}`,
+                  "YYYY-MM-DD HH:mm"
+                ).toISOString();
+                updates.push("scheduledDateTime = ?");
+                params.push(newDateTime);
+              }
+            } else {
+              return res
+                .status(400)
+                .json({ success: false, message: "Action inconnue" });
+            }
+
+            if (note) {
+              updates.push("notes = ?");
+              params.push(note);
+            }
+            params.push(appointmentId);
+
+            const sql = `UPDATE appointments SET ${updates.join(
+              ", "
+            )} WHERE id = ?`;
+            db.run(sql, params, function (uErr) {
+              if (uErr)
+                return res
+                  .status(500)
+                  .json({ success: false, message: "Erreur DB" });
+
+              // Notify patient if possible
+              if (appt.patientId) {
+                const noteId = uuidv4();
+                const title =
+                  action === "confirm"
+                    ? "Rendez-vous confirmé"
+                    : action === "reject"
+                    ? "Rendez-vous refusé"
+                    : "Rendez-vous modifié";
+                const msg =
+                  note ||
+                  `Votre rendez-vous (${appt.appointmentNumber}) a été ${action}.`;
+                db.run(
+                  `INSERT INTO notifications (id, userId, type, title, message, isRead, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                  [
+                    noteId,
+                    appt.userId || appt.patientId,
+                    "APPOINTMENT_UPDATE",
+                    title,
+                    msg,
+                    0,
+                    new Date().toISOString(),
+                  ],
+                  (nerr) => {
+                    if (nerr) console.error("Failed to notify patient", nerr);
+                  }
+                );
+              }
+
+              return res.json({
+                success: true,
+                message: "Action appliquée",
+                appointmentId,
+                status: newStatus,
+              });
+            });
+          }
+        );
+      }
+    );
+  }
+);
+
+// --- ROUTAGE STATIC ---
+app.get(/^\/(.+)$/, (req, res, next) => {
+  // Ne pas interférer avec les routes API ou Express explicites
+  if (req.path.startsWith("/api/")) return next();
+  const filePath = path.join(__dirname, req.params[0]);
   fs.access(filePath, fs.constants.F_OK, (err) => {
     if (err) return next();
     res.sendFile(filePath);
   });
 });
 
-// Route 404 JSON fallback
+// ...existing code...
+
+// --- DOCTOR PROFILE ENDPOINT (universel : doctorId OU userId) ---
+app.get("/api/doctor/:id", async (req, res) => {
+  console.log("[API] /api/doctor/:id hit", req.params.id);
+  try {
+    const id = req.params.id;
+    // 1. Cherche par doctorId
+    db.get(
+      `SELECT u.id as userId, u.firstName as userFirstName, u.lastName as userLastName, u.email, u.phone as userPhone,
+              d.id as doctorId, d.firstName as doctorFirstName, d.lastName as doctorLastName, d.phone as doctorPhone, d.specialty, d.birthdate, d.establishmentId,
+              e.name AS establishmentName, e.id AS establishmentId, e.city AS establishmentCity, e.specialite AS establishmentSpecialty
+       FROM doctors d
+       LEFT JOIN users u ON d.userId = u.id
+       LEFT JOIN establishments e ON e.id = d.establishmentId
+       WHERE d.id = ?`,
+      [id],
+      async (err, row) => {
+        if (err) {
+          console.log("[API] doctorId SQL error", err);
+          return res.status(500).json({ success: false, message: "Erreur DB" });
+        }
+        if (row) {
+          console.log("[API] doctorId found", row);
+          let establishmentAppointments = [];
+          if (row.establishmentId) {
+            try {
+              establishmentAppointments = await dbAll(
+                `SELECT * FROM appointments WHERE establishment_id = ? ORDER BY datetime(COALESCE(updatedAt, createdAt)) DESC`,
+                [row.establishmentId]
+              );
+            } catch (e) {
+              console.log("[API] doctorId appointments error", e);
+            }
+          }
+          return res.json({
+            success: true,
+            data: { ...row, establishmentAppointments },
+          });
+        }
+        // 2. Sinon, cherche par userId (fallback)
+        db.get(
+          `SELECT u.id as userId, u.firstName as userFirstName, u.lastName as userLastName, u.email, u.phone as userPhone,
+                  d.id as doctorId, d.firstName as doctorFirstName, d.lastName as doctorLastName, d.phone as doctorPhone, d.specialty, d.birthdate, d.establishmentId,
+                  e.name AS establishmentName, e.id AS establishmentId, e.city AS establishmentCity, e.specialite AS establishmentSpecialty
+           FROM users u
+           LEFT JOIN doctors d ON d.userId = u.id
+           LEFT JOIN establishments e ON e.id = d.establishmentId
+           WHERE u.id = ? AND u.role = 'DOCTOR'`,
+          [id],
+          async (err2, row2) => {
+            if (err2) {
+              console.log("[API] userId SQL error", err2);
+              return res
+                .status(500)
+                .json({ success: false, message: "Erreur DB" });
+            }
+            if (!row2) {
+              console.log("[API] userId not found", id);
+              return res
+                .status(404)
+                .json({ success: false, message: "Médecin non trouvé" });
+            }
+            console.log("[API] userId found", row2);
+            let establishmentAppointments = [];
+            if (row2.establishmentId) {
+              try {
+                establishmentAppointments = await dbAll(
+                  `SELECT * FROM appointments WHERE establishment_id = ? ORDER BY datetime(COALESCE(updatedAt, createdAt)) DESC`,
+                  [row2.establishmentId]
+                );
+              } catch (e) {
+                console.log("[API] userId appointments error", e);
+              }
+            }
+            return res.json({
+              success: true,
+              data: { ...row2, establishmentAppointments },
+            });
+          }
+        );
+      }
+    );
+  } catch (err) {
+    console.log("[API] /api/doctor/:id exception", err);
+    res.status(500).json({ success: false, message: "Erreur serveur" });
+  }
+});
+
+// Route 404 JSON fallback (doit être tout à la fin)
 app.use((req, res) => {
+  console.log("[404] Route non trouvée:", req.method, req.originalUrl);
   res.status(404).json({
     success: false,
     message: "Endpoint non trouvé",
   });
 });
 
+const PORT = process.env.PORT || 3000;
+
+// --- DOCTOR PROFILE ENDPOINT (accept doctorId or userId) ---
+app.get("/api/doctor/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    // On tente d'abord comme doctorId
+    db.get(
+      `SELECT u.id as userId, u.firstName as userFirstName, u.lastName as userLastName, u.email, u.phone as userPhone,
+              d.id as doctorId, d.firstName as doctorFirstName, d.lastName as doctorLastName, d.phone as doctorPhone, d.specialty, d.birthdate, d.establishmentId,
+              e.name AS establishmentName, e.id AS establishmentId, e.city AS establishmentCity, e.specialite AS establishmentSpecialty
+       FROM doctors d
+       LEFT JOIN users u ON d.userId = u.id
+       LEFT JOIN establishments e ON e.id = d.establishmentId
+       WHERE d.id = ?`,
+      [id],
+      async (err, row) => {
+        if (err) {
+          console.error("[API DEBUG] DB error (doctorId):", err);
+          return res.status(500).json({ success: false, message: "Erreur DB" });
+        }
+        if (row) {
+          // Récupérer les rendez-vous liés à l'établissement si possible
+          let establishmentAppointments = [];
+          if (row.establishmentId) {
+            try {
+              establishmentAppointments = await dbAll(
+                `SELECT * FROM appointments WHERE establishment_id = ? ORDER BY datetime(COALESCE(updatedAt, createdAt)) DESC`,
+                [row.establishmentId]
+              );
+            } catch (e) {
+              console.error(
+                "[API DEBUG] Erreur récupération RDV établissement:",
+                e
+              );
+            }
+          }
+          return res.json({
+            success: true,
+            data: { ...row, establishmentAppointments },
+          });
+        }
+        // Sinon, on tente comme userId (fallback)
+        db.get(
+          `SELECT u.id as userId, u.firstName as userFirstName, u.lastName as userLastName, u.email, u.phone as userPhone,
+                  d.id as doctorId, d.firstName as doctorFirstName, d.lastName as doctorLastName, d.phone as doctorPhone, d.specialty, d.birthdate, d.establishmentId,
+                  e.name AS establishmentName, e.id AS establishmentId, e.city AS establishmentCity, e.specialite AS establishmentSpecialty
+           FROM users u
+           LEFT JOIN doctors d ON d.userId = u.id
+           LEFT JOIN establishments e ON e.id = d.establishmentId
+           WHERE u.id = ? AND u.role = 'DOCTOR'`,
+          [id],
+          async (err2, row2) => {
+            if (err2) {
+              console.error("[API DEBUG] DB error (userId):", err2);
+              return res
+                .status(500)
+                .json({ success: false, message: "Erreur DB" });
+            }
+            if (!row2) {
+              return res
+                .status(404)
+                .json({ success: false, message: "Médecin non trouvé" });
+            }
+            let establishmentAppointments = [];
+            if (row2.establishmentId) {
+              try {
+                establishmentAppointments = await dbAll(
+                  `SELECT * FROM appointments WHERE establishment_id = ? ORDER BY datetime(COALESCE(updatedAt, createdAt)) DESC`,
+                  [row2.establishmentId]
+                );
+              } catch (e) {
+                console.error(
+                  "[API DEBUG] Erreur récupération RDV établissement:",
+                  e
+                );
+              }
+            }
+            return res.json({
+              success: true,
+              data: { ...row2, establishmentAppointments },
+            });
+          }
+        );
+      }
+    );
+  } catch (err) {
+    console.error("[API DEBUG] Exception:", err);
+    res.status(500).json({ success: false, message: "Erreur serveur" });
+  }
+});
+// Graceful shutdown
+process.on("SIGINT", () => {
+  console.log("Fermeture du serveur...");
+  db.close(() => {
+    console.log("Base de données fermée.");
+    process.exit(0);
+  });
+});
+
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Endpoint non trouvé",
+  });
+});
+// --- Lancement du serveur ---
 app.listen(PORT, () => {
   console.log(`🚀 Serveur GeniDoc démarré sur le port ${PORT}`);
   console.log(`📱 Interface web: http://localhost:${PORT}`);
@@ -1088,4 +2606,5 @@ app.listen(PORT, () => {
   console.log(`🏥 Gestion établissements: http://localhost:${PORT}/facilities`);
   console.log(`⚙️ Administration: http://localhost:${PORT}/admin`);
   console.log(`🔗 API: http://localhost:${PORT}/api`);
+  console.log("[DEBUG] Toutes les routes sont chargées, serveur prêt.");
 });

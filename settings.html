@@ -250,6 +250,20 @@
         <div id="roleBadge" class="role-badge"></div>
         <div style="display: flex; gap: 10px; align-items: center">
           <div id="avatar" aria-hidden="true"></div>
+          <input
+            type="file"
+            id="photo-upload"
+            accept="image/*"
+            style="display: none"
+          />
+          <button
+            id="change-photo-btn"
+            type="button"
+            class="btn secondary"
+            style="padding: 4px 10px; font-size: 13px"
+          >
+            Changer photo
+          </button>
           <button id="logout-btn" class="btn danger">Déconnexion</button>
         </div>
       </div>
@@ -258,8 +272,12 @@
 
       <form id="settings-form" novalidate>
         <div class="full">
-          <label for="username">Nom complet</label>
+          <label for="username">Prénom</label>
           <input id="username" name="username" type="text" />
+        </div>
+        <div class="full">
+          <label for="lastName">Nom de famille</label>
+          <input id="lastName" name="lastName" type="text" />
         </div>
 
         <div>
@@ -348,28 +366,57 @@
       function renderAvatar(u) {
         const c = $("avatar");
         c.innerHTML = "";
-        const initials =
-          u && (u.username || u.email)
-            ? (u.username || u.email)
-                .split(" ")
-                .map((s) => s[0])
-                .slice(0, 2)
-                .join("")
-                .toUpperCase()
-            : "GD";
-        const el = document.createElement("div");
-        el.style.width = "64px";
-        el.style.height = "64px";
-        el.style.borderRadius = "50%";
-        el.style.background = "#e6eefc";
-        el.style.display = "flex";
-        el.style.alignItems = "center";
-        el.style.justifyContent = "center";
-        el.style.fontSize = "20px";
-        el.style.color = "#0f172a";
-        el.textContent = initials;
-        c.appendChild(el);
+        if (u && u.photo) {
+          const img = document.createElement("img");
+          img.src = u.photo.startsWith("data:")
+            ? u.photo
+            : `data:image/png;base64,${u.photo}`;
+          img.alt = "Photo de profil";
+          img.style.width = "64px";
+          img.style.height = "64px";
+          img.style.borderRadius = "50%";
+          img.style.objectFit = "cover";
+          c.appendChild(img);
+        } else {
+          const initials =
+            u && (u.username || u.email)
+              ? (u.username || u.email)
+                  .split(" ")
+                  .map((s) => s[0])
+                  .slice(0, 2)
+                  .join("")
+                  .toUpperCase()
+              : "GD";
+          const el = document.createElement("div");
+          el.style.width = "64px";
+          el.style.height = "64px";
+          el.style.borderRadius = "50%";
+          el.style.background = "#e6eefc";
+          el.style.display = "flex";
+          el.style.alignItems = "center";
+          el.style.justifyContent = "center";
+          el.style.fontSize = "20px";
+          el.style.color = "#0f172a";
+          el.textContent = initials;
+          c.appendChild(el);
+        }
       }
+      // Gestion upload photo
+      let photoBase64 = null;
+      $("change-photo-btn").onclick = function () {
+        $("photo-upload").click();
+      };
+      $("photo-upload").onchange = function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (evt) {
+          photoBase64 = evt.target.result;
+          user.photo = photoBase64;
+          renderAvatar(user);
+        };
+        reader.readAsDataURL(file);
+      };
 
       function setMessage(text, type) {
         const m = $("message");
@@ -392,6 +439,7 @@
             ? user[key]
             : "";
         $("username").value = fallback("username");
+        $("lastName").value = fallback("lastName");
         $("email").value = fallback("email");
         $("telephone").value = fallback("telephone");
         $("birthdate").value = fallback("birthdate");
@@ -495,13 +543,16 @@
 
       // Save
       $("save-btn").addEventListener("click", async function () {
+        console.log("[SETTINGS] PUT", url, payload, headers);
         $("loader").style.display = "flex";
         setMessage("Sauvegarde en cours…");
         const payload = {
           username: $("username").value,
+          lastName: $("lastName").value,
           email: $("email").value,
           telephone: $("telephone").value,
           birthdate: $("birthdate").value,
+          photo: photoBase64 || user.photo || "",
         };
         if (role === "doctor" || role === "médecin")
           payload.specialty = $("specialty").value;
@@ -516,6 +567,14 @@
           headers["X-User-Role"] = role;
           headers["X-User-Id"] = user.id;
         } else {
+          if (!user.genidocId) {
+            setMessage(
+              "Erreur: identifiant patient manquant. Veuillez vous reconnecter ou revenir depuis le tableau de bord.",
+              "error"
+            );
+            $("loader").style.display = "none";
+            return;
+          }
           url = `/api/patient/${user.genidocId}`;
           headers["X-User-Role"] = "patient";
           headers["X-GenidocId"] = user.genidocId;
@@ -532,8 +591,8 @@
             "Accès refusé lors de la sauvegarde"
           );
           const j = await res.json();
-          if (j.success) {
-            Object.assign(user, payload, j.data || {});
+          if (j.success && j.data) {
+            Object.assign(user, j.data);
             setLocalUser(user);
             applyFormValues(user);
             setMessage("Modifications enregistrées ✔", "success");

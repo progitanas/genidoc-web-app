@@ -439,6 +439,7 @@
                 <th>Médecin</th>
                 <th>Date</th>
                 <th>Statut</th>
+                <th>Lieu</th>
               </tr>
             </thead>
             <tbody id="recent-appointments">
@@ -636,19 +637,14 @@
       // ========== SÉCURITÉ SESSION ========== //
       function forceLogout(msg) {
         localStorage.clear();
-        alert(
-          msg || "Session expirée ou accès interdit. Veuillez vous reconnecter."
-        );
+        // Session expired logic removed as requested
         window.location.href = "/auth.html";
       }
 
       async function secureFetch(url, options = {}, errorMsg) {
         const res = await fetch(url, options);
         if (res.status === 401 || res.status === 403) {
-          forceLogout(
-            errorMsg ||
-              "Session expirée ou accès interdit. Veuillez vous reconnecter."
-          );
+          forceLogout();
           throw new Error("Déconnecté");
         }
         return res;
@@ -716,13 +712,9 @@
           document.getElementById("avatar-init").textContent =
             (user.firstName || "A")[0].toUpperCase();
           // Load stats
-          const statsResponse = await secureFetch(
-            `${API}/admin/stats`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            },
-            "Accès interdit ou session expirée lors du chargement des stats."
-          );
+          const statsResponse = await secureFetch(`${API}/admin/stats`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
           const stats = await statsResponse.json();
           if (stats.success) {
             document.getElementById("doctor-count").textContent =
@@ -740,8 +732,7 @@
             `${API}/admin/appointments`,
             {
               headers: { Authorization: `Bearer ${token}` },
-            },
-            "Accès interdit ou session expirée lors du chargement des rendez-vous."
+            }
           );
           const appointmentsData = await appointmentsResponse.json();
           if (
@@ -763,19 +754,21 @@
                             <td><span style=\"color: var(--primary);\">${
                               apt.status || "Pending"
                             }</span></td>
+                            <td>${
+                              apt.establishment_name &&
+                              apt.establishment_name.trim() !== ""
+                                ? apt.establishment_name
+                                : "Non spécifié"
+                            }</td>
                         </tr>
                     `
               )
               .join("");
           }
           // Load doctors
-          const doctorsResponse = await secureFetch(
-            `${API}/doctors`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            },
-            "Accès interdit ou session expirée lors du chargement des médecins."
-          );
+          const doctorsResponse = await secureFetch(`${API}/doctors`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
           const doctorsData = await doctorsResponse.json();
           if (
             doctorsData.success &&
