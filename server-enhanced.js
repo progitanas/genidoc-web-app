@@ -9,8 +9,6 @@ const { v4: uuidv4 } = require("uuid");
 const jwt = require("jsonwebtoken");
 const sqlite3 = require("sqlite3").verbose();
 
-// In-memory data stores (legacy / development mode)
-// Ensure these exist so API routes can safely read/write during runtime.
 let patients = [];
 let doctors = [];
 let medicalFacilities = [];
@@ -2598,13 +2596,12 @@ app.use((req, res) => {
     message: "Endpoint non trouvé",
   });
 });
-// --- Lancement du serveur ---
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Serveur GeniDoc démarré sur le port ${PORT}`);
-  console.log(`📱 Interface web: http://localhost:${PORT}`);
-  console.log(`👨‍⚕️ Gestion médecins: http://localhost:${PORT}/doctors`);
-  console.log(`🏥 Gestion établissements: http://localhost:${PORT}/facilities`);
-  console.log(`⚙️ Administration: http://localhost:${PORT}/admin`);
-  console.log(`🔗 API: http://localhost:${PORT}/api`);
-  console.log("[DEBUG] Toutes les routes sont chargées, serveur prêt.");
+  console.log(`📱 Interface web: http://<IP_PUBLIQUE> :${PORT}`);
+  console.log(`👨‍⚕️ Gestion médecins: http://<IP_PUBLIQUE> :${PORT}/doctors`);
+  console.log(`🏥 Gestion établissements: http://<IP_PUBLIQUE> :${PORT}/facilities`);
+  console.log(`⚙️ Administration: http://<IP_PUBLIQUE> :${PORT}/admin`);
+  console.log(`🔗 API: http://<IP_PUBLIQUE> :${PORT}/api`);
 });
+
