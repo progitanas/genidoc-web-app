@@ -2,12 +2,161 @@ const express = require("express");
 const app = express();
 const multer = require("multer");
 const path = require("path");
+// --- SQLite DB (lightweight persistence for users/patients) ---
+const DB_FILE = path.join(__dirname, "genidoc.sqlite");
 const fs = require("fs");
 const bcrypt = require("bcryptjs");
 const moment = require("moment");
 const { v4: uuidv4 } = require("uuid");
 const jwt = require("jsonwebtoken");
+
+// --- MULTI-DB: SQLite (local) + MySQL (Alibaba Cloud/RDS) ---
+let dbType = process.env.DB_TYPE || "sqlite"; // "mysql" ou "sqlite"
+let db = null;
+let mysqlPool = null;
+let mysql2 = null;
 const sqlite3 = require("sqlite3").verbose();
+
+// Alibaba Cloud RDS / MySQL config (exemple)
+const MYSQL_CONFIG = {
+  host: process.env.MYSQL_HOST || "rm-xxxxxx.mysql.rds.aliyuncs.com",
+  user: process.env.MYSQL_USER || "genidoc",
+  password: process.env.MYSQL_PASSWORD || "Alibaba2025!",
+  database: process.env.MYSQL_DATABASE || "genidoc",
+  port: process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT) : 3306,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+};
+
+function initDatabaseMulti(recreate = false) {
+  if (dbType === "mysql") {
+    try {
+      mysql2 = require("mysql2");
+      mysqlPool = mysql2.createPool(MYSQL_CONFIG);
+      db = {
+        run: (sql, params = [], cb) => mysqlPool.query(sql, params, cb),
+        get: (sql, params = [], cb) => mysqlPool.query(sql, params, (err, rows) => cb(err, rows && rows[0])),
+        all: (sql, params = [], cb) => mysqlPool.query(sql, params, (err, rows) => cb(err, rows)),
+      };
+      console.log("✅ Connecté à MySQL (Alibaba Cloud/RDS)");
+    } catch (e) {
+      console.error("❌ mysql2 non installé ou erreur de connexion, fallback SQLite", e);
+      dbType = "sqlite";
+    }
+  }
+  if (dbType === "sqlite") {
+    db = new sqlite3.Database(DB_FILE);
+    console.log("✅ Connecté à SQLite (local)");
+  }
+}
+
+
+
+// Utiliser la nouvelle fonction d'init multi-DB
+initDatabaseMulti(false);
+if (dbType === "mysql") {
+  // Appel de la fonction d'init MySQL/compatibilité
+  const { initDatabaseCompat } = require("./init-mysql.js");
+  initDatabaseCompat(false).then(() => {
+    console.log("✅ Schéma MySQL vérifié");
+  }).catch((e) => {
+    console.error("Erreur migration MySQL:", e);
+  });
+}
+
+// --- DB Utility Functions (Promise wrappers for async/await) ---
+function dbGet(sql, params = []) {
+  return new Promise((resolve, reject) => {
+    if (dbType === "mysql") {
+      db.get(sql, params, (err, row) => {
+        if (err) return reject(err);
+        resolve(row);
+      });
+    } else {
+      db.get(sql, params, (err, row) => {
+        if (err) return reject(err);
+        resolve(row);
+      });
+    }
+  });
+}
+
+function dbAll(sql, params = []) {
+  return new Promise((resolve, reject) => {
+    if (dbType === "mysql") {
+      db.all(sql, params, (err, rows) => {
+        if (err) return reject(err);
+        resolve(rows);
+      });
+    } else {
+      db.all(sql, params, (err, rows) => {
+        if (err) return reject(err);
+        resolve(rows);
+      });
+    }
+  });
+}
+
+function dbRun(sql, params = []) {
+  return new Promise((resolve, reject) => {
+    if (dbType === "mysql") {
+      db.run(sql, params, (err, result) => {
+        if (err) return reject(err);
+        resolve(result);
+      });
+    } else {
+      db.run(sql, params, function (err) {
+        if (err) return reject(err);
+        resolve(this);
+      });
+    }
+  });
+}
+
+
+// --- Utility: Normalize appointment row for API responses ---
+function mapAppointmentRow(row) {
+  if (!row) return null;
+  // Normalize status
+  let status = row.status || "en attente";
+  if (typeof status === "string") status = status.trim();
+  // Normalize date/time
+  let date = row.date || (row.scheduledDateTime ? row.scheduledDateTime.slice(0, 10) : null);
+  let time = row.time || (row.scheduledDateTime ? row.scheduledDateTime.slice(11, 16) : null);
+  // Normalize service/consultationType
+  let service = row.service || row.consultationType || row.appointmentType || "Consultation";
+  // Normalize establishment fields
+  let establishment = row.establishment_name || row.establishment || "";
+  let ville = row.establishment_ville || row.ville || "";
+  let specialite = row.establishment_specialite || row.specialite || "";
+  return {
+    id: row.id,
+    appointmentNumber: row.appointmentNumber,
+    fullName: row.fullName || row.patientName || row.patient || "Patient",
+    email: row.email || row.patientEmail || "",
+    phone: row.phone || "",
+    service,
+    mode: row.mode || "",
+    date,
+    time,
+    notes: row.notes || "",
+    status,
+    patientId: row.patientId,
+    doctorId: row.doctorId,
+    userId: row.userId,
+    facilityId: row.facilityId,
+    appointmentType: row.appointmentType || row.consultationType || row.service || "",
+    scheduledDateTime: row.scheduledDateTime,
+    genidocId: row.genidocId,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+    establishment_id: row.establishment_id,
+    establishment_name: establishment,
+    establishment_ville: ville,
+    establishment_specialite: specialite,
+  };
+}
 
 let patients = [];
 let doctors = [];
@@ -15,9 +164,9 @@ let medicalFacilities = [];
 let localAlerts = [];
 let users = []; // For admin users
 
-// --- SQLite DB (lightweight persistence for users/patients) ---
-const DB_FILE = path.join(__dirname, "genidoc.sqlite");
-const db = new sqlite3.Database(DB_FILE);
+
+
+// db est déjà initialisé par initDatabaseMulti
 // Promise that resolves when DB schema migrations/rebuilds are finished
 let migrationsReady = Promise.resolve();
 let _resolveMigrations = null;
@@ -140,451 +289,39 @@ function initDatabase(recreate = false) {
       )
     `);
 
-    db.run(`
-      CREATE TABLE IF NOT EXISTS appointments (
-        id TEXT PRIMARY KEY,
-        appointmentNumber TEXT UNIQUE,
-        fullName TEXT,
-        email TEXT,
-        phone TEXT,
-        service TEXT,
-        consultationType TEXT,
-        date TEXT,
-        time TEXT,
-        mode TEXT,
-        notes TEXT,
-        status TEXT,
-        patientId TEXT,
-        doctorId TEXT,
-        userId TEXT,
-        facilityId TEXT,
-        appointmentType TEXT,
-        scheduledDateTime TEXT,
-        establishment_id TEXT,
-        establishment_name TEXT,
-        establishment_ville TEXT,
-        establishment_specialite TEXT,
-        genidocId TEXT,
-        createdAt TEXT,
-        updatedAt TEXT,
-        FOREIGN KEY(patientId) REFERENCES patients(id) ON DELETE SET NULL,
-        FOREIGN KEY(doctorId) REFERENCES doctors(id) ON DELETE SET NULL,
-        FOREIGN KEY(userId) REFERENCES users(id) ON DELETE SET NULL,
-        FOREIGN KEY(facilityId) REFERENCES establishments(id) ON DELETE SET NULL
-      )
-    `);
-
-    // --- MIGRATION: Ensure 'specialite' column exists in establishments table ---
-    db.all("PRAGMA table_info(establishments)", [], (estErr, estCols) => {
-      if (estErr) {
-        console.error("Failed to read establishments table info", estErr);
-        return;
-      }
-      const estNames = (estCols || []).map((c) => c.name);
-      if (!estNames.includes("specialite")) {
-        console.log(
-          "[DB MIGRATION] Adding missing 'specialite' column to establishments"
-        );
-        db.run(
-          `ALTER TABLE establishments ADD COLUMN specialite TEXT`,
-          (addErr) => {
-            if (addErr) {
-              console.error(
-                "Failed to add 'specialite' column to establishments:",
-                addErr
-              );
-            } else {
-              console.log(
-                "Migration applied: 'specialite' column added to establishments."
-              );
-            }
-          }
-        );
-      }
-    });
-
-    // Migration: if appointments table was created previously without certain columns,
-    // ensure the schema includes newer columns added during development.
-    db.all("PRAGMA table_info(appointments)", [], (piErr, cols) => {
-      if (piErr)
-        return console.error("Failed to read appointments table info", piErr);
-      const names = (cols || []).map((c) => c.name);
-      const columnsToEnsure = [
-        { name: "appointmentNumber", definition: "TEXT" },
-        { name: "fullName", definition: "TEXT" },
-        { name: "email", definition: "TEXT" },
-        { name: "phone", definition: "TEXT" },
-        { name: "service", definition: "TEXT" },
-        { name: "consultationType", definition: "TEXT" },
-        { name: "date", definition: "TEXT" },
-        { name: "time", definition: "TEXT" },
-        { name: "mode", definition: "TEXT" },
-        { name: "notes", definition: "TEXT" },
-        { name: "status", definition: "TEXT" },
-        { name: "patientId", definition: "TEXT" },
-        { name: "doctorId", definition: "TEXT" },
-        { name: "userId", definition: "TEXT" },
-        { name: "facilityId", definition: "TEXT" },
-        { name: "appointmentType", definition: "TEXT" },
-        { name: "scheduledDateTime", definition: "TEXT" },
-        { name: "establishment_id", definition: "TEXT" },
-        { name: "establishment_name", definition: "TEXT" },
-        { name: "establishment_ville", definition: "TEXT" },
-        { name: "establishment_specialite", definition: "TEXT" },
-        { name: "genidocId", definition: "TEXT" },
-        { name: "createdAt", definition: "TEXT" },
-        { name: "updatedAt", definition: "TEXT" },
-      ];
-
-      const missing = columnsToEnsure.filter(
-        ({ name }) => !names.includes(name)
-      );
-      if (missing.length > 0) {
-        console.log(
-          "[DB MIGRATION] Missing columns in appointments:",
-          missing.map((m) => m.name)
-        );
-      }
-      missing.forEach(({ name, definition }) => {
-        console.log(
-          `Applying DB migration: adding '${name}' column to appointments`
-        );
-        db.run(
-          `ALTER TABLE appointments ADD COLUMN ${name} ${definition}`,
-          (aErr) => {
-            if (aErr)
-              console.error(
-                `Failed to add ${name} column to appointments:`,
-                aErr
-              );
-            else
-              console.log(
-                `Migration applied: ${name} column added to appointments.`
-              );
-          }
-        );
-      });
-
-      // If table structure still doesn't match our canonical schema (order, NOT NULLs,
-      // or column types), do a safe table rebuild: create a new table with the
-      // canonical columns, copy existing data into it (mapping existing columns),
-      // then swap tables. This handles historical schema drift that ALTER TABLE
-      // can't fix (like removing NOT NULL constraints or reordering columns).
-      // We expose a migrationsReady promise to signal completion so the server
-      // can wait before accepting inserts.
-      migrationsReady = new Promise((resolve) => {
-        _resolveMigrations = resolve;
-      });
-      (async () => {
-        try {
-          const current = await new Promise((resolve, reject) =>
-            db.all("PRAGMA table_info(appointments)", [], (e, rows) => {
-              if (e) reject(e);
-              else resolve(rows || []);
-            })
-          );
-          const currentNames = (current || []).map((c) => c.name);
-
-          const canonical = [
-            { name: "id", type: "TEXT" },
-            { name: "appointmentNumber", type: "TEXT" },
-            { name: "fullName", type: "TEXT" },
-            { name: "email", type: "TEXT" },
-            { name: "phone", type: "TEXT" },
-            { name: "service", type: "TEXT" },
-            { name: "consultationType", type: "TEXT" },
-            { name: "date", type: "TEXT" },
-            { name: "time", type: "TEXT" },
-            { name: "mode", type: "TEXT" },
-            { name: "notes", type: "TEXT" },
-            { name: "status", type: "TEXT" },
-            { name: "patientId", type: "TEXT" },
-            { name: "doctorId", type: "TEXT" },
-            { name: "userId", type: "TEXT" },
-            { name: "facilityId", type: "TEXT" },
-            { name: "appointmentType", type: "TEXT" },
-            { name: "scheduledDateTime", type: "TEXT" },
-            { name: "establishment_id", type: "TEXT" },
-            { name: "establishment_name", type: "TEXT" },
-            { name: "establishment_ville", type: "TEXT" },
-            { name: "establishment_specialite", type: "TEXT" },
-            { name: "genidocId", type: "TEXT" },
-            { name: "createdAt", type: "TEXT NOT NULL" },
-            { name: "updatedAt", type: "TEXT" },
-          ];
-
-          // Decide if rebuild is necessary: missing canonical names or NOT NULL mismatch
-          const missingAny = canonical.some(
-            (c) => !currentNames.includes(c.name)
-          );
-          const createdAtCol = current.find((c) => c.name === "createdAt");
-          const createdAtNotNull = createdAtCol
-            ? createdAtCol.notnull === 1
-            : false;
-
-          // If createdAt exists but is not NOT NULL, or missing columns exist, rebuild
-          if (missingAny || !createdAtNotNull) {
-            console.log(
-              "[DB MIGRATION] appointments table schema drift detected; rebuilding table to canonical schema."
-            );
-
-            const temp = "appointments_new";
-            const colDefs = canonical
-              .map((c) => `${c.name} ${c.type}`)
-              .join(",\n  ");
-
-            await new Promise((res, rej) =>
-              db.run(
-                `CREATE TABLE IF NOT EXISTS ${temp} (\n  ${colDefs},\n  PRIMARY KEY(id),\n  UNIQUE(appointmentNumber)\n)`,
-                (e) => (e ? rej(e) : res())
-              )
-            );
-
-            // Build select list: use existing column if present, otherwise NULL as col
-            const selectList = canonical
-              .map((c) =>
-                currentNames.includes(c.name) ? c.name : `NULL AS ${c.name}`
-              )
-              .join(", ");
-
-            const insertCols = canonical.map((c) => c.name).join(", ");
-
-            await new Promise((res, rej) =>
-              db.run(
-                `INSERT INTO ${temp} (${insertCols}) SELECT ${selectList} FROM appointments`,
-                (e) => (e ? rej(e) : res())
-              )
-            );
-
-            await new Promise((res, rej) =>
-              db.run(`DROP TABLE appointments`, (e) => (e ? rej(e) : res()))
-            );
-
-            await new Promise((res, rej) =>
-              db.run(`ALTER TABLE ${temp} RENAME TO appointments`, (e) =>
-                e ? rej(e) : res()
-              )
-            );
-
-            console.log(
-              "[DB MIGRATION] appointments table rebuilt successfully."
-            );
-          } else {
-            console.log(
-              "[DB MIGRATION] appointments schema looks ok (no rebuild needed)."
-            );
-          }
-          // signal that migrations/rebuild is complete
-          if (_resolveMigrations) _resolveMigrations();
-        } catch (rebuildErr) {
-          console.error(
-            "Failed to rebuild appointments table schema:",
-            rebuildErr
-          );
-          if (_resolveMigrations) _resolveMigrations();
-        }
-      })();
-    });
-
-    db.run(`
-      CREATE TABLE IF NOT EXISTS notifications (
-        id TEXT PRIMARY KEY,
-        userId TEXT,
-        type TEXT,
-        title TEXT,
-        message TEXT,
-        isRead INTEGER DEFAULT 0,
-        createdAt TEXT,
-        FOREIGN KEY(userId) REFERENCES users(id) ON DELETE CASCADE
-      )
+        db.run(`
+          CREATE TABLE IF NOT EXISTS appointments (
+            id TEXT PRIMARY KEY,
+            appointmentNumber TEXT UNIQUE,
+            fullName TEXT,
+            email TEXT,
+            phone TEXT,
+            service TEXT,
+            consultationType TEXT,
+            date TEXT,
+            time TEXT,
+            mode TEXT,
+            notes TEXT,
+            status TEXT,
+            patientId TEXT,
+            doctorId TEXT,
+            userId TEXT,
+            facilityId TEXT,
+            appointmentType TEXT,
+            scheduledDateTime TEXT,
+            genidocId TEXT,
+            createdAt DATETIME,
+            updatedAt DATETIME,
+            establishment_id TEXT,
+            establishment_name TEXT,
+            establishment_ville TEXT,
+            establishment_specialite TEXT
+          )
         `);
-
-    db.run(`
-      CREATE TABLE IF NOT EXISTS payments (
-        id TEXT PRIMARY KEY,
-        transactionId TEXT UNIQUE,
-        appointmentId TEXT,
-        userId TEXT,
-        amount REAL,
-        currency TEXT,
-        status TEXT,
-        createdAt TEXT
-      )
-    `);
-
-    db.run(`
-      CREATE TABLE IF NOT EXISTS blacklisted_tokens (
-        id TEXT PRIMARY KEY,
-        token TEXT UNIQUE,
-        userId TEXT,
-        expiresAt TEXT,
-        createdAt TEXT
-      )
-    `);
-
-    db.run(`
-      CREATE TABLE IF NOT EXISTS establishments (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        email TEXT UNIQUE,
-        city TEXT,
-        address TEXT,
-        phone TEXT,
-        adminUserId TEXT,
-        createdAt TEXT,
-        FOREIGN KEY(adminUserId) REFERENCES users(id) ON DELETE SET NULL
-      )
-    `);
-
-    // Seed a default admin if none exists
-    db.get(`SELECT id FROM users WHERE role = 'ADMIN' LIMIT 1`, (err, row) => {
-      if (err) return console.error("DB seed error", err);
-      if (!row) {
-        const adminId = uuidv4();
-        const hashed = bcrypt.hashSync("AdminGeniDoc2025!", 10);
-        db.run(
-          `INSERT INTO users (id, email, password, firstName, lastName, role, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          [
-            adminId,
-            "admin@genidoc.ma",
-            hashed,
-            "Admin",
-            "GeniDoc",
-            "ADMIN",
-            new Date().toISOString(),
-          ],
-          (e) => {
-            if (e) console.error("Failed to seed admin", e);
-            else
-              console.log(
-                "Seeded default admin: admin@genidoc.ma / AdminGeniDoc2025!"
-              );
-          }
-        );
-      }
-    });
-  });
-}
-
-// Initialize DB on startup (do not recreate by default)
-initDatabase(false);
-
-// --- Add a column to all tables if not exists (SQLite) ---
-function alterAllTablesAddColumn(columnName, columnType) {
-  db.all("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'", [], (err, tables) => {
-    if (err) {
-      console.error("Failed to list tables:", err);
-      return;
-    }
-    tables.forEach((t) => {
-      const table = t.name;
-      db.all(`PRAGMA table_info(${table})`, [], (err2, cols) => {
-        if (err2) return;
-        const colNames = cols.map((c) => c.name);
-        if (!colNames.includes(columnName)) {
-          db.run(`ALTER TABLE ${table} ADD COLUMN ${columnName} ${columnType}`, (err3) => {
-            if (err3) {
-              console.warn(`Could not alter ${table}:`, err3.message);
-            } else {
-              console.log(`Added column ${columnName} to ${table}`);
-            }
-          });
-        }
       });
-    });
-  });
-}
+    }
 
-// Example usage: add 'updated_at' column to all tables
-alterAllTablesAddColumn('updated_at', 'TEXT');
-
-// Seed establishments and admin users from credentials file
-function seedEstablishmentsFromFile() {
-  const credsPath = path.join(__dirname, "establishments-credentials.txt");
-
-  if (!fs.existsSync(credsPath)) {
-    console.log("No establishments credentials file found, skipping seeding.");
-    return;
-  }
-  // (If you have seeding logic, it goes here)
-}
-
-// Run seeding after DB init
-seedEstablishmentsFromFile();
-
-// Helper: generate unique GeniDoc ID (GD-XXXXXX)
-function generateGenidocId() {
-  // Simple random 6-digit generator. In production, ensure uniqueness against DB.
-  return `GD-${Math.floor(100000 + Math.random() * 900000)}`;
-}
-
-function mapAppointmentRow(row) {
-  if (!row) return null;
-  return {
-    id: row.id,
-    appointmentNumber: row.appointmentNumber,
-    fullName: row.fullName,
-    email: row.email,
-    phone: row.phone,
-    service: row.service,
-    consultationType: row.consultationType,
-    date: row.date,
-    time: row.time,
-    mode: row.mode,
-    notes: row.notes,
-    status: row.status,
-    doctorId: row.doctorId,
-    facilityId: row.facilityId,
-    appointmentType: row.appointmentType,
-    scheduledDateTime: row.scheduledDateTime,
-    genidocId: row.genidocId,
-    createdAt: row.createdAt,
-    updatedAt: row.updatedAt,
-    establishment_id: row.establishment_id,
-    establishment_name: row.establishment_name,
-    establishment_ville: row.establishment_ville,
-    establishment_specialite: row.establishment_specialite,
-  };
-}
-
-function dbGet(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.get(sql, params, (err, row) => {
-      if (err) reject(err);
-      else resolve(row);
-    });
-  });
-}
-
-function dbAll(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.all(sql, params, (err, rows) => {
-      if (err) reject(err);
-      else resolve(rows || []);
-    });
-  });
-}
-
-function dbRun(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.run(sql, params, function (err) {
-      if (err) {
-        // Enhanced logging for constraint and SQL errors to aid debugging
-        try {
-          console.error("DB RUN ERROR:", {
-            message: err && err.message ? err.message : err,
-            code: err && err.code ? err.code : undefined,
-            sql: sql,
-            params: params,
-          });
-        } catch (loggingErr) {
-          console.error("Failed to log DB error details", loggingErr);
-        }
-        reject(err);
-      } else resolve(this);
-    });
-  });
-}
+// ...existing code...
 
 // --- CONFIGURATION MULTER ---
 const storage = multer.diskStorage({
@@ -2604,4 +2341,3 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`⚙️ Administration: http://<IP_PUBLIQUE> :${PORT}/admin`);
   console.log(`🔗 API: http://<IP_PUBLIQUE> :${PORT}/api`);
 });
-
