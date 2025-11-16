@@ -1,21 +1,17 @@
 const express = require("express");
-// optional: socket.io + nodemailer
 let io = null;
 try {
   io = require("socket.io");
 } catch (e) {
-  /** not installed */
 }
 let nodemailer = null;
 try {
   nodemailer = require("nodemailer");
 } catch (e) {
-  /** not installed */
 }
 const app = express();
 const multer = require("multer");
 const path = require("path");
-// --- SQLite DB (lightweight persistence for users/patients) ---
 const DB_FILE = path.join(__dirname, "genidoc.sqlite");
 const fs = require("fs");
 const bcrypt = require("bcryptjs");
@@ -23,7 +19,6 @@ const moment = require("moment");
 const { v4: uuidv4 } = require("uuid");
 const jwt = require("jsonwebtoken");
 
-// --- MULTI-DB: SQLite (local) + MySQL (Alibaba Cloud/RDS) ---
 let dbType = process.env.DB_TYPE || "sqlite"; // "mysql" ou "sqlite"
 let db = null;
 let mysqlPool = null;
@@ -56,10 +51,7 @@ function initDatabaseMulti(recreate = false) {
       };
       console.log("✅ Connecté à MySQL (Alibaba Cloud/RDS)");
     } catch (e) {
-      console.error(
-        "❌ mysql2 non installé ou erreur de connexion, fallback SQLite",
-        e
-      );
+      console.error("❌ mysql2 non installé ou erreur de connexion, fallback SQLite", e);
       dbType = "sqlite";
     }
   }
@@ -68,7 +60,6 @@ function initDatabaseMulti(recreate = false) {
     console.log("✅ Connecté à SQLite (local)");
   }
 }
-
 // Utiliser la nouvelle fonction d'init multi-DB
 initDatabaseMulti(false);
 if (dbType === "mysql") {
@@ -132,25 +123,16 @@ function dbRun(sql, params = []) {
   });
 }
 
-// --- Utility: Normalize appointment row for API responses ---
 function mapAppointmentRow(row) {
   if (!row) return null;
   // Normalize status
   let status = row.status || "en attente";
   if (typeof status === "string") status = status.trim();
   // Normalize date/time
-  let date =
-    row.date ||
-    (row.scheduledDateTime ? row.scheduledDateTime.slice(0, 10) : null);
-  let time =
-    row.time ||
-    (row.scheduledDateTime ? row.scheduledDateTime.slice(11, 16) : null);
+  let date = row.date || (row.scheduledDateTime ? row.scheduledDateTime.slice(0, 10) : null);
+  let time = row.time || (row.scheduledDateTime ? row.scheduledDateTime.slice(11, 16) : null);
   // Normalize service/consultationType
-  let service =
-    row.service ||
-    row.consultationType ||
-    row.appointmentType ||
-    "Consultation";
+  let service = row.service || row.consultationType || row.appointmentType || "Consultation";
   // Normalize establishment fields
   let establishment = row.establishment_name || row.establishment || "";
   let ville = row.establishment_ville || row.ville || "";
@@ -172,7 +154,8 @@ function mapAppointmentRow(row) {
     userId: row.userId,
     facilityId: row.facilityId,
     appointmentType:
-      row.appointmentType || row.consultationType || row.service || "",
+    row.appointmentType || row.consultationType || row.service || "",
+    appointmentType: row.appointmentType || row.consultationType || row.service || "",
     scheduledDateTime: row.scheduledDateTime,
     genidocId: row.genidocId,
     createdAt: row.createdAt,
@@ -183,7 +166,7 @@ function mapAppointmentRow(row) {
     establishment_specialite: specialite,
   };
 }
-
+let patients = [];
 let doctors = [];
 let medicalFacilities = [];
 let localAlerts = [];
@@ -311,8 +294,7 @@ function initDatabase(recreate = false) {
         FOREIGN KEY(establishmentId) REFERENCES establishments(id) ON DELETE SET NULL
       )
     `);
-
-    db.run(`
+        db.run(`
           CREATE TABLE IF NOT EXISTS appointments (
             id TEXT PRIMARY KEY,
             appointmentNumber TEXT UNIQUE,
@@ -341,7 +323,6 @@ function initDatabase(recreate = false) {
             establishment_specialite TEXT
           )
         `);
-
     // Social coverage requests (AMO / RAMED)
     db.run(`
         CREATE TABLE IF NOT EXISTS social_requests (
@@ -372,8 +353,6 @@ function initDatabase(recreate = false) {
       `);
   });
 }
-
-// ...existing code...
 
 // --- CONFIGURATION MULTER ---
 const storage = multer.diskStorage({
@@ -2440,92 +2419,7 @@ app.get(/^\/(.+)$/, (req, res, next) => {
 
 // ...existing code...
 
-// --- DOCTOR PROFILE ENDPOINT (universel : doctorId OU userId) ---
-app.get("/api/doctor/:id", async (req, res) => {
-  console.log("[API] /api/doctor/:id hit", req.params.id);
-  try {
-    const id = req.params.id;
-    // 1. Cherche par doctorId
-    db.get(
-      `SELECT u.id as userId, u.firstName as userFirstName, u.lastName as userLastName, u.email, u.phone as userPhone,
-              d.id as doctorId, d.firstName as doctorFirstName, d.lastName as doctorLastName, d.phone as doctorPhone, d.specialty, d.birthdate, d.establishmentId,
-              e.name AS establishmentName, e.id AS establishmentId, e.city AS establishmentCity, e.specialite AS establishmentSpecialty
-       FROM doctors d
-       LEFT JOIN users u ON d.userId = u.id
-       LEFT JOIN establishments e ON e.id = d.establishmentId
-       WHERE d.id = ?`,
-      [id],
-      async (err, row) => {
-        if (err) {
-          console.log("[API] doctorId SQL error", err);
-          return res.status(500).json({ success: false, message: "Erreur DB" });
-        }
-        if (row) {
-          console.log("[API] doctorId found", row);
-          let establishmentAppointments = [];
-          if (row.establishmentId) {
-            try {
-              establishmentAppointments = await dbAll(
-                `SELECT * FROM appointments WHERE establishment_id = ? ORDER BY datetime(COALESCE(updatedAt, createdAt)) DESC`,
-                [row.establishmentId]
-              );
-            } catch (e) {
-              console.log("[API] doctorId appointments error", e);
-            }
-          }
-          return res.json({
-            success: true,
-            data: { ...row, establishmentAppointments },
-          });
-        }
-        // 2. Sinon, cherche par userId (fallback)
-        db.get(
-          `SELECT u.id as userId, u.firstName as userFirstName, u.lastName as userLastName, u.email, u.phone as userPhone,
-                  d.id as doctorId, d.firstName as doctorFirstName, d.lastName as doctorLastName, d.phone as doctorPhone, d.specialty, d.birthdate, d.establishmentId,
-                  e.name AS establishmentName, e.id AS establishmentId, e.city AS establishmentCity, e.specialite AS establishmentSpecialty
-           FROM users u
-           LEFT JOIN doctors d ON d.userId = u.id
-           LEFT JOIN establishments e ON e.id = d.establishmentId
-           WHERE u.id = ? AND u.role = 'DOCTOR'`,
-          [id],
-          async (err2, row2) => {
-            if (err2) {
-              console.log("[API] userId SQL error", err2);
-              return res
-                .status(500)
-                .json({ success: false, message: "Erreur DB" });
-            }
-            if (!row2) {
-              console.log("[API] userId not found", id);
-              return res
-                .status(404)
-                .json({ success: false, message: "Médecin non trouvé" });
-            }
-            console.log("[API] userId found", row2);
-            let establishmentAppointments = [];
-            if (row2.establishmentId) {
-              try {
-                establishmentAppointments = await dbAll(
-                  `SELECT * FROM appointments WHERE establishment_id = ? ORDER BY datetime(COALESCE(updatedAt, createdAt)) DESC`,
-                  [row2.establishmentId]
-                );
-              } catch (e) {
-                console.log("[API] userId appointments error", e);
-              }
-            }
-            return res.json({
-              success: true,
-              data: { ...row2, establishmentAppointments },
-            });
-          }
-        );
-      }
-    );
-  } catch (err) {
-    console.log("[API] /api/doctor/:id exception", err);
-    res.status(500).json({ success: false, message: "Erreur serveur" });
-  }
-});
+// (Removed duplicate /api/doctor/:id endpoint to avoid route conflicts)
 
 // Route 404 JSON fallback (doit être tout à la fin)
 app.use((req, res) => {
@@ -2652,3 +2546,4 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log(`⚙️ Administration: http://<IP_PUBLIQUE> :${PORT}/admin`);
   console.log(`🔗 API: http://<IP_PUBLIQUE> :${PORT}/api`);
 });
+
