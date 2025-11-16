@@ -2,13 +2,11 @@ const express = require("express");
 let io = null;
 try {
   io = require("socket.io");
-} catch (e) {
-}
+} catch (e) {}
 let nodemailer = null;
 try {
   nodemailer = require("nodemailer");
-} catch (e) {
-}
+} catch (e) {}
 const app = express();
 const multer = require("multer");
 const path = require("path");
@@ -18,6 +16,13 @@ const bcrypt = require("bcryptjs");
 const moment = require("moment");
 const { v4: uuidv4 } = require("uuid");
 const jwt = require("jsonwebtoken");
+
+// Helper to generate a unique GeniDoc ID (GD-XXXXXX)
+function generateGenidocId() {
+  // 6 random digits, zero-padded
+  const num = Math.floor(100000 + Math.random() * 900000);
+  return `GD-${num}`;
+}
 
 let dbType = process.env.DB_TYPE || "sqlite"; // "mysql" ou "sqlite"
 let db = null;
@@ -51,7 +56,10 @@ function initDatabaseMulti(recreate = false) {
       };
       console.log("✅ Connecté à MySQL (Alibaba Cloud/RDS)");
     } catch (e) {
-      console.error("❌ mysql2 non installé ou erreur de connexion, fallback SQLite", e);
+      console.error(
+        "❌ mysql2 non installé ou erreur de connexion, fallback SQLite",
+        e
+      );
       dbType = "sqlite";
     }
   }
@@ -129,10 +137,18 @@ function mapAppointmentRow(row) {
   let status = row.status || "en attente";
   if (typeof status === "string") status = status.trim();
   // Normalize date/time
-  let date = row.date || (row.scheduledDateTime ? row.scheduledDateTime.slice(0, 10) : null);
-  let time = row.time || (row.scheduledDateTime ? row.scheduledDateTime.slice(11, 16) : null);
+  let date =
+    row.date ||
+    (row.scheduledDateTime ? row.scheduledDateTime.slice(0, 10) : null);
+  let time =
+    row.time ||
+    (row.scheduledDateTime ? row.scheduledDateTime.slice(11, 16) : null);
   // Normalize service/consultationType
-  let service = row.service || row.consultationType || row.appointmentType || "Consultation";
+  let service =
+    row.service ||
+    row.consultationType ||
+    row.appointmentType ||
+    "Consultation";
   // Normalize establishment fields
   let establishment = row.establishment_name || row.establishment || "";
   let ville = row.establishment_ville || row.ville || "";
@@ -154,8 +170,9 @@ function mapAppointmentRow(row) {
     userId: row.userId,
     facilityId: row.facilityId,
     appointmentType:
-    row.appointmentType || row.consultationType || row.service || "",
-    appointmentType: row.appointmentType || row.consultationType || row.service || "",
+      row.appointmentType || row.consultationType || row.service || "",
+    appointmentType:
+      row.appointmentType || row.consultationType || row.service || "",
     scheduledDateTime: row.scheduledDateTime,
     genidocId: row.genidocId,
     createdAt: row.createdAt,
@@ -294,7 +311,7 @@ function initDatabase(recreate = false) {
         FOREIGN KEY(establishmentId) REFERENCES establishments(id) ON DELETE SET NULL
       )
     `);
-        db.run(`
+    db.run(`
           CREATE TABLE IF NOT EXISTS appointments (
             id TEXT PRIMARY KEY,
             appointmentNumber TEXT UNIQUE,
@@ -2546,4 +2563,3 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log(`⚙️ Administration: http://<IP_PUBLIQUE> :${PORT}/admin`);
   console.log(`🔗 API: http://<IP_PUBLIQUE> :${PORT}/api`);
 });
-
