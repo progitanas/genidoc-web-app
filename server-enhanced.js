@@ -1,3 +1,10 @@
+// Helper to generate a unique GeniDoc ID (GD-XXXXXX)
+function generateGenidocId() {
+  // 6 random digits, zero-padded
+  const num = Math.floor(100000 + Math.random() * 900000);
+  return `GD-${num}`;
+}
+
 const express = require("express");
 let io = null;
 try {
