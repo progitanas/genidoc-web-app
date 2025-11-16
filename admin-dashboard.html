@@ -389,6 +389,10 @@
         </button>
         <button class="tab-btn" onclick="switchTab(1)">Médecins</button>
         <button class="tab-btn" onclick="switchTab(2)">Rendez-vous</button>
+        <button class="tab-btn" onclick="switchTab(4)">
+          Demandes sociales
+        </button>
+        <button class="tab-btn" onclick="switchTab(5)">Support</button>
         <button
           class="tab-btn"
           title="Paramètres"
@@ -493,6 +497,58 @@
               </tr>
             </thead>
             <tbody id="appointment-list">
+              <tr>
+                <td colspan="6" style="text-align: center; color: #999">
+                  Chargement...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SOCIAL REQUESTS TAB -->
+      <div id="tab-4" class="tab-content">
+        <div class="card">
+          <h2>Demandes de couverture sociale</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>UniqueID</th>
+                <th>Type</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="social-requests-list">
+              <tr>
+                <td colspan="6" style="text-align: center; color: #999">
+                  Chargement...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SUPPORT TAB -->
+      <div id="tab-5" class="tab-content">
+        <div class="card">
+          <h2>Tickets Support</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Utilisateur</th>
+                <th>Sujet</th>
+                <th>Message</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="support-list">
               <tr>
                 <td colspan="6" style="text-align: center; color: #999">
                   Chargement...
@@ -783,6 +839,78 @@
               )
               .join("");
           }
+
+          // Load social requests (admin only)
+          try {
+            const sr = await secureFetch(`${API}/social-requests`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            const srj = await sr.json();
+            if (srj.success) {
+              const el = document.getElementById("social-requests-list");
+              if (!srj.data.length)
+                el.innerHTML =
+                  '<tr><td colspan="6" style="text-align:center;color:#999">Aucune demande</td></tr>';
+              else
+                el.innerHTML = srj.data
+                  .map(
+                    (r) => `
+                    <tr>
+                      <td>${r.id}</td>
+                      <td>${r.fullname}</td>
+                      <td>${r.uniqueid}</td>
+                      <td>${r.coverageType}</td>
+                      <td>${r.status}</td>
+                      <td>
+                        <button class="btn btn-primary" title="Marquer ticket en cours" onclick="adminUpdateSupport('${s.id}','in_progress')">En cours</button>
+                        <button class="btn btn-secondary" title="Clôturer le ticket" onclick="adminUpdateSupport('${s.id}','closed')">Clôturer</button>
+                      </td>
+                    </tr>
+                  `
+                  )
+                  .join("");
+            }
+          } catch (e) {
+            console.warn("Could not load social requests:", e);
+          }
+
+          // Load support tickets
+          try {
+            const sp = await secureFetch(`${API}/support`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            const spj = await sp.json();
+            if (spj.success) {
+              const el = document.getElementById("support-list");
+              if (!spj.data.length)
+                el.innerHTML =
+                  '<tr><td colspan="6" style="text-align:center;color:#999">Aucun ticket</td></tr>';
+              else
+                el.innerHTML = spj.data
+                  .map(
+                    (s) => `
+                    <tr>
+                      <td>${s.id}</td>
+                      <td>${s.userId || "Anonyme"}</td>
+                      <td>${s.subject}</td>
+                      <td>${s.message}</td>
+                      <td>${s.status}</td>
+                      <td>
+                        <button class="btn btn-primary" onclick="adminUpdateSupport('${
+                          s.id
+                        }','in_progress')">En cours</button>
+                        <button class="btn btn-secondary" onclick="adminUpdateSupport('${
+                          s.id
+                        }','closed')">Clôturer</button>
+                      </td>
+                    </tr>
+                  `
+                  )
+                  .join("");
+            }
+          } catch (e) {
+            console.warn("Could not load support tickets", e);
+          }
         } catch (error) {
           if (error.message !== "Déconnecté") {
             console.error("Error loading dashboard:", error);
@@ -797,6 +925,51 @@
       function deleteDoctor(doctorId) {
         if (confirm("Êtes-vous sûr de vouloir supprimer ce médecin?")) {
           alert("Fonction supprimer médecin à implémenter");
+        }
+      }
+
+      // Admin actions for social requests
+      async function adminUpdateSocial(id, status) {
+        if (!confirm("Confirmer la mise à jour du statut ?")) return;
+        try {
+          const token = localStorage.getItem("token");
+          const res = await secureFetch(`${API}/social-requests/${id}/status`, {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ status }),
+          });
+          const j = await res.json();
+          if (j.success) {
+            alert("Statut mis à jour");
+            loadDashboard();
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      async function adminUpdateSupport(id, status) {
+        if (!confirm("Confirmer la mise à jour du ticket ?")) return;
+        try {
+          const token = localStorage.getItem("token");
+          const res = await secureFetch(`${API}/support/${id}/status`, {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ status }),
+          });
+          const j = await res.json();
+          if (j.success) {
+            alert("Ticket mis à jour");
+            loadDashboard();
+          }
+        } catch (e) {
+          console.error(e);
         }
       }
 

@@ -951,42 +951,57 @@
 
     <!-- Contenu principal -->
     <main class="main-content">
-            <div style="display:flex;justify-content:center;margin-bottom:18px;">
-              <button id="btn-patient-dashboard" style="background:#2056AE;color:#fff;padding:10px 22px;border-radius:10px;font-weight:700;border:none;cursor:pointer;font-size:1em;box-shadow:0 2px 8px #2056ae22;">Mon espace patient</button>
-            </div>
-            <script>
-              document.getElementById('btn-patient-dashboard').onclick = function() {
-                console.log('[LOG] Bouton Mon espace patient cliqué');
-                const params = new URLSearchParams(window.location.search);
-                const genidocId = params.get("genidocId");
-                let url = "patients/dashboard-patient.html";
-                if (genidocId) {
-                  url += `?genidocId=${genidocId}`;
-                  console.log('[LOG] genidocId trouvé:', genidocId);
-                } else {
-                  console.warn('[LOG] Aucun genidocId trouvé dans l\'URL');
-                }
-                console.log('[LOG] Redirection vers:', url);
-                window.location.href = url;
-              };
-            </script>
-            <!-- Bouton dashboard patient : redirige avec genidocId -->
-            <script>
-              document.getElementById('btn-patient-dashboard').onclick = function() {
-                console.log('[DEBUG] Bouton Mon espace patient cliqué');
-                const params = new URLSearchParams(window.location.search);
-                const genidocId = params.get("genidocId");
-                let url = "patients/dashboard-patient.html";
-                if (genidocId) {
-                  url += `?genidocId=${genidocId}`;
-                  console.log('[DEBUG] genidocId trouvé:', genidocId);
-                } else {
-                  console.warn('[DEBUG] Aucun genidocId trouvé dans l\'URL');
-                }
-                console.log('[DEBUG] Redirection vers:', url);
-                window.location.href = url;
-              };
-            </script>
+      <div style="display: flex; justify-content: center; margin-bottom: 18px">
+        <button
+          id="btn-patient-dashboard"
+          style="
+            background: #2056ae;
+            color: #fff;
+            padding: 10px 22px;
+            border-radius: 10px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            box-shadow: 0 2px 8px #2056ae22;
+          "
+        >
+          Mon espace patient
+        </button>
+      </div>
+      <script>
+        document.getElementById("btn-patient-dashboard").onclick = function () {
+          console.log("[LOG] Bouton Mon espace patient cliqué");
+          const params = new URLSearchParams(window.location.search);
+          const genidocId = params.get("genidocId");
+          let url = "patients/dashboard-patient.html";
+          if (genidocId) {
+            url += `?genidocId=${genidocId}`;
+            console.log("[LOG] genidocId trouvé:", genidocId);
+          } else {
+            console.warn("[LOG] Aucun genidocId trouvé dans l'URL");
+          }
+          console.log("[LOG] Redirection vers:", url);
+          window.location.href = url;
+        };
+      </script>
+      <!-- Bouton dashboard patient : redirige avec genidocId -->
+      <script>
+        document.getElementById("btn-patient-dashboard").onclick = function () {
+          console.log("[DEBUG] Bouton Mon espace patient cliqué");
+          const params = new URLSearchParams(window.location.search);
+          const genidocId = params.get("genidocId");
+          let url = "patients/dashboard-patient.html";
+          if (genidocId) {
+            url += `?genidocId=${genidocId}`;
+            console.log("[DEBUG] genidocId trouvé:", genidocId);
+          } else {
+            console.warn("[DEBUG] Aucun genidocId trouvé dans l'URL");
+          }
+          console.log("[DEBUG] Redirection vers:", url);
+          window.location.href = url;
+        };
+      </script>
       <!-- Annonce GeniDoc GPT -->
       <div
         style="
@@ -1059,6 +1074,29 @@
 
       <!-- Grille des modules/fonctionnalités -->
       <section class="modules-grid">
+        <!-- MODULE: Demande Couverture Sociale -->
+        <div
+          class="module-card"
+          onclick="window.location.href='social-coverage-request.html'"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <rect x="3" y="5" width="18" height="14" rx="4" />
+              <path d="M7 9h10M7 13h7M7 17h4" />
+              <circle cx="19" cy="7" r="2" fill="#2056ae" stroke="none" />
+            </svg>
+          </div>
+          <h3>Demande couverture sociale</h3>
+          <p>
+            Soumettez et suivez vos demandes AMO/RAMED en ligne, vérifiez votre
+            éligibilité et accédez à vos droits sociaux.
+          </p>
+        </div>
         <!-- MODULE: Consultation à distance (Dashboard global) -->
         <div
           class="module-card"

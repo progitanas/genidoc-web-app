@@ -1,14 +1,13 @@
-
 <!DOCTYPE html>
 <html lang="fr">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>GeniDoc — Votre santé mérite mieux qu'une salle d'attente</title>
+    <title>GeniDoc — Your health deserves better than a waiting room</title>
     <meta
       name="description"
-      content="Trouvez un médecin, CHU ou clinique au Maroc en quelques secondes. Prenez rendez-vous en ligne facilement."
+      content="Find a doctor, university hospital, or clinic in Morocco in seconds. Book appointments online easily."   
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -16,19 +15,11 @@
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect fill='%232563eb' width='32' height='32' rx='6'/><text x='16' y='22' text-anchor='middle' fill='white' font-size='18' font-weight='700'>G</text></svg>"
-    />
+    <link rel="icon" type="image/png" href="static/ong_GeniDoc1preview.png" />
     <link rel="stylesheet" href="styles/main.css" />
 
     <style>
-      /* ========================================================================
-         🎨 DESIGN SYSTEM FORMEL - VARIABLES STANDARDISÉES
-         ======================================================================== */
       :root {
-        /* ===== COULEURS PRIMAIRES & PALETTE ===== */
         --color-primary: #c71f37;
         --color-primary-dark: #a01829;
         --color-primary-light: #e8394d;
@@ -36,7 +27,6 @@
         --color-secondary-blue: #2563eb;
         --color-secondary-cyan: #06b6d4;
         
-        /* ===== NEUTRAL COLORS ===== */
         --color-text-primary: #1f1f1f;
         --color-text-secondary: #6a7a8a;
         --color-text-light: #9ca3af;
@@ -45,14 +35,12 @@
         --color-bg-tertiary: #fafbf8;
         --color-border: #e5e7eb;
         
-        /* ===== SHADOWS SYSTEM ===== */
         --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
         --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(34, 197, 94, 0.08);
         --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(34, 197, 94, 0.12);
         --shadow-lg: 0 8px 24px rgba(34, 197, 94, 0.18), 0 12px 40px rgba(34, 197, 94, 0.12), 0 16px 56px rgba(10, 61, 26, 0.08);
         --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.15), 0 20px 64px rgba(0, 0, 0, 0.1);
         
-        /* ===== SPACING SCALE (8px BASE) ===== */
         --space-xs: 4px;
         --space-sm: 8px;
         --space-md: 16px;
@@ -62,13 +50,11 @@
         --space-3xl: 64px;
         --space-4xl: 96px;
         
-        /* ===== TRANSITIONS & ANIMATIONS ===== */
         --transition-fast: 0.15s ease;
         --transition-base: 0.3s ease;
         --transition-slow: 0.5s ease;
         --transition-slower: 0.7s ease;
         
-        /* ===== BORDER RADIUS ===== */
         --radius-sm: 6px;
         --radius-md: 12px;
         --radius-lg: 20px;
@@ -2331,9 +2317,12 @@
       }
 
       .popular-services-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        display: flex;
+        flex-wrap: wrap;
         gap: 24px;
+        justify-content: center;
+        align-items: stretch;
+        width: 100%;
       }
 
       .service-card {
@@ -2344,6 +2333,10 @@
         overflow: hidden;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         transition: all var(--transition-base);
+        flex: 1 1 280px;
+        min-width: 260px;
+        max-width: 340px;
+        margin: 0 8px 16px 8px;
       }
 
       .service-card:hover {
@@ -2486,7 +2479,7 @@
       }
 
       .step-number {
-        width: 56px;
+                      width: 56px;
         height: 56px;
         border-radius: 50%;
         background-color: var(--color-primary);
@@ -3156,14 +3149,6 @@
         animation: ripple 0.6s ease-out;
       }
 
-      @keyframes ripple {
-        to {
-          width: 300px;
-          height: 300px;
-          opacity: 0;
-        }
-      }
-
       /* Logo Easter Egg Animation */
       .logo:hover {
         animation: logoWiggle 0.5s ease-in-out;
@@ -3202,11 +3187,11 @@
       @keyframes slideInAchievement {
         from {
           opacity: 0;
-          transform: translateY(100px);
+          transform: translate(-50%, -50%) scale(0.5);
         }
         to {
           opacity: 1;
-          transform: translateY(0);
+          transform: translate(-50%, -50%) scale(1);
         }
       }
 
@@ -3476,7 +3461,7 @@
 
           <div class="top-bar-dropdown">
             <button class="top-bar-link top-bar-dropdown-btn">
-              GeniDoc Offres d'Emploi
+              GeniDoc Job Openings
               <svg
                 width="12"
                 height="8"
@@ -3491,9 +3476,9 @@
               </svg>
             </button>
             <div class="top-bar-dropdown-menu">
-              <a href="/browse-jobs.html">Parcourir les offres</a>
-              <a href="/browse-jobs.html#saved">Mes offres sauvegardées</a>
-              <a href="/browse-jobs.html#alerts">Alertes emploi</a>
+              <a href="/browse-jobs.html">Browse offers</a>
+              <a href="/browse-jobs.html#saved">My saved offers</a>
+              <a href="/browse-jobs.html#alerts">Job alerts</a>
             </div>
           </div>
 
@@ -3516,9 +3501,9 @@
               </svg>
             </button>
             <div class="top-bar-dropdown-menu">
-              <a href="/support.html">Centre d'Aide</a>
+              <a href="/support.html">Help Center</a>
               <a href="/support.html#faq">Documentation</a>
-              <a href="/support.html#contact">Nous Contacter</a>
+              <a href="/support.html#contact">Contact Us</a>
             </div>
           </div>
 
@@ -3541,9 +3526,9 @@
               </svg>
             </button>
             <div class="top-bar-dropdown-menu">
-              <a href="/settings.html">Mon Profil</a>
-              <a href="/settings.html">Paramètres</a>
-              <a href="/">Déconnexion</a>
+              <a href="/settings.html">My Profile</a>
+              <a href="/settings.html">Settings</a>
+              <a href="/">Logout</a>
             </div>
           </div>
 
@@ -3577,7 +3562,7 @@
           style="width: 32px; height: 32px; object-fit: contain"
         />
         <span class="ribbon-text"
-          >Plateforme e-santé intelligente pour le Maroc | Your smart healthcare platform</span
+          >Your smart healthcare platform</span
         >
         <img
           src="/static/ong_GeniDoc1preview.png"
@@ -3589,7 +3574,7 @@
     </div>
 
     <!-- Skip link for keyboard navigation -->
-    <a class="skip-link" href="#main">Aller au contenu principal</a>
+    <a class="skip-link" href="#main">Skip to main content</a>
 
     <!-- Drawer Overlay -->
     <div class="drawer-overlay" id="drawerOverlay"></div>
@@ -3611,22 +3596,22 @@
         </div>
 
         <!-- Desktop Navigation -->
-        <nav class="nav" role="navigation" aria-label="Navigation principale">
+        <nav class="nav" role="navigation" aria-label="Main navigation">
           <ul class="nav-list">
-            <li><a href="#home" class="nav-link" data-scroll>Accueil</a></li>
+            <li><a href="#home" class="nav-link" data-scroll>Home</a></li>
             <li class="nav-dropdown">
               <a href="#" class="nav-link dropdown-toggle"
-                >Fonctionnalités <span class="dropdown-arrow">▼</span></a
+                >Features <span class="dropdown-arrow">▼</span></a
               >
               <ul class="dropdown-menu">
                 <li>
                   <a href="fonctionnalites-generales.html" class="dropdown-link"
-                    >Fonctionnalités générales</a
+                    >General Features</a
                   >
                 </li>
                 <li>
                   <a href="comment-ca-marche.html" class="dropdown-link"
-                    >Comment ça marche</a
+                    >How It Works</a
                   >
                 </li>
               </ul>
@@ -3634,11 +3619,11 @@
             <li>
               <a href="#services" class="nav-link" data-scroll>Services</a>
             </li>
-            <li><a href="tarifs.html" class="nav-link">Tarifs</a></li>
+            <li><a href="tarifs.html" class="nav-link">Rates</a></li>
             <li><a href="#faq" class="nav-link" data-scroll>FAQ</a></li>
             <li>
               <a href="#testimonials" class="nav-link" data-scroll
-                >Témoignages</a
+                >Testimonials</a
               >
             </li>
           </ul>
@@ -3646,46 +3631,15 @@
 
         <!-- Header Actions (Login/Signup) -->
         <div class="header-actions">
-          <!-- Language Dropdown -->
-          <div class="language-dropdown">
-            <button
-              class="lang-dropdown-btn"
-              aria-label="Sélectionner la langue"
-              aria-haspopup="true"
-            >
-              <span class="current-lang">FR</span>
-              <svg
-                width="12"
-                height="8"
-                viewBox="0 0 12 8"
-                fill="none"
-                aria-hidden="true"
-              >
-                <path
-                  d="M1 1L6 6L11 1"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                />
-              </svg>
-            </button>
-            <div class="lang-dropdown-menu">
-              <button class="lang-option active" data-lang="fr">
-                Français
-              </button>
-              <button class="lang-option" data-lang="en">English</button>
-              <button class="lang-option" data-lang="es">Español</button>
-              <button class="lang-option" data-lang="de">Deutsch</button>
-              <button class="lang-option" data-lang="ar">العربية</button>
-            </div>
-          </div>
+          <!-- Affichage simple de la langue courante -->
+          <span class="current-lang" style="font-weight:600;font-size:15px;padding:0 12px;">EN</span>
           <button
             class="btn btn-ghost"
             id="loginBtn"
             data-i18n="btn-login"
             aria-label="Se connecter"
           >
-            Connexion
+            Login
           </button>
           <a
             href="auth.html"
@@ -3694,7 +3648,7 @@
             data-i18n="btn-signup"
             aria-label="S'inscrire"
           >
-            Inscription
+            Signup
           </a>
           <!-- Mobile menu toggle -->
           <button
@@ -3727,21 +3681,21 @@
           </button>
           <ul class="drawer-nav">
             <li>
-              <a href="#home" class="drawer-link" data-drawer-close>Accueil</a>
+              <a href="#home" class="drawer-link" data-drawer-close>Home</a>
             </li>
             <li class="drawer-dropdown">
               <a href="#" class="drawer-link drawer-dropdown-toggle"
-                >Fonctionnalités <span class="dropdown-arrow">▼</span></a
+                >Features <span class="dropdown-arrow">▼</span></a
               >
               <ul class="drawer-submenu hidden">
                 <li>
-                  <a href="fonctionnalites-generales.html" class="drawer-link"
-                    >Fonctionnalités générales</a
+                  <a href="general-features.html" class="drawer-link"
+                    >General Features</a
                   >
                 </li>
                 <li>
-                  <a href="comment-ca-marche.html" class="drawer-link"
-                    >Comment ça marche</a
+                  <a href="how-it-works.html" class="drawer-link"
+                    >How It Works</a
                   >
                 </li>
               </ul>
@@ -3751,18 +3705,18 @@
                 >Services</a
               >
             </li>
-            <li><a href="tarifs.html" class="drawer-link">Tarifs</a></li>
+            <li><a href="rates.html" class="drawer-link">Rates</a></li>
             <li>
               <a href="#faq" class="drawer-link" data-drawer-close>FAQ</a>
             </li>
             <li>
               <a href="#testimonials" class="drawer-link" data-drawer-close
-                >Témoignages</a
+                >Testimonials</a
               >
             </li>
           </ul>
           <div class="drawer-ctas">
-            <a href="auth.html" class="btn btn-ghost" style="text-decoration: none; display: inline-block;">Connexion</a>
+            <a href="auth.html" class="btn btn-ghost" style="text-decoration: none; display: inline-block;">Login</a>
             <a href="auth.html" class="btn btn-primary" style="text-decoration: none; display: inline-block;">Inscription</a>
           </div>
         </div>
@@ -3777,16 +3731,15 @@
         <div class="container hero-grid">
           <!-- Hero Content (Left Column) -->
           <div class="hero-content">
-            <span class="badge badge-accent">Plateforme e-Santé Intelligente</span>
+            <span class="badge badge-accent">Intelligent e-Health Platform</span>
             <h1 class="hero-title" data-i18n="hero-title">
-              Votre santé mérite mieux qu'une salle d'attente
+              Your health deserves better than a waiting room
             </h1>
             <p class="lead" data-i18n="hero-subtitle">
-              Trouvez un médecin, CHU ou clinique au Maroc en quelques secondes. 
-              Prenez rendez-vous en ligne aussi facilement que commander un café.
+              Find a doctor, university hospital, or clinic in Morocco in seconds. 
+              Book an appointment online as easily as ordering a coffee.
             </p>
 
-            <!-- CTA Buttons -->
             <div class="hero-ctas">
               <a
                 href="auth.html"
@@ -3795,10 +3748,10 @@
                 data-i18n="btn-start"
                 style="text-decoration: none; display: inline-flex;"
               >
-                Prendre Rendez-vous
+                Book Appointment
               </a>
               <button class="btn btn-outline" data-i18n="btn-demo">
-                Voir Comment ça Marche
+                See How It Works
               </button>
             </div>
 
@@ -3811,7 +3764,7 @@
               >
                 <img src="static/appstorelogo.png" alt="App Store" class="app-logo" />
                 <div class="app-button-text">
-                  <span class="app-button-label">Télécharger sur</span>
+                  <span class="app-button-label">Download on the</span>
                   <span class="app-button-store">App Store</span>
                 </div>
               </a>
@@ -3822,14 +3775,14 @@
               >
                 <img src="static/play-store.png" alt="Google Play" class="app-logo" />
                 <div class="app-button-text">
-                  <span class="app-button-label">Disponible sur</span>
+                  <span class="app-button-label">Available on</span>
                   <span class="app-button-store">Google Play</span>
                 </div>
               </a>
             </div>
 
             <div class="trust-section">
-              <span class="trust-text">Utilisé par</span>
+              <span class="trust-text">Used by</span>
               <div class="trust-logos" aria-hidden="true">
                 <svg
                   class="logo-placeholder"
@@ -3932,8 +3885,8 @@
             <!-- Professional Image with Frame -->
             <div class="hero-image-container">
               <img
-                src="professional-hero.png"
-                alt="Professionnel utilisant RecruitAI"
+                src="/professional-hero.png"
+                alt="GeniDoc"
                 class="hero-image"
               />
               <div class="hero-image-frame"></div>
@@ -4004,10 +3957,10 @@
           <!-- Tabs: Trouver un Médecin / Parcourir les Soins -->
           <div class="search-tabs">
             <button class="search-tab active" data-tab="find-talent">
-              Trouver un Médecin
+              Find a Doctor
             </button>
             <button class="search-tab" data-tab="browse-jobs">
-              Parcourir les Soins
+              Browse Care
             </button>
           </div>
 
@@ -4315,19 +4268,19 @@
           <div class="stats-grid">
             <div class="stat-card">
               <div class="stat-number">1,247+</div>
-              <div class="stat-label">Médecins disponibles</div>
+              <div class="stat-label">Available physicians</div>
             </div>
             <div class="stat-card">
               <div class="stat-number">8,423+</div>
-              <div class="stat-label">Patients satisfaits</div>
+              <div class="stat-label">Satisfied patients</div>
             </div>
             <div class="stat-card">
               <div class="stat-number">98%</div>
-              <div class="stat-label">Taux de satisfaction</div>
+              <div class="stat-label">Satisfaction Rate</div>
             </div>
             <div class="stat-card">
               <div class="stat-number">24h</div>
-              <div class="stat-label">Délai moyen rendez-vous</div>
+              <div class="stat-label">Average Appointment Time</div>
             </div>
           </div>
         </div>
@@ -4354,171 +4307,85 @@
                 </svg>
               </div>
               <span class="category-label" data-i18n="cat-programming"
-                >Médecine Générale</span
-              >
+                >General Medicine</span>
             </div>
-
-            <!-- Cardiologie -->
             <div class="service-category">
               <div class="category-icon">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  aria-hidden="true"
-                >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                 </svg>
               </div>
-              <span class="category-label" data-i18n="cat-design"
-                >Cardiologie</span
-              >
+              <span class="category-label" data-i18n="cat-design">Cardiology</span>
             </div>
-
-            <!-- Pédiatrie -->
             <div class="service-category">
               <div class="category-icon">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  aria-hidden="true"
-                >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                   <circle cx="12" cy="8" r="7"></circle>
                   <path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.11"></path>
                 </svg>
               </div>
-              <span class="category-label" data-i18n="cat-marketing"
-                >Pédiatrie</span
-              >
+              <span class="category-label" data-i18n="cat-marketing">Pediatrics</span>
             </div>
-
-            <!-- Dermatologie -->
             <div class="service-category">
               <div class="category-icon">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  aria-hidden="true"
-                >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                   <circle cx="12" cy="12" r="10"></circle>
                   <circle cx="12" cy="12" r="6"></circle>
                   <circle cx="12" cy="12" r="2"></circle>
                 </svg>
               </div>
-              <span class="category-label" data-i18n="cat-writing"
-                >Dermatologie</span
-              >
+              <span class="category-label" data-i18n="cat-writing">Dermatology</span>
             </div>
-
-            <!-- Gynécologie -->
             <div class="service-category">
               <div class="category-icon">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  aria-hidden="true"
-                >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                   <path d="M12 2a3 3 0 0 0-3 3v4a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
                   <path d="M12 9v13"></path>
                   <path d="M8 19h8"></path>
                 </svg>
               </div>
-              <span class="category-label" data-i18n="cat-video"
-                >Gynécologie</span
-              >
+              <span class="category-label" data-i18n="cat-video">Gynecology</span>
             </div>
-
-            <!-- Ophtalmologie -->
             <div class="service-category">
               <div class="category-icon">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  aria-hidden="true"
-                >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                   <circle cx="12" cy="12" r="3"></circle>
                 </svg>
               </div>
-              <span class="category-label" data-i18n="cat-business"
-                >Ophtalmologie</span
-              >
+              <span class="category-label" data-i18n="cat-business">Ophthalmology</span>
             </div>
-
-            <!-- Dentisterie -->
             <div class="service-category">
               <div class="category-icon">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  aria-hidden="true"
-                >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                   <path d="M12 2C8 2 5 5 5 8c0 3 0 7 2 10 1 2 2 3 3 3s2-1 2-3c0-2 0-4 0-5 0-1 0-3 0-5 0 2 0 4 0 5 0 1 0 3 0 5 0 2 1 3 2 3s2-1 3-3c2-3 2-7 2-10 0-3-3-6-7-6z"></path>
                 </svg>
               </div>
-              <span class="category-label" data-i18n="cat-ai">Dentisterie</span>
+              <span class="category-label" data-i18n="cat-ai">Dentistry</span>
             </div>
-
-            <!-- ORL (Oto-Rhino-Laryngologie) -->
             <div class="service-category">
               <div class="category-icon">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  aria-hidden="true"
-                >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                   <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
                   <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
                 </svg>
               </div>
-              <span class="category-label" data-i18n="cat-music"
-                >ORL</span
-              >
+              <span class="category-label" data-i18n="cat-music">ORL</span>
             </div>
-
-            <!-- Radiologie -->
             <div class="service-category">
               <div class="category-icon">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  aria-hidden="true"
-                >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                   <rect x="3" y="3" width="18" height="18" rx="2"></rect>
                   <circle cx="8.5" cy="8.5" r="1.5"></circle>
                   <path d="m21 15-5-5L5 21"></path>
                 </svg>
               </div>
-              <span class="category-label" data-i18n="cat-consulting"
-                >Radiologie</span
-              >
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                </svg>
-              </div>
-              <span class="category-label" data-i18n="cat-consulting"
-                >Consulting</span
-              >
+              <span class="category-label" data-i18n="cat-consulting">Radiology</span>
             </div>
           </div>
 
-          <h3 class="popular-title">Popular services</h3>
+          <div style="display:flex;justify-content:center;align-items:center;width:100%;"><h3 class="popular-title" style="margin-bottom:18px;">Popular Services</h3></div>
 
-          <!-- POPULAR SERVICES GRID -->
           <div class="popular-services-grid">
             <div class="service-card">
               <div
@@ -4527,7 +4394,7 @@
                   background: linear-gradient(135deg, #1a4d2e 0%, #0f3a20 100%);
                 "
               >
-                <h4>Website Development</h4>
+                <h4>Medical Checkup</h4>
               </div>
               <div class="service-card-accent"></div>
             </div>
@@ -4539,7 +4406,7 @@
                   background: linear-gradient(135deg, #2a3a4d 0%, #1f2a39 100%);
                 "
               >
-                <h4>Video Editing</h4>
+                <h4>ECG</h4>
               </div>
               <div
                 class="service-card-accent"
@@ -4554,7 +4421,7 @@
                   background: linear-gradient(135deg, #3a4a2e 0%, #2a3a1f 100%);
                 "
               >
-                <h4>Software Development</h4>
+                <h4>Blood Test</h4>
               </div>
               <div
                 class="service-card-accent"
@@ -4569,7 +4436,7 @@
                   background: linear-gradient(135deg, #1a4d4d 0%, #0f3a3a 100%);
                 "
               >
-                <h4>SEO</h4>
+                <h4>MRI Scan</h4>
               </div>
               <div
                 class="service-card-accent"
@@ -4584,7 +4451,7 @@
                   background: linear-gradient(135deg, #4a3a2e 0%, #3a2a1f 100%);
                 "
               >
-                <h4>Architecture & Interior Design</h4>
+                <h4>Vaccination</h4>
               </div>
               <div
                 class="service-card-accent"
@@ -4599,7 +4466,7 @@
                   background: linear-gradient(135deg, #4a1a3a 0%, #3a0f2a 100%);
                 "
               >
-                <h4>Book Design</h4>
+                <h4>Nutrition Consultation</h4>
               </div>
               <div
                 class="service-card-accent"
@@ -4677,7 +4544,7 @@
                         GeniDoc Hayat
                       </div>
                       <div style="color: rgba(255,255,255,0.8); font-size: 0.75rem; margin-top: 4px;">
-                        Royaume du Maroc
+                        Kingdom of Morocco
                       </div>
                     </div>
                     <!-- Logo GeniDoc -->
@@ -4712,14 +4579,14 @@
                       PATIENT GD 000001
                     </div>
                     <div style="color: rgba(255,255,255,0.9); font-size: 0.85rem; margin-bottom: 2px;">
-                      Nom: SENHAJI Anas
+                      Name: SENHAJI Anas
                     </div>
                     <div style="color: rgba(255,255,255,0.8); font-size: 0.75rem;">
-                      Validité: 12/2030
+                      Validity: 12/2030
                     </div>
                   </div>
 
-                  <!-- Footer avec code barre -->
+                  <!-- Footer with barcode -->
                   <div style="
                     margin-top: 8px;
                     padding-top: 8px;
@@ -4758,24 +4625,23 @@
                   margin-bottom: 24px;
                 "
               >
-                Votre Carte Vitale, toujours avec vous
+                Your Health Card, always with you
               </h2>
               <p style="font-size: 1.05rem; line-height: 1.7; color: #6b6560; margin-bottom: 16px;">
-                Accédez à votre dossier médical complet, vos ordonnances et votre historique 
-                de santé depuis n'importe où.
+                Access your complete medical record, prescriptions, and health history from anywhere.
               </p>
               <ul style="list-style: none; padding: 0;">
                 <li style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; color: #6b6560;">
                   <span style="color: #10b981; font-size: 1.25rem;">✓</span>
-                  <span>Historique médical sécurisé et centralisé</span>
+                  <span>Secure and centralized medical history</span>
                 </li>
                 <li style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; color: #6b6560;">
                   <span style="color: #10b981; font-size: 1.25rem;">✓</span>
-                  <span>Ordonnances numériques renouvelables</span>
+                  <span>Renewable digital prescriptions</span>
                 </li>
                 <li style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; color: #6b6560;">
                   <span style="color: #10b981; font-size: 1.25rem;">✓</span>
-                  <span>Compatible avec toutes les assurances marocaines</span>
+                  <span>Compatible with all Moroccan insurances</span>
                 </li>
               </ul>
             </div>
@@ -4790,13 +4656,12 @@
         <div class="container">
           <!-- Section Header -->
           <div class="section-header">
-            <span class="badge badge-accent">Témoignages</span>
+            <span class="badge badge-accent">Testimonials</span>
             <h2 class="section-title" data-i18n="testimonials-title">
-              Ce que disent nos patients
+              What our patients say
             </h2>
             <p class="section-subtitle" data-i18n="testimonials-subtitle">
-              Des milliers de patients au Maroc font déjà confiance à GeniDoc pour 
-              gérer leur santé au quotidien.
+              Thousands of patients in Morocco already trust GeniDoc to manage their health daily.
             </p>
           </div>
 
@@ -4818,20 +4683,18 @@
                 />
               </svg>
               <p class="testimonial-text">
-                "GeniDoc a complètement changé ma façon de gérer ma santé. J'ai pu consulter 
-                un cardiologue en téléconsultation en moins de 24h. Plus besoin d'attendre 
-                des semaines pour un rendez-vous !"
+                "GeniDoc has completely changed the way I manage my health. I was able to consult 
+                a cardiologist via teleconsultation in less than 24 hours. No more waiting 
+                weeks for an appointment!"
               </p>
               <div class="testimonial-author">
                 <div class="author-avatar">YB</div>
                 <div>
                   <div class="author-name">Youssef BENALI</div>
-                  <div class="author-role">Patient Premium, Casablanca</div>
+                  <div class="author-role">Premium Patient, Casablanca</div>
                 </div>
               </div>
-            </article>
-
-            <!-- Testimonial 2 -->
+            </article> 
             <article class="testimonial-card">
               <svg
                 class="quote-icon"
@@ -4847,15 +4710,15 @@
                 />
               </svg>
               <p class="testimonial-text">
-                "Avec le plan Famille, toute ma famille a accès aux meilleurs 
-                médecins. Les téléconsultations nous font gagner énormément de temps, 
-                surtout avec les enfants !"
+                "With the Family plan, my whole family has access to the best 
+                doctors. Teleconsultations save us a lot of time, 
+                especially with the kids!"
               </p>
               <div class="testimonial-author">
                 <div class="author-avatar">SK</div>
                 <div>
                   <div class="author-name">Sanaa KHALIL</div>
-                  <div class="author-role">Patiente Famille, Rabat</div>
+                  <div class="author-role">Family Patient, Rabat</div>
                 </div>
               </div>
             </article>
@@ -4876,9 +4739,9 @@
                 />
               </svg>
               <p class="testimonial-text">
-                "L'historique médical centralisé est génial ! Plus besoin de chercher 
-                mes anciennes ordonnances. Tout est accessible en un clic, et je peux 
-                les partager facilement avec mon médecin."
+                "The centralized medical history is great! No more searching for 
+                my old prescriptions. Everything is accessible with one click, and I can 
+                easily share them with my doctor."
               </p>
               <div class="testimonial-author">
                 <div class="author-avatar">MR</div>
@@ -4905,16 +4768,16 @@
                 />
               </svg>
               <p class="testimonial-text">
-                "L'interface est intuitive et les résultats sont
-                impressionnants. Nos entretiens vidéo asynchrones ont réduit
-                notre délai d'embauche de façon significative."
+                "The interface is intuitive and the results are
+                impressive. Our asynchronous video interviews have significantly reduced
+                our hiring time."
               </p>
               <div class="testimonial-author">
                 <div class="author-avatar">SA</div>
                 <div>
                   <div class="author-name">Samira Aziz</div>
                   <div class="author-role">
-                    Recrutrice Senior, FinTech Solutions
+                    Senior Recruiter, FinTech Solutions
                   </div>
                 </div>
               </div>
@@ -4936,15 +4799,15 @@
                 />
               </svg>
               <p class="testimonial-text">
-                "En tant que médecin, GeniDoc m'a permis de mieux organiser mes 
-                consultations et d'offrir la téléconsultation à mes patients. 
-                Un vrai gain de temps pour tout le monde !"
+                "As a doctor, GeniDoc has helped me better organize my 
+                consultations and offer teleconsultation to my patients. 
+                A real time saver for everyone!"
               </p>
               <div class="testimonial-author">
                 <div class="author-avatar">DZ</div>
                 <div>
                   <div class="author-name">Dr. Zineb ALAMI</div>
-                  <div class="author-role">Médecin Généraliste, Fès</div>
+                  <div class="author-role">General Practitioner, Fès</div>
                 </div>
               </div>
             </article>
@@ -4965,16 +4828,16 @@
                 />
               </svg>
               <p class="testimonial-text">
-                "La prise en charge par ma mutuelle est automatique avec GeniDoc. 
-                Plus besoin de gérer les remboursements manuellement. C'est vraiment 
-                pratique !"
+                "The coverage by my insurance is automatic with GeniDoc. 
+                No more managing reimbursements manually. It's really 
+                convenient!"
               </p>
               <div class="testimonial-author">
                 <div class="author-avatar">LB</div>
                 <div>
                   <div class="author-name">Laila BENJELLOUN</div>
                   <div class="author-role">
-                    Patiente Premium, Tanger
+                    Premium Patient, Tangier
                   </div>
                 </div>
               </div>
@@ -4993,158 +4856,157 @@
         <div class="container">
           <!-- Section Header -->
           <div class="section-header">
-            <span class="badge badge-accent">Tarifs</span>
-            <h2 class="section-title">Plans Transparents pour Tous</h2>
+            <span class="badge badge-accent">Prices</span>
+            <h2 class="section-title">Transparent Plans for Everyone</h2>
             <p class="section-subtitle">
-              Choisissez le plan qui correspond à vos besoins de santé
+              Choose the plan that fits your health needs
             </p>
           </div>
 
-          <!-- Pricing Grid - Design Professionnel -->
+          <!-- Pricing Grid - Professional Design -->
           <div class="pricing-grid" style="max-width: 1100px; margin: 0 auto;">
             
             <!-- Plan Essentiel -->
             <div class="pricing-card" style="background: white; border: 2px solid #e2e8f0; border-radius: 16px; padding: 40px 32px; position: relative; transition: all 0.3s ease;">
               <div style="margin-bottom: 24px;">
-                <h3 style="font-size: 1.5rem; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Essentiel</h3>
-                <p style="font-size: 0.95rem; color: #64748b; line-height: 1.6;">Pour découvrir GeniDoc et gérer vos consultations occasionnelles</p>
+                <h3 style="font-size: 1.5rem; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Essential</h3>
+                <p style="font-size: 0.95rem; color: #64748b; line-height: 1.6;">To discover GeniDoc and manage your occasional consultations</p>
               </div>
               
               <div style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #f1f5f9;">
                 <div style="display: flex; align-items: baseline; gap: 4px; margin-bottom: 12px;">
                   <span style="font-size: 3rem; font-weight: 700; color: #0f172a; line-height: 1;">0</span>
-                  <span style="font-size: 1.125rem; color: #475569; font-weight: 600;">DH/mois</span>
+                  <span style="font-size: 1.125rem; color: #475569; font-weight: 600;">DH/month</span>
                 </div>
-                <p style="font-size: 0.875rem; color: #64748b;">Gratuit à vie, sans carte bancaire</p>
+                <p style="font-size: 0.875rem; color: #64748b;">Free for life, no credit card required</p>
               </div>
               
               <ul style="list-style: none; padding: 0; margin: 0 0 32px 0; display: flex; flex-direction: column; gap: 16px;">
                 <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #334155;">
                   <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Recherche illimitée de médecins et établissements</span>
+                  <span>Unlimited search for doctors and facilities</span>
                 </li>
                 <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #334155;">
                   <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Prise de rendez-vous en ligne</span>
+                  <span>Online appointment booking</span>
                 </li>
                 <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #334155;">
                   <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Rappels automatiques par email</span>
+                  <span>Automatic email reminders</span>
                 </li>
                 <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #334155;">
                   <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Avis et notes vérifiés</span>
+                  <span>Verified reviews and ratings</span>
                 </li>
                 <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #94a3b8;">
                   <svg style="width: 20px; height: 20px; color: #cbd5e1; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                  <span>Téléconsultations</span>
+                  <span>Teleconsultations</span>
                 </li>
                 <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #94a3b8;">
                   <svg style="width: 20px; height: 20px; color: #cbd5e1; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                  <span>Dossier médical numérique</span>
+                  <span>Digital medical record</span>
                 </li>
               </ul>
               
               <button style="width: 100%; padding: 14px 24px; background: white; border: 2px solid #2563eb; color: #2563eb; border-radius: 12px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.2s ease;">
-                Commencer gratuitement
+                Start for free
               </button>
             </div>
 
             <!-- Plan Premium (Mise en avant) -->
             <div class="pricing-card pricing-card-featured" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: none; border-radius: 16px; padding: 40px 32px; position: relative; box-shadow: 0 20px 60px rgba(37, 99, 235, 0.25); transform: scale(1.05);">
               <div style="position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 6px 20px; border-radius: 20px; font-size: 0.8125rem; font-weight: 600; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
-                Le plus choisi
+                Most chosen
               </div>
               
               <div style="margin-bottom: 24px;">
                 <h3 style="font-size: 1.5rem; font-weight: 700; color: white; margin-bottom: 8px;">Premium</h3>
-                <p style="font-size: 0.95rem; color: rgba(255,255,255,0.9); line-height: 1.6;">Santé connectée complète avec téléconsultations illimitées</p>
+                <p style="font-size: 0.95rem; color: rgba(255,255,255,0.9); line-height: 1.6;">Complete connected health with unlimited teleconsultations</p>
               </div>
               
               <div style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid rgba(255,255,255,0.2);">
                 <div style="display: flex; align-items: baseline; gap: 4px; margin-bottom: 12px;">
                   <span style="font-size: 3rem; font-weight: 700; color: white; line-height: 1;">99</span>
-                  <span style="font-size: 1.125rem; color: rgba(255,255,255,0.9); font-weight: 600;">DH/mois</span>
+                  <span style="font-size: 1.125rem; color: rgba(255,255,255,0.9); font-weight: 600;">DH/month</span>
                 </div>
-                <p style="font-size: 0.875rem; color: rgba(255,255,255,0.85);">Essai gratuit 30 jours • Résiliable à tout moment</p>
+                <p style="font-size: 0.875rem; color: rgba(255,255,255,0.85);">30-day free trial • Cancel anytime</p>
               </div>
               
               <ul style="list-style: none; padding: 0; margin: 0 0 32px 0; display: flex; flex-direction: column; gap: 16px;">
                 <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: white;">
                   <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span><strong>Tout du plan Essentiel</strong></span>
+                  <span><strong>Everything from the Essential plan</strong></span>
                 </li>
                 <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: white;">
                   <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span><strong>5 téléconsultations/mois incluses</strong></span>
+                  <span><strong>5 teleconsultations/month included</strong></span>
                 </li>
                 <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: white;">
                   <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Dossier médical numérique sécurisé</span>
+                  <span>Secure digital medical record</span>
                 </li>
                 <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: white;">
                   <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Ordonnances numériques renouvelables</span>
+                  <span>Renewable digital prescriptions</span>
                 </li>
                 <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: white;">
                   <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Rappels SMS + Push</span>
+                  <span>SMS + Push reminders</span>
                 </li>
                 <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: white;">
                   <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Support prioritaire 7j/7</span>
+                  <span>Priority support 7 days a week</span>
                 </li>
               </ul>
               
               <button style="width: 100%; padding: 14px 24px; background: white; border: none; color: #2563eb; border-radius: 12px; font-weight: 600; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.2s ease;">
-                Essayer 30 jours gratuits
+                Try 30 days free
               </button>
             </div>
 
-            <!-- Plan Famille -->
             <div class="pricing-card" style="background: white; border: 2px solid #e2e8f0; border-radius: 16px; padding: 40px 32px; position: relative; transition: all 0.3s ease;">
               <div style="margin-bottom: 24px;">
-                <h3 style="font-size: 1.5rem; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Famille</h3>
-                <p style="font-size: 0.95rem; color: #64748b; line-height: 1.6;">Protection santé complète pour toute votre famille</p>
+                <h3 style="font-size: 1.5rem; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Family</h3>
+                <p style="font-size: 0.95rem; color: #64748b; line-height: 1.6;">Comprehensive health protection for your entire family</p>
               </div>
               
               <div style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #f1f5f9;">
                 <div style="display: flex; align-items: baseline; gap: 4px; margin-bottom: 12px;">
                   <span style="font-size: 3rem; font-weight: 700; color: #0f172a; line-height: 1;">249</span>
-                  <span style="font-size: 1.125rem; color: #475569; font-weight: 600;">DH/mois</span>
+                  <span style="font-size: 1.125rem; color: #475569; font-weight: 600;">DH/month</span>
                 </div>
-                <p style="font-size: 0.875rem; color: #64748b;">Jusqu'à 5 membres • Économisez 50%</p>
+                <p style="font-size: 0.875rem; color: #64748b;">Up to 5 members • Save 50%</p>
               </div>
               
               <ul style="list-style: none; padding: 0; margin: 0 0 32px 0; display: flex; flex-direction: column; gap: 16px;">
                 <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #334155;">
                   <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span><strong>Tout du plan Premium × 5 membres</strong></span>
+                  <span><strong>Everything from the Premium plan × 5 members</strong></span>
                 </li>
                 <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #334155;">
                   <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span><strong>15 téléconsultations/mois partagées</strong></span>
+                  <span><strong>15 shared teleconsultations/month</strong></span>
                 </li>
                 <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #334155;">
                   <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Carnet de vaccination familial</span>
+                  <span>Family vaccination record</span>
                 </li>
                 <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #334155;">
                   <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Suivi pédiatrique et croissance</span>
+                  <span>Pediatric and growth monitoring</span>
                 </li>
                 <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #334155;">
                   <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Coordination automatique entre médecins</span>
+                  <span>Automatic coordination between doctors</span>
                 </li>
                 <li style="display: flex; align-items: start; gap: 12px; font-size: 0.9375rem; color: #334155;">
                   <svg style="width: 20px; height: 20px; color: #10b981; flex-shrink: 0; margin-top: 2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <span>Réduction sur assurances partenaires</span>
+                  <span>Discount on partner insurances</span>
                 </li>
               </ul>
               
               <button style="width: 100%; padding: 14px 24px; background: #2563eb; border: none; color: white; border-radius: 12px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.2s ease;">
-                Protéger ma famille
+                Protect my family
               </button>
             </div>
             
@@ -5153,8 +5015,8 @@
           <!-- Note professionnelle -->
           <div style="max-width: 800px; margin: 48px auto 0; text-align: center; padding: 24px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
             <p style="font-size: 0.9375rem; color: #475569; line-height: 1.7; margin: 0;">
-              <strong style="color: #0f172a;">Tous les plans incluent</strong> : Chiffrement bancaire AES-256, conformité RGPD, hébergement au Maroc, support client en français et arabe. 
-              <span style="color: #2563eb; font-weight: 600;">Annulation possible à tout moment, sans engagement.</span>
+              <strong style="color: #0f172a;">All plans include</strong> : AES-256 bank encryption, GDPR compliance, hosting in Morocco, customer support in French and Arabic. 
+              <span style="color: #2563eb; font-weight: 600;">Cancellation possible at any time, no commitment.</span>
             </p>
           </div>
         </div>
@@ -5169,7 +5031,7 @@
             <div class="section-header">
               <span class="badge badge-accent">FAQ</span>
               <h2 class="section-title" data-i18n="faq-title">
-                Questions fréquemment posées
+                Frequently Asked Questions
               </h2>
             </div>
 
@@ -5177,110 +5039,103 @@
             <div class="accordion">
               <details class="accordion-item">
                 <summary class="accordion-trigger" data-i18n="faq-1">
-                  Comment fonctionne la prise de rendez-vous en ligne ?
+                  How does online appointment booking work?
                 </summary>
                 <div class="accordion-content">
                   <p data-i18n="faq-1-answer">
-                    Recherchez votre médecin ou spécialité, consultez les disponibilités en temps réel, 
-                    choisissez un créneau et confirmez. Vous recevez une confirmation instantanée par 
-                    email et SMS avec tous les détails (adresse, instructions, documents à apporter).
+                    Search for your doctor or specialty, check real-time availability, 
+                    choose a time slot and confirm. You receive an instant confirmation by 
+                    email and SMS with all the details (address, instructions, documents to bring).
                   </p>
                 </div>
               </details>
 
               <details class="accordion-item">
                 <summary class="accordion-trigger" data-i18n="faq-2">
-                  Les téléconsultations sont-elles aussi efficaces qu'un rendez-vous physique ?
+                  Are teleconsultations as effective as in-person appointments?
                 </summary>
                 <div class="accordion-content">
                   <p data-i18n="faq-2-answer">
-                    Pour de nombreux cas (renouvellement d'ordonnance, consultation de suivi, conseils médicaux), 
-                    la téléconsultation est parfaitement adaptée. Le médecin peut évaluer vos symptômes, 
-                    prescrire des médicaments et vous orienter si un examen physique est nécessaire.
+                    For many cases (prescription renewal, follow-up consultation, medical advice), 
+                    teleconsultation is perfectly suitable. The doctor can assess your symptoms, prescribe medication, and refer you if a physical examination is necessary.
                   </p>
                 </div>
               </details>
 
               <details class="accordion-item">
                 <summary class="accordion-trigger" data-i18n="faq-3">
-                  Comment mes données médicales sont-elles protégées ?
+                  How is my medical data protected?
                 </summary>
                 <div class="accordion-content">
                   <p data-i18n="faq-3-answer">
-                    Nous appliquons un chiffrement de niveau bancaire (AES-256) pour toutes vos données. 
-                    Conformité RGPD stricte, serveurs hébergés au Maroc avec certification ISO 27001. 
-                    Seuls vous et les professionnels que vous autorisez peuvent accéder à votre dossier médical.
+                    We apply bank-level encryption (AES-256) for all your data. 
+                    Strict GDPR compliance, servers hosted in Morocco with ISO 27001 certification. 
+                    Only you and the professionals you authorize can access your medical record.
                   </p>
                 </div>
               </details>
 
               <details class="accordion-item">
                 <summary class="accordion-trigger" data-i18n="faq-4">
-                  Puis-je utiliser GeniDoc avec mon assurance santé ?
+                  Can I use GeniDoc with my health insurance?
                 </summary>
                 <div class="accordion-content">
                   <p data-i18n="faq-4-answer">
-                    Oui ! Nous sommes partenaires de nombreuses mutuelles marocaines (CNSS, CNOPS, mutuelles privées). 
-                    Les remboursements peuvent être traités directement via l'app. Consultez la liste des assurances 
-                    partenaires dans votre profil.
+                    Yes! We partner with many Moroccan health insurance providers (CNSS, CNOPS, private mutuals). 
+                    Reimbursements can be processed directly through the app. Check the list of partner insurance companies 
+                    in your profile.
                   </p>
                 </div>
               </details>
 
               <details class="accordion-item">
                 <summary class="accordion-trigger">
-                  Que faire en cas d'urgence médicale ?
+                  What to do in case of a medical emergency?
                 </summary>
                 <div class="accordion-content">
                   <p>
-                    En cas d'urgence vitale (douleur thoracique, difficulté respiratoire, hémorragie), 
-                    appelez le 141 (SAMU) immédiatement. GeniDoc propose un service d'urgence non-vitale 
-                    24/7 pour les situations nécessitant une consultation rapide mais non critique.
+                    In case of a life-threatening emergency (chest pain, difficulty breathing, hemorrhage), 
+                    call 141 (SAMU) immediately. GeniDoc offers a non-life-threatening emergency service
+                    24/7 for situations requiring a quick but non-critical consultation.
                   </p>
                 </div>
               </details>
 
               <details class="accordion-item">
                 <summary class="accordion-trigger">
-                  Puis-je consulter mon historique médical complet ?
+                  Can I view my complete medical history?
                 </summary>
                 <div class="accordion-content">
                   <p>
-                    Avec un compte Premium ou Famille, votre historique médical est centralisé et accessible 24/7 : 
-                    consultations passées, ordonnances, résultats d'analyses, vaccinations, allergies. 
-                    Vous pouvez le partager avec n'importe quel professionnel de santé en un clic.
+                    With a Premium or Family account, your medical history is centralized and accessible 24/7: 
+                    past consultations, prescriptions, test results, vaccinations, allergies. 
+                    You can share it with any healthcare professional with one click.
                   </p>
                 </div>
               </details>
-                    le matching IA automatique. Nos clients rapportent un ROI de
-                    300% en 6 mois.
+              <details class="accordion-item">
+                <summary class="accordion-trigger">
+                  Do you offer customer support?
+                </summary>
+                <div class="accordion-content">
+                  <p>
+                    Yes. All plans include 24/7 email and chatbot support.
+                    Pro and Enterprise plans have access to priority support
+                    by phone and video chat. Enterprise customers
+                    benefit from a dedicated account manager.
                   </p>
                 </div>
               </details>
 
               <details class="accordion-item">
                 <summary class="accordion-trigger">
-                  Offrez-vous un support client ?
+                  What is the free trial period?
                 </summary>
                 <div class="accordion-content">
                   <p>
-                    Oui. Tous les plans incluent un support par email et chatbot
-                    24/7. Les plans Pro et Enterprise ont accès à un support
-                    prioritaire par téléphone et video-chat. Les clients
-                    Enterprise bénéficient d'un account manager dédié.
-                  </p>
-                </div>
-              </details>
-
-              <details class="accordion-item">
-                <summary class="accordion-trigger">
-                  Quelle est la période d'essai gratuit ?
-                </summary>
-                <div class="accordion-content">
-                  <p>
-                    Les clients Pro et Enterprise bénéficient de 14 jours
-                    d'essai gratuit sans carte bancaire. Le plan Starter est
-                    gratuit indéfiniment avec 5 offres/mois.
+                    Pro and Enterprise customers enjoy a 14-day
+                    free trial without a credit card. The Starter plan is
+                    free indefinitely with 5 offers/month.
                   </p>
                 </div>
               </details>
@@ -5293,16 +5148,16 @@
          ============================================================ -->
         <section class="cta-final">
           <div class="container">
-            <h2 class="cta-title">Prêt à prendre soin de votre santé ?</h2>
+            <h2 class="cta-title">Ready to take care of your health?</h2>
             <p class="cta-subtitle">
-              Rejoignez les milliers de patients qui gèrent leur santé plus facilement 
-              avec GeniDoc.
+              Join the thousands of patients who manage their health more easily 
+              with GeniDoc.
             </p>
             <a href="auth.html" class="btn btn-cta-inverted" id="cta-final" style="text-decoration: none; display: inline-flex;">
-              Créer Mon Compte Gratuit
+              Create My Free Account
             </a>
             <p class="cta-note">
-              Sans carte bancaire • 30 jours d'essai • Annulation à tout moment
+              No credit card • 30-day trial • Cancel anytime
             </p>
           </div>
         </section>
@@ -5311,16 +5166,71 @@
       <!-- ============================================================
          FOOTER
          ============================================================ -->
+      <!-- ============================================================
+         QUICK CONTACT FORM (bottom of page)
+         ============================================================ -->
+      <section id="quick-contact" style="background:#f8fafc;padding:48px 0 32px 0;">
+        <div class="container" style="max-width:600px;margin:0 auto;">
+          <h2 style="font-size:1.5rem;font-weight:700;color:#2563eb;margin-bottom:18px;text-align:center;">Contact us quickly</h2>
+          <form id="quickContactForm" style="display:flex;flex-direction:column;gap:16px;">
+            <input type="text" name="name" placeholder="Your name" required style="padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:1rem;">
+            <input type="email" name="email" placeholder="Your email" required style="padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:1rem;">
+            <textarea name="message" placeholder="Your message" rows="4" required style="padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:1rem;"></textarea>
+            <button type="submit" style="background:#2563eb;color:white;font-weight:600;font-size:1rem;padding:12px 0;border:none;border-radius:8px;cursor:pointer;transition:background 0.2s;">Send</button>
+            <div id="quickContactMsg" style="margin-top:8px;font-size:0.98rem;color:#10b981;display:none;text-align:center;"></div>
+          </form>
+        </div>
+        <script>
+        document.addEventListener('DOMContentLoaded',function(){
+          var form=document.getElementById('quickContactForm');
+          var msg=document.getElementById('quickContactMsg');
+          if(form){
+            form.addEventListener('submit',async function(e){
+              e.preventDefault();
+              msg.style.display='block';
+              msg.style.color='#2563eb';
+              msg.textContent='Sending...';
+              const formData = new FormData(form);
+              const data = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                message: formData.get('message')
+              };
+              try {
+                const resp = await fetch('/api/contact', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(data)
+                });
+                const result = await resp.json();
+                if(result.success){
+                  msg.style.color = '#10b981';
+                  msg.textContent = 'Thank you! Your message has been sent.';
+                  form.reset();
+                } else {
+                  msg.style.color = '#ef4444';
+                  msg.textContent = result.message || 'An error occurred.';
+                }
+              } catch(err){
+                msg.style.color = '#ef4444';
+                msg.textContent = 'Server error. Please try again later.';
+              }
+              setTimeout(function(){msg.style.display='none';},4000);
+            });
+          }
+        });
+        </script>
+      </section>
+
       <footer class="site-footer" role="contentinfo">
         <div class="container footer-grid">
           <!-- Column 1: Branding -->
           <div class="footer-col">
             <a href="#home" class="footer-logo">GeniDoc</a>
             <p class="footer-tagline">
-              Votre plateforme e-santé pour des soins accessibles, rapides et 
-              de qualité au Maroc.
+              Your e-health platform for accessible, fast, and quality care in Morocco.
             </p>
-            <div class="footer-socials" aria-label="Réseaux sociaux">
+            <div class="footer-socials" aria-label="Social media">
               <a href="#" aria-label="GitHub" class="social-link">
                 <svg
                   width="20"
@@ -5365,10 +5275,10 @@
 
           <!-- Column 2: Product -->
           <div class="footer-col">
-            <h4 class="footer-heading">Produit</h4>
+            <h4 class="footer-heading">Product</h4>
             <ul class="footer-links">
-              <li><a href="#features">Fonctionnalités</a></li>
-              <li><a href="#pricing">Tarifs</a></li>
+              <li><a href="#features">Features</a></li>
+              <li><a href="#pricing">Pricing</a></li>
               <li><a href="#">API Documentation</a></li>
               <li><a href="#">Roadmap</a></li>
               <li><a href="#">Blog</a></li>
@@ -5377,25 +5287,25 @@
 
           <!-- Column 3: Company -->
           <div class="footer-col">
-            <h4 class="footer-heading">Entreprise</h4>
+            <h4 class="footer-heading">Company</h4>
             <ul class="footer-links">
-              <li><a href="#">À propos</a></li>
-              <li><a href="#">Carrières</a></li>
+              <li><a href="#">About</a></li>
+              <li><a href="#">Careers</a></li>
               <li><a href="#">Press Kit</a></li>
               <li><a href="#">Contact</a></li>
-              <li><a href="#">Partenaires</a></li>
+              <li><a href="#">Partners</a></li>
             </ul>
           </div>
 
           <!-- Column 4: Legal -->
           <div class="footer-col">
-            <h4 class="footer-heading">Légal</h4>
+            <h4 class="footer-heading">Legal</h4>
             <ul class="footer-links">
-              <li><a href="#">Confidentialité</a></li>
-              <li><a href="#">Conditions d'utilisation</a></li>
-              <li><a href="#">Mentions légales</a></li>
+              <li><a href="#">Privacy</a></li>
+              <li><a href="#">Terms of Use</a></li>
+              <li><a href="#">Legal Notice</a></li>
               <li><a href="#">Cookies</a></li>
-              <li><a href="#">RGPD</a></li>
+              <li><a href="#">GDPR</a></li>
             </ul>
           </div>
         </div>
@@ -5403,7 +5313,7 @@
         <!-- Footer Bottom -->
         <div class="footer-bottom">
           <div class="container">
-            <p class="copyright">© 2025 GeniDoc. Créé avec ❤️ pour révolutionner la santé au Maroc.</p>
+            <p class="copyright">© 2025 GeniDoc. Created to revolutionize healthcare in Morocco.</p>
           </div>
         </div>
       </footer>
@@ -6273,27 +6183,35 @@
         // ============================================================
       })();
     </script>
-    <!-- Chatbot Button -->
-    <button
-      class="chatbot-toggle"
-      id="chatbotBtn"
-      aria-label="Ouvrir le chatbot"
-      title="Assistance RecruitAI"
-    >
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path
-          d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-        ></path>
+    <!-- Chatbot Button (ouvre la fenêtre) -->
+    <button class="chatbot-toggle" id="chatbotBtn" aria-label="Ouvrir le chatbot" title="Assistance GeniDoc">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
       </svg>
     </button>
+    <script>
+      // Ouvre/ferme le chatbot avec le bouton flottant
+      document.addEventListener('DOMContentLoaded', function() {
+        var chatbotBtn = document.getElementById('chatbotBtn');
+        var chatbotWindow = document.getElementById('genidoc-chatbot-window');
+        var closeBtn = document.getElementById('closeGenidocChatbot');
+        if(chatbotBtn && chatbotWindow) {
+          chatbotBtn.onclick = function(e) {
+            e.preventDefault();
+            if (chatbotWindow.style.display === 'flex') {
+              chatbotWindow.style.display = 'none';
+            } else {
+              chatbotWindow.style.display = 'flex';
+              chatbotWindow.style.animation = 'fadeInChatbot 0.35s cubic-bezier(.4,1.4,.6,1)';
+            }
+          };
+        }
+        if(closeBtn && chatbotWindow) {
+          closeBtn.onclick = function() {
+            chatbotWindow.style.display = 'none';
+          };
+        }
+      });
+    </script>
   </body>
 </html>
