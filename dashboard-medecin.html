@@ -298,11 +298,15 @@
         }
         /* .quick-btn .icon { supprimé car plus d'emoji } */
         .quick-btn:hover,
-        .quick-btn:focus {
+        .quick-btn:focus,
+        .quick-btn:focus-visible {
           background: #174080;
           box-shadow: 0 4px 16px rgba(32, 86, 174, 0.16);
           transform: translateY(-2px) scale(1.03);
-          outline: none;
+        }
+        .quick-btn:focus-visible {
+          outline: 3px solid rgba(16, 123, 255, 0.18);
+          outline-offset: 3px;
         }
       </style>
 
@@ -880,20 +884,35 @@
         window.location.href = 'stats.html?doctorId=' + getDoctorId();
       }
       function openDiagnosticModal(appointmentId, patientIdentifier) {
-        // Open an in-page modal to add diagnostic
+        // Open an in-page modal to add diagnostic (safe DOM construction)
         const title = 'Ajouter diagnostic';
         const body = document.getElementById('modal-body');
-        body.innerHTML = `
-          <div>
-            <div style="margin-bottom:8px"><strong>Patient:</strong> ${
-              patientIdentifier || ''
-            }</div>
-            <label>Résumé du diagnostic</label>
-            <textarea id="diag-text" style="width:100%;min-height:120px;padding:8px;margin-top:6px"></textarea>
-          </div>
-        `;
+        body.innerHTML = '';
+        const container = document.createElement('div');
+        const patientDiv = document.createElement('div');
+        patientDiv.style.marginBottom = '8px';
+        const strong = document.createElement('strong');
+        strong.textContent = 'Patient:';
+        patientDiv.appendChild(strong);
+        patientDiv.appendChild(document.createTextNode(' ' + (patientIdentifier || '')));
+        container.appendChild(patientDiv);
+
+        const label = document.createElement('label');
+        label.textContent = 'Résumé du diagnostic';
+        container.appendChild(label);
+
+        const textarea = document.createElement('textarea');
+        textarea.id = 'diag-text';
+        textarea.style.width = '100%';
+        textarea.style.minHeight = '120px';
+        textarea.style.padding = '8px';
+        textarea.style.marginTop = '6px';
+        container.appendChild(textarea);
+
+        body.appendChild(container);
+
         openModal(title, async () => {
-          const text = document.getElementById('diag-text').value.trim();
+          const text = (document.getElementById('diag-text') || { value: '' }).value.trim();
           if (!text) return alert('Veuillez saisir le diagnostic.');
           try {
             const payload = {
@@ -911,7 +930,7 @@
               closeModal();
               fetchAppointments();
             } else {
-              alert(j.message || "Erreur lors de l'enregistrement");
+              alert(j.message || 'Erreur lors de l'enregistrement');
             }
           } catch (e) {
             alert('Erreur réseau');
@@ -919,20 +938,35 @@
         });
       }
       function openPrescriptionModal(appointmentId, patientIdentifier) {
-        // Open in-page modal to create prescription (exam or meds)
+        // Open in-page modal to create prescription (exam or meds) - safe DOM
         const title = 'Prescrire un examen / médicament';
         const body = document.getElementById('modal-body');
-        body.innerHTML = `
-          <div>
-            <div style="margin-bottom:8px"><strong>Patient:</strong> ${
-              patientIdentifier || ''
-            }</div>
-            <label>Prescription (détails)</label>
-            <textarea id="presc-text" style="width:100%;min-height:120px;padding:8px;margin-top:6px"></textarea>
-          </div>
-        `;
+        body.innerHTML = '';
+        const container = document.createElement('div');
+        const patientDiv = document.createElement('div');
+        patientDiv.style.marginBottom = '8px';
+        const strong = document.createElement('strong');
+        strong.textContent = 'Patient:';
+        patientDiv.appendChild(strong);
+        patientDiv.appendChild(document.createTextNode(' ' + (patientIdentifier || '')));
+        container.appendChild(patientDiv);
+
+        const label = document.createElement('label');
+        label.textContent = 'Prescription (détails)';
+        container.appendChild(label);
+
+        const textarea = document.createElement('textarea');
+        textarea.id = 'presc-text';
+        textarea.style.width = '100%';
+        textarea.style.minHeight = '120px';
+        textarea.style.padding = '8px';
+        textarea.style.marginTop = '6px';
+        container.appendChild(textarea);
+
+        body.appendChild(container);
+
         openModal(title, async () => {
-          const text = document.getElementById('presc-text').value.trim();
+          const text = (document.getElementById('presc-text') || { value: '' }).value.trim();
           if (!text) return alert('Veuillez saisir la prescription.');
           try {
             const payload = {
@@ -950,7 +984,7 @@
               closeModal();
               fetchAppointments();
             } else {
-              alert(j.message || "Erreur lors de l'enregistrement");
+              alert(j.message || 'Erreur lors de l'enregistrement');
             }
           } catch (e) {
             alert('Erreur réseau');
@@ -979,7 +1013,10 @@
             closeModal();
           });
           const body = document.getElementById('modal-body');
-          body.innerHTML = "<div>Chargement de l'historique...</div>";
+          body.innerHTML = '';
+          const loadingDiv = document.createElement('div');
+          loadingDiv.textContent = 'Chargement de l\'historique...';
+          body.appendChild(loadingDiv);
           try {
             const res = await secureFetch(
               '/api/patient/' +
@@ -988,26 +1025,46 @@
             );
             const j = await res.json();
             if (j.success) {
-              const html = j.data
-                .map(
-                  (h) =>
-                    `<div style="padding:8px;border-bottom:1px solid #eee"><strong>${
-                      h.date || ''
-                    }</strong><div>${(h.note || h.summary || '').replace(
-                      /\n/g,
-                      '<br>'
-                    )}</div></div>`
-                )
-                .join('');
-              body.innerHTML = html || '<div>Aucun historique trouvé</div>';
+              body.innerHTML = '';
+              if (!Array.isArray(j.data) || j.data.length === 0) {
+                const none = document.createElement('div');
+                none.textContent = 'Aucun historique trouvé';
+                body.appendChild(none);
+              } else {
+                j.data.forEach(function (h) {
+                  const item = document.createElement('div');
+                  item.style.padding = '8px';
+                  item.style.borderBottom = '1px solid #eee';
+                  const dateEl = document.createElement('strong');
+                  dateEl.textContent = h.date || '';
+                  item.appendChild(dateEl);
+                  const contentDiv = document.createElement('div');
+                  const text = (h.note || h.summary || '') + '';
+                  if (text.indexOf('\n') === -1) {
+                    contentDiv.textContent = text;
+                  } else {
+                    // preserve line breaks by splitting into paragraphs
+                    text.split('\n').forEach(function (line) {
+                      const p = document.createElement('div');
+                      p.textContent = line;
+                      contentDiv.appendChild(p);
+                    });
+                  }
+                  item.appendChild(contentDiv);
+                  body.appendChild(item);
+                });
+              }
             } else {
-              body.innerHTML =
-                '<div>Erreur: ' +
-                (j.message || 'Impossible de charger') +
-                '</div>';
+              body.innerHTML = '';
+              const errDiv = document.createElement('div');
+              errDiv.textContent = 'Erreur: ' + (j.message || 'Impossible de charger');
+              body.appendChild(errDiv);
             }
           } catch (e) {
-            body.innerHTML = '<div>Erreur réseau</div>';
+            body.innerHTML = '';
+            const errNet = document.createElement('div');
+            errNet.textContent = 'Erreur réseau';
+            body.appendChild(errNet);
           }
         }
       }
