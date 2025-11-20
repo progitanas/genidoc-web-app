@@ -6451,13 +6451,11 @@
               return;
             }
 
-            // generic fallback - navigate to main site
             openGenidoc();
             installBtn.disabled = false;
           });
         });
 
-        // Register service worker (if present)
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.register('/service-worker.js')
             .then((reg) => console.log('ServiceWorker registered', reg))
