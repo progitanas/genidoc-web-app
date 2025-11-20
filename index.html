@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -17,6 +17,8 @@
     />
     <link rel="icon" type="image/png" href="static/ong_GeniDoc1preview.png" />
     <link rel="stylesheet" href="styles/main.css" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#2563eb" />
 
     <style>
       :root {
@@ -708,7 +710,9 @@
         align-items: center;
         gap: 1rem;
         align-items: center;
-        overflow: visible;
+        overflow: visible !important;
+        position: relative;
+        z-index: 100000;
       }
 
       .top-bar-link {
@@ -737,8 +741,8 @@
       .top-bar-dropdown {
         position: relative;
         display: inline-block;
-        overflow: visible;
-        z-index: 999999;
+        overflow: visible !important;
+        z-index: 100001;
       }
 
       .top-bar-dropdown-btn {
@@ -748,12 +752,15 @@
       }
 
       .top-bar-dropdown-menu {
-        position: fixed;
-        top: auto;
+          max-height: none !important;
+          overflow: visible !important;
+          z-index: 100002;
+        position: absolute;
+        top: 100%;
+        left: 0;
         right: auto;
-        left: auto;
         background: #1f1f1f;
-        border: 1px solid #333;
+        border: 2px solid #2563eb;
         border-top: none;
         min-width: 150px;
         opacity: 0;
@@ -775,12 +782,15 @@
       }
 
       .top-bar-dropdown-menu a {
-        padding: 10px 15px;
+        display: block;
+        padding: 12px 18px;
         color: #ffffff;
         text-decoration: none;
-        transition: color 0.2s;
-        border-bottom: 1px solid #333;
-        font-size: 0.85rem;
+        transition: color 0.2s, background 0.2s;
+        border-bottom: 1px solid #2563eb;
+        font-size: 1rem;
+        background: none;
+        white-space: nowrap;
       }
 
       .top-bar-dropdown-menu a:last-child {
@@ -3779,6 +3789,13 @@
                   <span class="app-button-store">Google Play</span>
                 </div>
               </a>
+              <button id="install-app-btn" class="app-button btn btn-primary" style="align-items:center;gap:0.5rem;" aria-label="Installer l'application">
+                <img src="static/ong_GeniDoc1preview.png" alt="GeniDoc" class="app-logo" style="height:28px;"/>
+                <div class="app-button-text">
+                  <span class="app-button-label">Ajouter</span>
+                  <span class="app-button-store">Sur l'accueil</span>
+                </div>
+              </button>
             </div>
 
             <div class="trust-section">
@@ -3882,16 +3899,13 @@
 
           <!-- Hero Visual (Right Column - Desktop Only) -->
           <div class="hero-visual" aria-hidden="true">
-            <!-- Full block image background -->
-            <div class="hero-image-container" style="position: relative; width: 100%; height: 100%; min-height: 400px; display: flex; align-items: center; justify-content: center;">
+            <div class="hero-image-container">
               <img
                 src="1763307229517.jpg"
-                alt="GeniDoc Visual"
-                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 24px; z-index: 1; opacity: 0.96;"
+                alt="GeniDoc"
+                class="hero-image"
+                style="display:block;max-width:380px;width:100%;height:auto;border-radius:18px;box-shadow:0 8px 32px rgba(34,197,94,0.10);border:4px solid #2563eb;background:#fff;z-index:2;"
               />
-              <!-- Only one logo or overlay, not both -->
-              <div class="hero-image-frame" style="z-index: 2;"></div>
-              <div class="hero-image-glow" style="z-index: 2;"></div>
             </div>
           </div>
         </div>
@@ -4308,12 +4322,7 @@
                 </svg>
               </div>
               <span class="category-label" data-i18n="cat-programming"
-<<<<<<< HEAD
                 >General Medicine</span>
-=======
-                >General Medicine</span
-              >
->>>>>>> 10f9f4fc94a4db8df5a6009db3fdbf00967f6f9e
             </div>
             <div class="service-category">
               <div class="category-icon">
@@ -4321,17 +4330,8 @@
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                 </svg>
               </div>
-<<<<<<< HEAD
               <span class="category-label" data-i18n="cat-design">Cardiology</span>
             </div>
-=======
-              <span class="category-label" data-i18n="cat-design"
-                >Cardiology</span
-              >
-            </div>
-
-            <!-- PPediatrics -->
->>>>>>> 10f9f4fc94a4db8df5a6009db3fdbf00967f6f9e
             <div class="service-category">
               <div class="category-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
@@ -4339,17 +4339,8 @@
                   <path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.11"></path>
                 </svg>
               </div>
-<<<<<<< HEAD
               <span class="category-label" data-i18n="cat-marketing">Pediatrics</span>
             </div>
-=======
-              <span class="category-label" data-i18n="cat-marketing"
-                >Pediatrics</span
-              >
-            </div>
-
-            <!-- Dermatology -->
->>>>>>> 10f9f4fc94a4db8df5a6009db3fdbf00967f6f9e
             <div class="service-category">
               <div class="category-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
@@ -4358,17 +4349,8 @@
                   <circle cx="12" cy="12" r="2"></circle>
                 </svg>
               </div>
-<<<<<<< HEAD
               <span class="category-label" data-i18n="cat-writing">Dermatology</span>
             </div>
-=======
-              <span class="category-label" data-i18n="cat-writing"
-                >Dermatology</span
-              >
-            </div>
-
-            <!-- Gynecology -->
->>>>>>> 10f9f4fc94a4db8df5a6009db3fdbf00967f6f9e
             <div class="service-category">
               <div class="category-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
@@ -4377,17 +4359,8 @@
                   <path d="M8 19h8"></path>
                 </svg>
               </div>
-<<<<<<< HEAD
               <span class="category-label" data-i18n="cat-video">Gynecology</span>
             </div>
-=======
-              <span class="category-label" data-i18n="cat-video"
-                >Gynecology</span
-              >
-            </div>
-
-            <!-- Ophthalmology -->
->>>>>>> 10f9f4fc94a4db8df5a6009db3fdbf00967f6f9e
             <div class="service-category">
               <div class="category-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
@@ -4397,36 +4370,6 @@
               </div>
               <span class="category-label" data-i18n="cat-business">Ophthalmology</span>
             </div>
-            <!-- Dentistry -->
-            <div class="service-category">
-              <div class="category-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                  <path d="M12 2C8 2 5 5 5 8c0 3 0 7 2 10 1 2 2 3 3 3s2-1 2-3c0-2 0-4 0-5 0-1 0-3 0-5 0 2 0 4 0 5 0 1 0 3 0 5 0 2 1 3 2 3s2-1 3-3c2-3 2-7 2-10 0-3-3-6-7-6z"></path>
-                </svg>
-              </div>
-              <span class="category-label" data-i18n="cat-ai">Dentistry</span>
-            </div>
-            <!-- ORL -->
-            <div class="service-category">
-              <div class="category-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                  <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
-                  <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
-                </svg>
-              </div>
-              <span class="category-label" data-i18n="cat-music">ORL</span>
-            </div>
-            <!-- Radiology -->
-            <div class="service-category">
-              <div class="category-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                  <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                  <path d="m21 15-5-5L5 21"></path>
-                </svg>
-              </div>
-              <span class="category-label" data-i18n="cat-consulting">Radiology</span>
-            </div>
             <div class="service-category">
               <div class="category-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
@@ -4444,11 +4387,6 @@
               </div>
               <span class="category-label" data-i18n="cat-music">ORL</span>
             </div>
-<<<<<<< HEAD
-=======
-
-            <!-- Radiology -->
->>>>>>> 10f9f4fc94a4db8df5a6009db3fdbf00967f6f9e
             <div class="service-category">
               <div class="category-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
@@ -4457,16 +4395,7 @@
                   <path d="m21 15-5-5L5 21"></path>
                 </svg>
               </div>
-<<<<<<< HEAD
               <span class="category-label" data-i18n="cat-consulting">Radiology</span>
-=======
-              <span class="category-label" data-i18n="cat-consulting"
-                >Radiology</span
-              >
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                </svg>
-              </div>
->>>>>>> 10f9f4fc94a4db8df5a6009db3fdbf00967f6f9e
             </div>
           </div>
 
@@ -5291,11 +5220,11 @@
                 const result = await resp.json();
                 if(result.success){
                   msg.style.color = '#10b981';
-                  msg.textContent = 'Thank you! Your message has been sent.';
+                  msg.textContent = 'Thank you! Your message has been sent to the GeniDoc team.';
                   form.reset();
                 } else {
                   msg.style.color = '#ef4444';
-                  msg.textContent = result.message || 'An error occurred.';
+                  msg.textContent = result.message || 'An error occurred. Please check your email and try again.';
                 }
               } catch(err){
                 msg.style.color = '#ef4444';
@@ -5410,89 +5339,6 @@
        JAVASCRIPT - ALL INTERACTIONS
        ============================================================ */
       (function () {
-
-                // ===============================
-                // TOP BAR DROPDOWN ACCESSIBILITY
-                // ===============================
-                function closeAllTopBarDropdowns() {
-                  document.querySelectorAll('.top-bar-dropdown').forEach(function(drop) {
-                    drop.classList.remove('open');
-                    var btn = drop.querySelector('.top-bar-dropdown-btn');
-                    var menu = drop.querySelector('.top-bar-dropdown-menu');
-                    if (btn) btn.setAttribute('aria-expanded', 'false');
-                    if (menu) menu.setAttribute('aria-hidden', 'true');
-                  });
-                }
-
-                document.querySelectorAll('.top-bar-dropdown').forEach(function(dropdown) {
-                  var btn = dropdown.querySelector('.top-bar-dropdown-btn');
-                  var menu = dropdown.querySelector('.top-bar-dropdown-menu');
-                  if (!btn || !menu) return;
-
-                  // Set ARIA attributes
-                  btn.setAttribute('aria-haspopup', 'true');
-                  btn.setAttribute('aria-expanded', 'false');
-                  menu.setAttribute('aria-hidden', 'true');
-
-                  // Toggle on click
-                  btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    var isOpen = dropdown.classList.contains('open');
-                    closeAllTopBarDropdowns();
-                    if (!isOpen) {
-                      dropdown.classList.add('open');
-                      btn.setAttribute('aria-expanded', 'true');
-                      menu.setAttribute('aria-hidden', 'false');
-                      // Focus first link for accessibility
-                      var firstLink = menu.querySelector('a');
-                      if (firstLink) firstLink.focus();
-                    }
-                  });
-
-                  // Keyboard: open on Enter/Space
-                  btn.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      btn.click();
-                    }
-                    if (e.key === 'ArrowDown') {
-                      e.preventDefault();
-                      var firstLink = menu.querySelector('a');
-                      if (firstLink) firstLink.focus();
-                    }
-                  });
-
-                  // Close on focusout (if focus leaves dropdown)
-                  dropdown.addEventListener('focusout', function(e) {
-                    setTimeout(function() {
-                      if (!dropdown.contains(document.activeElement)) {
-                        dropdown.classList.remove('open');
-                        btn.setAttribute('aria-expanded', 'false');
-                        menu.setAttribute('aria-hidden', 'true');
-                      }
-                    }, 10);
-                  });
-                });
-
-                // Close dropdowns on outside click
-                document.addEventListener('mousedown', function(e) {
-                  document.querySelectorAll('.top-bar-dropdown.open').forEach(function(drop) {
-                    if (!drop.contains(e.target)) {
-                      drop.classList.remove('open');
-                      var btn = drop.querySelector('.top-bar-dropdown-btn');
-                      var menu = drop.querySelector('.top-bar-dropdown-menu');
-                      if (btn) btn.setAttribute('aria-expanded', 'false');
-                      if (menu) menu.setAttribute('aria-hidden', 'true');
-                    }
-                  });
-                });
-
-                // Close dropdowns on ESC
-                document.addEventListener('keydown', function(e) {
-                  if (e.key === 'Escape') {
-                    closeAllTopBarDropdowns();
-                  }
-                });
         "use strict";
 
         // ============================================================
@@ -5987,6 +5833,20 @@
               "Comment mes données de recrutement sont-elles protégées ?",
             "faq-4-answer":
               "Nous utilisons le chiffrement de bout en bout et respectons les normes RGPD. Vos données sont stockées dans des serveurs sécurisés et vous gardez le contrôle total de vos informations.",
+            "faq-genidoc-title": "Questions Fréquentes sur GeniDoc",
+            "faq-genidoc-subtitle": "Trouvez les réponses aux questions les plus posées sur notre plateforme",
+            "faq-q1": "Comment puis-je prendre un rendez-vous en ligne avec GeniDoc?",
+            "faq-a1": "Vous pouvez prendre un rendez-vous en ligne en quelques étapes simples: 1) Recherchez votre médecin ou spécialité, 2) Consultez les créneaux disponibles, 3) Sélectionnez la date et l'heure préférées, 4) Confirmez votre rendez-vous. Vous recevrez une confirmation par email avec tous les détails.",
+            "faq-q2": "Mes données médicales sont-elles sécurisées?",
+            "faq-a2": "Oui, la sécurité de vos données est notre priorité absolue. GeniDoc utilise le chiffrement SSL/TLS, le stockage crypté et respecte les normes de conformité HIPAA et RGPD. Vos informations médicales ne sont jamais partagées sans votre consentement explicite.",
+            "faq-q3": "Puis-je consulter un médecin par téléconsultation?",
+            "faq-a3": "Oui! GeniDoc propose des consultations à distance par vidéo pour de nombreuses spécialités. Vous pouvez choisir la téléconsultation lors de la réservation de votre rendez-vous. Il suffit d'avoir une connexion Internet et une caméra web.",
+            "faq-q4": "Comment puis-je accéder à mon dossier médical électronique?",
+            "faq-a4": "Vous pouvez accéder à votre dossier médical électronique en vous connectant à votre compte GeniDoc. Vous y trouverez tous vos rapports médicaux, résultats d'analyse, historique des rendez-vous et ordonnances en un seul endroit, organisé et facile à consulter.",
+            "faq-q5": "Quels sont les modes de paiement acceptés?",
+            "faq-a5": "GeniDoc accepte plusieurs modes de paiement: cartes bancaires (Visa, Mastercard, American Express), virements bancaires, portefeuilles numériques (Apple Pay, Google Pay) et paiements à la clinique. Les consultations sont remboursables par les assurances maladie partenaires.",
+            "faq-q6": "Comment puis-je contacter le support GeniDoc?",
+            "faq-a6": "Notre équipe support est disponible 24/7 via plusieurs canaux: chat en direct sur notre plateforme, email (support@genidoc.ma), téléphone (+212 5XX XXX XXX) et réseaux sociaux. Nous nous engageons à répondre à vos questions dans les 2 heures.",
           },
           en: {
             "nav-home": "Home",
@@ -6046,6 +5906,20 @@
             "faq-4": "How is my recruitment data protected?",
             "faq-4-answer":
               "We use end-to-end encryption and comply with GDPR standards. Your data is stored on secure servers and you have full control of your information.",
+            "faq-genidoc-title": "Frequently Asked Questions about GeniDoc",
+            "faq-genidoc-subtitle": "Find answers to the most asked questions about our platform",
+            "faq-q1": "How can I book an appointment online with GeniDoc?",
+            "faq-a1": "You can book an appointment online in a few simple steps: 1) Search for your doctor or specialty, 2) Check available slots in real-time, 3) Select your preferred date and time, 4) Confirm your appointment. You will receive instant confirmation by email with all details.",
+            "faq-q2": "Is my medical data secure?",
+            "faq-a2": "Yes, data security is our top priority. GeniDoc uses SSL/TLS encryption, encrypted storage and complies with HIPAA and GDPR standards. Your medical information is never shared without your explicit consent.",
+            "faq-q3": "Can I consult a doctor via teleconsultation?",
+            "faq-a3": "Yes! GeniDoc offers video consultations for many specialties. You can choose teleconsultation when booking your appointment. You only need an internet connection and a web camera.",
+            "faq-q4": "How can I access my electronic medical record?",
+            "faq-a4": "You can access your electronic medical record by logging into your GeniDoc account. You will find all your medical reports, test results, appointment history and prescriptions in one organized place.",
+            "faq-q5": "What payment methods are accepted?",
+            "faq-a5": "GeniDoc accepts multiple payment methods: credit cards (Visa, Mastercard, American Express), bank transfers, digital wallets (Apple Pay, Google Pay) and clinic payments. Consultations are reimbursable by partner health insurance companies.",
+            "faq-q6": "How can I contact GeniDoc support?",
+            "faq-a6": "Our support team is available 24/7 through multiple channels: live chat on our platform, email (support@genidoc.ma), phone (+212 5XX XXX XXX) and social media. We commit to answering your questions within 2 hours.",
           },
           es: {
             "nav-home": "Inicio",
@@ -6068,16 +5942,15 @@
               "Herramientas poderosas para transformar tu reclutamiento",
             "feature-1": "Emparejamiento IA Avanzado",
             "feature-1-desc":
-              "Algoritmo que analiza 200+ criterios para encontrar los mejores matches",
+              "Algoritmo que analiza 200+ criterios para encontrar los mejores matchs",
             "feature-2": "Entrevistas de Video",
             "feature-2-desc": "Entrevistas asincrónicas para más flexibilidad",
             "feature-3": "Reducción de Tiempo",
             "feature-3-desc": "Reduce tu ciclo de reclutamiento en 50%",
             "feature-4": "Análisis Predictivo",
-            "feature-4-desc":
-              "Predice el éxito de candidatos antes de contratar",
+            "feature-4-desc": "Predice el éxito de candidatos antes de contratar",
             "feature-5": "Gestión Fácil",
-            "feature-5-desc": "Interfaz simple e intuitiva para todos",
+            "feature-5-desc": "Einfache und intuitive Benutzeroberfläche",
             "feature-6": "Soporte 24/7",
             "feature-6-desc": "Equipo de expertos siempre disponible",
             "services-title": "Nuestros Servicios",
@@ -6101,8 +5974,7 @@
             "faq-2": "¿Cuánto tiempo tarda contratar vía RecruitAI?",
             "faq-2-answer":
               "En promedio, nuestros clientes reducen el ciclo de reclutamiento en 50%. En lugar de 4-6 semanas, puedes completar tu contratación en 2 semanas.",
-            "faq-3":
-              "¿Las entrevistas de video asincrónicas son realmente efectivas?",
+            "faq-3": "¿Las entrevistas de video asincrónicas son realmente efectivas?",
             "faq-3-answer":
               "Absolutamente. Las entrevistas asincrónicas ofrecen más flexibilidad a los candidatos, reducen las no presentaciones en 80%, y permiten a los reclutadores evaluar mejor.",
             "faq-4": "¿Cómo están protegidos mis datos de reclutamiento?",
@@ -6136,8 +6008,7 @@
             "feature-3": "Zeitreduktion",
             "feature-3-desc": "Reduzieren Sie Ihren Rekrutierungszyklus um 50%",
             "feature-4": "Vorhersageanalytik",
-            "feature-4-desc":
-              "Vorhersagen des Kandidatenerfolgs vor der Einstellung",
+            "feature-4-desc": "Vorhersagen des Kandidatenerfolgs vor der Einstellung",
             "feature-5": "Einfache Verwaltung",
             "feature-5-desc": "Einfache und intuitive Benutzeroberfläche",
             "feature-6": "Support 24/7",
@@ -6230,7 +6101,7 @@
           },
         };
 
-        let currentLanguage = localStorage.getItem("language") || "fr";
+        let currentLanguage = 'en';
 
         // Function to change language
         function changeLanguage(lang) {
@@ -6269,85 +6140,183 @@
         // Language dropdown toggle
         const dropdownBtn = document.querySelector(".lang-dropdown-btn");
         const dropdown = document.querySelector(".language-dropdown");
-
+        function updateLangBtn() {
+          if (dropdownBtn) {
+            if (currentLanguage === 'en') dropdownBtn.innerHTML = '<span style="margin-right:6px;">English</span> <svg style="vertical-align:middle;" width="16" height="16" viewBox="0 0 20 20"><path fill="#fff" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.06l3.71-3.83a.75.75 0 1 1 1.08 1.04l-4.25 4.39a.75.75 0 0 1-1.08 0L5.21 8.27a.75.75 0 0 1 .02-1.06z"/></svg>';
+            else if (currentLanguage === 'fr') dropdownBtn.innerHTML = '<span style="margin-right:6px;">Français</span> <svg style="vertical-align:middle;" width="16" height="16" viewBox="0 0 20 20"><path fill="#fff" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.06l3.71-3.83a.75.75 0 1 1 1.08 1.04l-4.25 4.39a.75.75 0 0 1-1.08 0L5.21 8.27a.75.75 0 0 1 .02-1.06z"/></svg>';
+            else if (currentLanguage === 'ar') dropdownBtn.innerHTML = '<span style="margin-right:6px;">العربية</span> <svg style="vertical-align:middle;" width="16" height="16" viewBox="0 0 20 20"><path fill="#fff" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.06l3.71-3.83a.75.75 0 1 1 1.08 1.04l-4.25 4.39a.75.75 0 0 1-1.08 0L5.21 8.27a.75.75 0 0 1 .02-1.06z"/></svg>';
+          }
+        }
         dropdownBtn.addEventListener("click", function () {
           dropdown.classList.toggle("active");
         });
-
         // Language option listeners
         document.querySelectorAll(".lang-option").forEach((btn) => {
           btn.addEventListener("click", function () {
             const lang = this.getAttribute("data-lang");
+            currentLanguage = lang;
             changeLanguage(lang);
+            updateLangBtn();
+            document.documentElement.lang = lang;
+            dropdown.classList.remove("active");
+            // Optionally, handle RTL for Arabic
+            if(lang==='ar') document.body.dir = 'rtl';
+            else document.body.dir = 'ltr';
           });
         });
-
         // Close dropdown when clicking outside
         document.addEventListener("click", function (e) {
           if (!dropdown.contains(e.target)) {
             dropdown.classList.remove("active");
           }
         });
-
         // Initialize language on page load
         changeLanguage(currentLanguage);
+        updateLangBtn();
 
         // ============================================================
         // TOP BAR DROPDOWN MENU HANDLER - Move to body for visibility
         // ============================================================
         const topBarDropdowns = document.querySelectorAll('.top-bar-dropdown');
-        
+        let openPortal = null, openBtn = null;
+        function closeAnyPortal() {
+          document.querySelectorAll('.dropdown-portal').forEach(function(el) { el.remove(); });
+          openPortal = null; openBtn = null;
+        }
         topBarDropdowns.forEach(dropdown => {
           const btn = dropdown.querySelector('.top-bar-dropdown-btn');
           const menu = dropdown.querySelector('.top-bar-dropdown-menu');
-          
-          if (btn && menu) {
-            // Clone menu and move to body
-            const clonedMenu = menu.cloneNode(true);
-            clonedMenu.style.position = 'fixed';
-            clonedMenu.style.zIndex = '999999';
-            document.body.appendChild(clonedMenu);
-            
-            // Hide original menu
-            menu.style.display = 'none';
-            
-            let hideTimeout;
-            
-            function positionMenu() {
-              const btnRect = btn.getBoundingClientRect();
-              clonedMenu.style.top = (btnRect.bottom + 8) + 'px';
-              clonedMenu.style.left = (btnRect.right - 150) + 'px';
+          // Open on click or keyboard
+          function openDropdownPortal(e) {
+            if (e) e.preventDefault();
+            closeAnyPortal();
+            var rect = btn.getBoundingClientRect();
+            var portal = menu.cloneNode(true);
+            portal.classList.add('dropdown-portal');
+            portal.style.position = 'fixed';
+            let left = rect.left;
+            const portalWidth = rect.width;
+            if (left + portalWidth > window.innerWidth - 8) {
+              left = window.innerWidth - portalWidth - 8;
+              if (left < 8) left = 8;
             }
-            
-            function showMenu() {
-              clearTimeout(hideTimeout);
-              positionMenu();
-              clonedMenu.style.opacity = '1';
-              clonedMenu.style.visibility = 'visible';
-              clonedMenu.style.transform = 'translateY(0)';
-              clonedMenu.style.pointerEvents = 'auto';
+            portal.style.left = left + 'px';
+            // Calculer la hauteur réelle du menu cloné (portal)
+            // Forcer l'affichage du portal pour mesurer la vraie hauteur
+            portal.style.display = 'flex';
+            portal.style.opacity = '1';
+            portal.style.visibility = 'visible';
+            portal.style.position = 'fixed';
+            portal.style.left = '-9999px';
+            portal.style.top = '-9999px';
+            document.body.appendChild(portal);
+            let menuHeight = portal.offsetHeight;
+            if (!menuHeight || menuHeight < 40) menuHeight = 220; // fallback si vide
+            portal.remove();
+            const spaceBelow = window.innerHeight - rect.bottom;
+            const spaceAbove = rect.top;
+            let top = rect.bottom + window.scrollY;
+            if (spaceBelow < menuHeight && spaceAbove > menuHeight) {
+              top = rect.top + window.scrollY - menuHeight;
             }
-            
-            function hideMenu() {
-              hideTimeout = setTimeout(() => {
-                clonedMenu.style.opacity = '0';
-                clonedMenu.style.visibility = 'hidden';
-                clonedMenu.style.transform = 'translateY(-10px)';
-                clonedMenu.style.pointerEvents = 'none';
-              }, 200);
+            portal.style.top = top + 'px';
+            portal.style.minWidth = rect.width + 'px';
+            portal.style.maxHeight = 'calc(100vh - 32px)';
+            portal.style.overflowY = 'auto';
+            portal.style.zIndex = '2147483647'; // toujours au-dessus de tout
+            portal.style.opacity = '1';
+            portal.style.visibility = 'visible';
+            portal.style.transform = 'none';
+            portal.style.zIndex = '2147483647';
+            portal.style.pointerEvents = 'auto';
+            // Remove any pointer-events:none from children (in case cloned)
+            Array.from(portal.querySelectorAll('*')).forEach(function(el){
+              if (el.style.pointerEvents === 'none') el.style.pointerEvents = 'auto';
+            });
+            // Style visuel garanti (fond sombre, bordure bleue, padding, couleur texte)
+            portal.style.background = '#1f1f1f';
+            portal.style.border = '2px solid #2563eb';
+            portal.style.boxShadow = '0 4px 16px rgba(0,0,0,0.18)';
+            portal.style.borderRadius = '10px';
+            portal.style.display = 'flex';
+            portal.style.flexDirection = 'column';
+            portal.style.padding = '0';
+            // Style des liens (force la visibilité et la lisibilité)
+            Array.from(portal.querySelectorAll('a')).forEach(function(a){
+              a.style.color = '#fff';
+              a.style.background = '#1f1f1f';
+              a.style.padding = '12px 18px';
+              a.style.fontSize = '1rem';
+              a.style.textDecoration = 'none';
+              a.style.borderBottom = '1px solid #2563eb';
+              a.style.display = 'block';
+              a.style.whiteSpace = 'nowrap';
+              a.style.zIndex = '2147483647';
+              a.style.opacity = '1';
+              a.style.visibility = 'visible';
+              a.style.fontWeight = '600';
+              a.style.filter = 'none';
+              a.style.pointerEvents = 'auto'; // always clickable
+              a.tabIndex = 0; // ensure focusable
+              a.onkeydown = function(ev) {
+                if(ev.key==='Enter'||ev.key===' '){
+                  ev.preventDefault();
+                  a.click();
+                }
+              };
+            });
+            var links = portal.querySelectorAll('a');
+            if(links.length) links[links.length-1].style.borderBottom = 'none';
+            // Focus first link for accessibility
+            setTimeout(()=>{
+              let firstLink = portal.querySelector('a');
+              if(firstLink) firstLink.focus();
+            }, 10);
+            document.body.appendChild(portal);
+            openPortal = portal; openBtn = btn;
+            // Keep open on hover/focus
+            let hoverOnBtn = false, hoverOnPortal = false;
+            function checkClose() {
+              setTimeout(()=>{ if(!hoverOnBtn && !hoverOnPortal) closeAnyPortal(); }, 120);
             }
-            
-            // Show menu on hover over button
-            dropdown.addEventListener('mouseenter', showMenu);
-            
-            // Keep menu open if hovering over menu
-            clonedMenu.addEventListener('mouseenter', showMenu);
-            clonedMenu.addEventListener('mouseleave', hideMenu);
-            
-            // Hide menu when leaving button (with delay for smooth transition)
-            dropdown.addEventListener('mouseleave', hideMenu);
+            btn.addEventListener('mouseenter', ()=>{ hoverOnBtn=true; });
+            btn.addEventListener('mouseleave', ()=>{ hoverOnBtn=false; checkClose(); });
+            portal.addEventListener('mouseenter', ()=>{ hoverOnPortal=true; });
+            portal.addEventListener('mouseleave', ()=>{ hoverOnPortal=false; checkClose(); });
+            // Close on click outside or ESC
+            function closePortal(e) {
+              if (!portal.contains(e.target) && e.target !== btn) {
+                closeAnyPortal();
+                document.removeEventListener('mousedown', closePortal);
+                document.removeEventListener('keydown', escListener);
+              }
+            }
+            function escListener(e) {
+              if (e.key === 'Escape') {
+                closeAnyPortal();
+                document.removeEventListener('mousedown', closePortal);
+                document.removeEventListener('keydown', escListener);
+              }
+              // Tab navigation: close if tabbing out
+              if (e.key === 'Tab' && openPortal) {
+                let focusable = Array.from(openPortal.querySelectorAll('a'));
+                let idx = focusable.indexOf(document.activeElement);
+                if ((e.shiftKey && idx === 0) || (!e.shiftKey && idx === focusable.length-1)) {
+                  closeAnyPortal();
+                }
+              }
+            }
+            document.addEventListener('mousedown', closePortal);
+            document.addEventListener('keydown', escListener);
           }
+          btn.addEventListener('click', openDropdownPortal);
+          btn.addEventListener('keydown', function(e){
+            if(e.key==='Enter'||e.key===' '){ openDropdownPortal(e); }
+          });
         });
+        // Close all portals on scroll or resize
+        window.addEventListener('scroll', closeAnyPortal);
+        window.addEventListener('resize', closeAnyPortal);
 
         // ============================================================
       })();
@@ -6381,6 +6350,80 @@
           };
         }
       });
+    </script>
+    <script>
+        // PWA install + service worker registration
+      (function() {
+        let deferredPrompt = null;
+        const installBtn = document.getElementById('install-app-btn');
+
+        // Helper: open genidoc.ma in the same tab (user requested behaviour)
+        function openGenidoc() {
+          try {
+            window.location.href = 'https://genidoc.ma';
+          } catch (err) {
+            window.open('https://genidoc.ma', '_blank');
+          }
+        }
+
+        // If browser supports beforeinstallprompt, capture event and allow prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          deferredPrompt = e;
+          if (installBtn) {
+            installBtn.style.display = 'inline-flex';
+          }
+        });
+
+        // Always show the button near the store badges for discoverability
+        if (installBtn) {
+          installBtn.style.display = 'inline-flex';
+          installBtn.addEventListener('click', async (ev) => {
+            ev.preventDefault();
+            installBtn.disabled = true;
+
+            // If we have a deferred prompt (Chrome/Android PWA flow)
+            if (deferredPrompt) {
+              try {
+                deferredPrompt.prompt();
+                const choiceResult = await deferredPrompt.userChoice;
+                // clear the saved prompt since it can only be used once
+                deferredPrompt = null;
+              } catch (err) {
+                console.warn('PWA prompt failed:', err);
+              }
+              installBtn.disabled = false;
+              // After prompting, go to genidoc.ma as requested
+              openGenidoc();
+              return;
+            }
+
+            // Fallback for iOS / browsers without beforeinstallprompt:
+            // show short instructions then navigate to genidoc.ma
+            if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+              // Small instruction overlay (simple alert to avoid extra markup)
+              alert("Pour ajouter GeniDoc à l'écran d'accueil : appuyez sur le bouton 'Partager' puis 'Ajouter à l'écran d'accueil'. Vous serez ensuite redirigé vers genidoc.ma.");
+              openGenidoc();
+              installBtn.disabled = false;
+              return;
+            }
+
+            // Generic fallback: just navigate to genidoc.ma
+            openGenidoc();
+            installBtn.disabled = false;
+          });
+        }
+
+        // Register service worker (if present)
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('/service-worker.js')
+            .then((reg) => {
+              console.log('ServiceWorker registered', reg);
+            }).catch((err) => {
+              console.warn('ServiceWorker registration failed:', err);
+            });
+        }
+      })();
     </script>
   </body>
 </html>

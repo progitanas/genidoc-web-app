@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Fiches de service</title>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        padding: 20px;
+      }
+      .fiche {
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Fiches de service</h1>
+    <label
+      >Service clé: <input id="service" placeholder="ex: cardiologie"
+    /></label>
+    <button id="load">Charger</button>
+    <div id="list"></div>
+
+    <script>
+      document.getElementById('load').addEventListener('click', async () => {
+        const service = document.getElementById('service').value;
+        const url = service
+          ? `/api/service-fiches?service=${encodeURIComponent(service)}`
+          : '/api/service-fiches';
+        const res = await fetch(url);
+        const data = await res.json();
+        const out = document.getElementById('list');
+        out.innerHTML = '';
+        if (!data || !data.length) {
+          out.textContent = JSON.stringify(data);
+          return;
+        }
+        for (const f of data) {
+          const d = document.createElement('div');
+          d.className = 'fiche';
+          d.innerHTML = `<h3>${f.title || f.service || 'Fiche'}</h3><div>${
+            f.content || f.description || ''
+          }</div>`;
+          out.appendChild(d);
+        }
+      });
+      const p = new URLSearchParams(location.search);
+      if (p.get('service'))
+        document.getElementById('service').value = p.get('service');
+    </script>
+  </body>
+</html>

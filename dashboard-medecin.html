@@ -5,9 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard Médecin — GeniDoc</title>
     <link rel="icon" type="image/png" href="/static/ong_GeniDoc1preview.png" />
+    <link rel="stylesheet" href="assets/css/mobile.css" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#2056ae" />
     <style>
       body {
-        font-family: "Space Grotesk", "Segoe UI", Tahoma, Geneva, Verdana,
+        font-family: 'Space Grotesk', 'Segoe UI', Tahoma, Geneva, Verdana,
           sans-serif;
         background: #f5f7fa;
         margin: 0;
@@ -68,19 +71,257 @@
       .logout-btn:hover {
         background: #c0392b;
       }
+      /* Buttons inside appointment table and quick actions - larger touch targets */
+      .appointments-table button,
+      .quick-btn,
+      .quick-actions button {
+        padding: 10px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        border: 1px solid transparent;
+      }
+      .appointments-table button:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
+      /* Mobile: convert table rows into stacked cards (fallback if mobile.css not loaded) */
+      @media (max-width: 700px) {
+        .appointments-table,
+        .appointments-table thead {
+          display: block;
+        }
+        .appointments-table thead {
+          overflow: auto;
+        }
+        .appointments-table tbody {
+          display: block;
+        }
+        .appointments-table tr {
+          display: block;
+          margin-bottom: 12px;
+          border: 1px solid #e6eefc;
+          border-radius: 10px;
+          padding: 8px;
+        }
+        .appointments-table td {
+          display: block;
+          border: none;
+          padding: 8px 6px;
+        }
+        .appointments-table td[data-label]:before {
+          content: attr(data-label) ': ';
+          font-weight: 700;
+          display: inline-block;
+          width: 120px;
+        }
+      }
     </style>
   </head>
   <body>
+    <script>
+      // Session/authentication check for dashboard-medecin.html
+      (function () {
+        var doctorId = localStorage.getItem('doctorId');
+        if (!doctorId) {
+          window.location.href = 'auth.html';
+        }
+      })();
+      // secureFetch helper: attach token and handle 401/403 centrally
+      async function secureFetch(url, options = {}, errorMsg) {
+        options = options || {};
+        options.headers = options.headers || {};
+        try {
+          const token = localStorage.getItem('token');
+          if (token) options.headers['Authorization'] = 'Bearer ' + token;
+        } catch (e) {
+          console.warn('Unable to read token', e);
+        }
+        const res = await fetch(url, options);
+        if (res.status === 401 || res.status === 403) {
+          try {
+            localStorage.removeItem('token');
+            localStorage.removeItem('doctorId');
+          } catch (e) {}
+          if (typeof showBanner === 'function')
+            showBanner('Accès refusé ou session expirée. Redirection...');
+          setTimeout(() => (window.location.href = 'auth.html'), 1200);
+          throw new Error('Déconnecté');
+        }
+        return res;
+      }
+    </script>
     <div class="dashboard-container">
+      <!-- Ruban supprimé -->
       <button class="logout-btn" onclick="logout()">Déconnexion</button>
+      <button
+        id="install-app-btn"
+        class="logout-btn"
+        style="background: #10b981; margin-left: 8px"
+      >
+        Installer
+      </button>
       <h1>Bienvenue, Dr <span id="doctor-name"></span></h1>
       <div class="profile-box">
         <strong>Email :</strong> <span id="doctor-email"></span><br />
         <strong>Spécialité :</strong> <span id="doctor-specialty"></span><br />
         <strong>Établissement :</strong> <span id="doctor-establishment"></span>
       </div>
+
+      <!-- Modals: Diagnostic / Prescription / Ordonnance / Historique -->
+      <div
+        id="modal-backdrop"
+        style="
+          display: none;
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.45);
+          z-index: 1200;
+          align-items: center;
+          justify-content: center;
+        "
+      >
+        <div
+          id="modal"
+          style="
+            background: #fff;
+            border-radius: 12px;
+            max-width: 760px;
+            width: 92%;
+            padding: 18px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+          "
+        >
+          <div
+            id="modal-header"
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 12px;
+            "
+          >
+            <strong id="modal-title">Titre</strong>
+            <button
+              id="modal-close"
+              style="
+                background: #eee;
+                border: none;
+                padding: 8px 10px;
+                border-radius: 8px;
+                cursor: pointer;
+              "
+            >
+              Fermer
+            </button>
+          </div>
+          <div id="modal-body" style="max-height: 60vh; overflow: auto"></div>
+          <div style="margin-top: 12px; text-align: right">
+            <button
+              id="modal-save"
+              style="
+                background: #2056ae;
+                color: #fff;
+                border: none;
+                padding: 10px 14px;
+                border-radius: 8px;
+                cursor: pointer;
+              "
+            >
+              Enregistrer
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Boutons d'accès rapide aux fonctionnalités -->
+      <div class="quick-actions">
+        <button
+          class="quick-btn"
+          onclick="createPatientRecord()"
+          title="Créer un nouveau dossier patient"
+        >
+          Nouveau dossier patient
+        </button>
+        <button
+          class="quick-btn"
+          onclick="uploadMedicalDocument()"
+          title="Ajouter un document médical au dossier patient"
+        >
+          Uploader un document
+        </button>
+        <button
+          class="quick-btn"
+          onclick="openTeleconsultation()"
+          title="Démarrer une téléconsultation vidéo"
+        >
+          Téléconsultation
+        </button>
+        <button
+          class="quick-btn"
+          onclick="openMessaging()"
+          title="Accéder à la messagerie sécurisée"
+        >
+          Messagerie
+        </button>
+        <button
+          class="quick-btn"
+          onclick="showStats()"
+          title="Voir les statistiques d'activité"
+        >
+          Statistiques
+        </button>
+      </div>
+      <style>
+        .quick-actions {
+          margin-bottom: 24px;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 14px;
+          justify-content: flex-start;
+        }
+        .quick-btn {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: #2056ae;
+          color: #fff;
+          border: none;
+          border-radius: 8px;
+          padding: 12px 20px;
+          font-size: 1em;
+          font-weight: 600;
+          cursor: pointer;
+          box-shadow: 0 2px 8px rgba(32, 86, 174, 0.08);
+          transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+          min-width: 210px;
+          justify-content: flex-start;
+        }
+        /* .quick-btn .icon { supprimé car plus d'emoji } */
+        .quick-btn:hover,
+        .quick-btn:focus {
+          background: #174080;
+          box-shadow: 0 4px 16px rgba(32, 86, 174, 0.16);
+          transform: translateY(-2px) scale(1.03);
+          outline: none;
+        }
+      </style>
+
       <div class="section">
         <h2>Rendez-vous à venir</h2>
+        <!-- Agenda par service (vue calendrier) -->
+        <div class="section" id="agenda-section" style="margin-bottom: 32px">
+          <h2>Agenda par service</h2>
+          <label for="service-filter">Filtrer par service :</label>
+          <select id="service-filter">
+            <option value="">Tous</option>
+            <option value="consultation">Consultation</option>
+            <option value="téléconsultation">Téléconsultation</option>
+            <option value="téléexpertise">Téléexpertise</option>
+            <option value="telesoin">Télésuivi</option>
+            <option value="urgence">Urgence</option>
+          </select>
+          <div id="calendar" style="margin-top: 18px"></div>
+        </div>
         <table class="appointments-table">
           <thead>
             <tr>
@@ -90,24 +331,177 @@
               <th>Motif</th>
               <th>Statut</th>
               <th>Action</th>
+              <th>Diagnostic</th>
+              <th>Prescription</th>
+              <th>Ordonnance</th>
+              <th>Historique</th>
+              <th>Téléconsult</th>
+              <th>Statut action</th>
             </tr>
           </thead>
           <tbody id="appointments-list">
             <tr>
-              <td colspan="5">Chargement...</td>
+              <td colspan="12">Chargement...</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
     <script>
+      // --- Agenda par service (vue calendrier) ---
+      // Simple calendrier JS (pas de dépendance externe)
+      let agendaAppointments = [];
+      function renderCalendar(appointments, month, year) {
+        const calendarDiv = document.getElementById('calendar');
+        calendarDiv.innerHTML = '';
+        const now = new Date();
+        month = month ?? now.getMonth();
+        year = year ?? now.getFullYear();
+        // En-tête mois/année
+        const header = document.createElement('div');
+        header.style.display = 'flex';
+        header.style.justifyContent = 'space-between';
+        header.style.alignItems = 'center';
+        header.style.marginBottom = '8px';
+        const prevBtn = document.createElement('button');
+        prevBtn.textContent = '<';
+        prevBtn.onclick = () =>
+          renderCalendar(
+            appointments,
+            month === 0 ? 11 : month - 1,
+            month === 0 ? year - 1 : year
+          );
+        const nextBtn = document.createElement('button');
+        nextBtn.textContent = '>';
+        nextBtn.onclick = () =>
+          renderCalendar(
+            appointments,
+            month === 11 ? 0 : month + 1,
+            month === 11 ? year + 1 : year
+          );
+        const monthNames = [
+          'Janvier',
+          'Février',
+          'Mars',
+          'Avril',
+          'Mai',
+          'Juin',
+          'Juillet',
+          'Août',
+          'Septembre',
+          'Octobre',
+          'Novembre',
+          'Décembre',
+        ];
+        const title = document.createElement('span');
+        title.textContent = monthNames[month] + ' ' + year;
+        header.appendChild(prevBtn);
+        header.appendChild(title);
+        header.appendChild(nextBtn);
+        calendarDiv.appendChild(header);
+        // Tableau calendrier
+        const table = document.createElement('table');
+        table.style.width = '100%';
+        table.style.borderCollapse = 'collapse';
+        const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+        const thead = document.createElement('thead');
+        const trh = document.createElement('tr');
+        days.forEach((d) => {
+          const th = document.createElement('th');
+          th.textContent = d;
+          th.style.background = '#f0f5ff';
+          th.style.color = '#2056ae';
+          th.style.padding = '6px';
+          trh.appendChild(th);
+        });
+        thead.appendChild(trh);
+        table.appendChild(thead);
+        const firstDay = new Date(year, month, 1);
+        let startDay = firstDay.getDay();
+        startDay = startDay === 0 ? 6 : startDay - 1; // Lundi=0
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        let date = 1;
+        const tbody = document.createElement('tbody');
+        for (let i = 0; i < 6; i++) {
+          const tr = document.createElement('tr');
+          for (let j = 0; j < 7; j++) {
+            const td = document.createElement('td');
+            td.style.height = '48px';
+            td.style.verticalAlign = 'top';
+            td.style.border = '1px solid #e5e7eb';
+            td.style.padding = '4px';
+            if (i === 0 && j < startDay) {
+              td.innerHTML = '';
+            } else if (date > daysInMonth) {
+              td.innerHTML = '';
+            } else {
+              td.innerHTML = `<div style='font-weight:600;'>${date}</div>`;
+              // RDV du jour
+              const dayStr = `${year}-${String(month + 1).padStart(
+                2,
+                '0'
+              )}-${String(date).padStart(2, '0')}`;
+              const dayApps = appointments.filter((a) =>
+                (a.date || '').startsWith(dayStr)
+              );
+              dayApps.forEach((a) => {
+                const badge = document.createElement('div');
+                badge.textContent = `${a.time || ''} - ${
+                  a.fullName || a.patientName || ''
+                } (${a.service || a.reason || ''})`;
+                badge.style.background = '#2056ae';
+                badge.style.color = '#fff';
+                badge.style.borderRadius = '6px';
+                badge.style.fontSize = '0.92em';
+                badge.style.margin = '2px 0';
+                badge.style.padding = '2px 6px';
+                badge.title = `Statut: ${a.status || '-'}\nMotif: ${
+                  a.reason || '-'
+                }\nService: ${a.service || '-'}\nPatient: ${
+                  a.fullName || a.patientName || ''
+                }`;
+                td.appendChild(badge);
+              });
+              date++;
+            }
+            tr.appendChild(td);
+          }
+          tbody.appendChild(tr);
+        }
+        table.appendChild(tbody);
+        calendarDiv.appendChild(table);
+      }
+
+      function updateAgendaCalendar() {
+        const service = document.getElementById('service-filter').value;
+        let filtered = agendaAppointments;
+        if (service) {
+          filtered = agendaAppointments.filter(
+            (a) =>
+              (a.service || a.reason || '').toLowerCase() ===
+              service.toLowerCase()
+          );
+        }
+        renderCalendar(filtered);
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        const filter = document.getElementById('service-filter');
+        if (filter) {
+          filter.addEventListener('change', updateAgendaCalendar);
+        }
+      });
+      // La navbar ne contient plus le nom du médecin, seulement le logo
+      function setNavbarDoctorName(name) {
+        /* plus utilisé */
+      }
       function getDoctorId() {
         const url = new URL(window.location.href);
         const id =
-          url.searchParams.get("doctorId") ||
-          localStorage.getItem("doctorId") ||
-          "";
-        console.log("[DASHBOARD] doctorId utilisé:", id);
+          url.searchParams.get('doctorId') ||
+          localStorage.getItem('doctorId') ||
+          '';
+        console.log('[DASHBOARD] doctorId utilisé:', id);
         return id;
       }
 
@@ -117,61 +511,70 @@
           alert(
             "Aucun doctorId trouvé dans l'URL ni dans le stockage local. Veuillez vous reconnecter."
           );
-          document.getElementById("doctor-name").textContent =
-            "[Aucun médecin connecté]";
-          document.getElementById("doctor-email").textContent = "-";
-          document.getElementById("doctor-specialty").textContent = "-";
-          document.getElementById("doctor-establishment").textContent = "-";
+          document.getElementById('doctor-name').textContent =
+            '[Aucun médecin connecté]';
+          document.getElementById('doctor-email').textContent = '-';
+          document.getElementById('doctor-specialty').textContent = '-';
+          document.getElementById('doctor-establishment').textContent = '-';
           return;
         }
         try {
-          console.log("[DASHBOARD] Appel API:", `/api/doctor/${doctorId}`);
-          const res = await fetch(`/api/doctor/${doctorId}`);
+          console.log(
+            '[DASHBOARD] Appel API sécurisé:',
+            `/api/doctor/${doctorId}`
+          );
+          const res = await secureFetch(`/api/doctor/${doctorId}`);
           const result = await res.json();
+          console.log('[DASHBOARD] Données médecin reçues:', result);
           if (result.success && result.data) {
             const d = result.data;
-            document.getElementById("doctor-name").textContent =
-              (d.doctorFirstName || d.userFirstName || d.firstName || "") +
-              " " +
-              (d.doctorLastName || d.userLastName || d.lastName || "");
-            document.getElementById("doctor-email").textContent =
-              d.email || "-";
-            document.getElementById("doctor-specialty").textContent =
-              d.specialty || d.establishmentSpecialty || "-";
-            document.getElementById("doctor-establishment").textContent =
-              d.establishmentName || "-";
+            const fullName =
+              (d.doctorFirstName || d.userFirstName || d.firstName || '') +
+              ' ' +
+              (d.doctorLastName || d.userLastName || d.lastName || '');
+            document.getElementById('doctor-name').textContent =
+              fullName.trim() || '-';
+            setNavbarDoctorName(fullName.trim() || '-');
+            document.getElementById('doctor-email').textContent =
+              d.email || d.userEmail || d.doctorEmail || '-';
+            document.getElementById('doctor-specialty').textContent =
+              d.specialty || d.establishmentSpecialty || '-';
+            document.getElementById('doctor-establishment').textContent =
+              d.establishmentName || '-';
           } else {
-            document.getElementById("doctor-name").textContent =
-              "[Médecin introuvable]";
-            document.getElementById("doctor-email").textContent = "-";
-            document.getElementById("doctor-specialty").textContent = "-";
-            document.getElementById("doctor-establishment").textContent = "-";
+            document.getElementById('doctor-name').textContent =
+              '[Erreur: ' + (result.message || 'Médecin introuvable') + ']';
+            document.getElementById('doctor-email').textContent = '-';
+            document.getElementById('doctor-specialty').textContent = '-';
+            document.getElementById('doctor-establishment').textContent = '-';
+            console.error('[DASHBOARD] Erreur API doctor:', result);
           }
         } catch (e) {
-          document.getElementById("doctor-name").textContent =
-            "[Erreur serveur]";
-          document.getElementById("doctor-email").textContent = "-";
-          document.getElementById("doctor-specialty").textContent = "-";
-          document.getElementById("doctor-establishment").textContent = "-";
+          document.getElementById('doctor-name').textContent =
+            '[Erreur JS: ' + (e && e.message ? e.message : e) + ']';
+          document.getElementById('doctor-email').textContent = '-';
+          document.getElementById('doctor-specialty').textContent = '-';
+          document.getElementById('doctor-establishment').textContent = '-';
+          console.error('[DASHBOARD] Exception fetchDoctorProfile:', e);
         }
       }
 
       async function fetchAppointments() {
         const doctorId = getDoctorId();
-        const tbody = document.getElementById("appointments-list");
+        const tbody = document.getElementById('appointments-list');
         if (!doctorId) {
           tbody.innerHTML =
-            '<tr><td colspan="5">Erreur : aucun identifiant médecin trouvé.</td></tr>';
+            '<tr><td colspan="12">Erreur : aucun identifiant médecin trouvé.</td></tr>';
           return;
         }
         try {
           // On récupère le profil médecin pour avoir les RDV établissement si besoin
-          const doctorRes = await fetch(`/api/doctor/${doctorId}`);
+          const doctorRes = await secureFetch(`/api/doctor/${doctorId}`);
           const doctorResult = await doctorRes.json();
           let appointments = [];
           if (doctorResult.success && doctorResult.data) {
             // Priorité : RDV directs du médecin, sinon RDV établissement
-            const directRes = await fetch(
+            const directRes = await secureFetch(
               `/api/appointments?doctorId=${doctorId}`
             );
             const directResult = await directRes.json();
@@ -188,60 +591,474 @@
               appointments = doctorResult.data.establishmentAppointments;
             }
           }
-          tbody.innerHTML = "";
+          // Pour l'agenda : stocker tous les RDV (directs ou établissement)
+          agendaAppointments = appointments;
+          updateAgendaCalendar();
+          tbody.innerHTML = '';
           if (appointments.length) {
             appointments.forEach((app) => {
-              const tr = document.createElement("tr");
-              tr.innerHTML = `<td>${
-                app.fullName || app.patientName || "-"
-              }</td><td>${app.date || "-"}</td><td>${app.time || "-"}</td><td>${
-                app.service || app.reason || "-"
-              }</td><td>${app.status || "-"}</td>`;
-              // Ajout des boutons d'action si le statut est "en attente"
-              const actionTd = document.createElement("td");
-              if (app.status === "en attente") {
-                const acceptBtn = document.createElement("button");
-                acceptBtn.textContent = "Accepter";
-                acceptBtn.style.marginRight = "8px";
+              const tr = document.createElement('tr');
+              // Patient
+              const tdPatient = document.createElement('td');
+              tdPatient.setAttribute('data-label', 'Patient');
+              tdPatient.textContent = app.fullName || app.patientName || '-';
+              tr.appendChild(tdPatient);
+              // Date
+              const tdDate = document.createElement('td');
+              tdDate.setAttribute('data-label', 'Date');
+              tdDate.textContent = app.date || '-';
+              tr.appendChild(tdDate);
+              // Heure
+              const tdTime = document.createElement('td');
+              tdTime.setAttribute('data-label', 'Heure');
+              tdTime.textContent = app.time || '-';
+              tr.appendChild(tdTime);
+              // Motif / Service
+              const tdReason = document.createElement('td');
+              tdReason.setAttribute('data-label', 'Motif');
+              tdReason.textContent = app.service || app.reason || '-';
+              tr.appendChild(tdReason);
+              // Statut
+              const tdStatus = document.createElement('td');
+              tdStatus.setAttribute('data-label', 'Statut');
+              tdStatus.textContent = app.status || '-';
+              tr.appendChild(tdStatus);
+              // Action (accepter/refuser)
+              const actionTd = document.createElement('td');
+              actionTd.setAttribute('data-label', 'Action');
+              if (app.status === 'en attente') {
+                const acceptBtn = document.createElement('button');
+                acceptBtn.textContent = 'Accepter';
+                acceptBtn.style.marginRight = '8px';
                 acceptBtn.onclick = async () => {
-                  await updateAppointmentStatus(app.id, "confirmé");
+                  await updateAppointmentStatus(app.id, 'confirmé');
                 };
-                const refuseBtn = document.createElement("button");
-                refuseBtn.textContent = "Refuser";
+                const refuseBtn = document.createElement('button');
+                refuseBtn.textContent = 'Refuser';
                 refuseBtn.onclick = async () => {
-                  await updateAppointmentStatus(app.id, "annulé");
+                  await updateAppointmentStatus(app.id, 'annulé');
                 };
                 actionTd.appendChild(acceptBtn);
                 actionTd.appendChild(refuseBtn);
               } else {
-                actionTd.textContent = "-";
+                actionTd.textContent = '-';
               }
               tr.appendChild(actionTd);
+              // Diagnostic
+              const diagTd = document.createElement('td');
+              diagTd.setAttribute('data-label', 'Diagnostic');
+              const diagBtn = document.createElement('button');
+              diagBtn.textContent = 'Ajouter diagnostic';
+              diagBtn.onclick = () =>
+                openDiagnosticModal(
+                  app.id,
+                  app.patientId || app.genidocId || app.id
+                );
+              diagTd.appendChild(diagBtn);
+              tr.appendChild(diagTd);
+              // Prescription
+              const prescTd = document.createElement('td');
+              prescTd.setAttribute('data-label', 'Prescription');
+              const prescBtn = document.createElement('button');
+              prescBtn.textContent = 'Prescrire examen';
+              prescBtn.onclick = () =>
+                openPrescriptionModal(
+                  app.id,
+                  app.patientId || app.genidocId || app.id
+                );
+              prescTd.appendChild(prescBtn);
+              tr.appendChild(prescTd);
+              // Ordonnance
+              const ordTd = document.createElement('td');
+              ordTd.setAttribute('data-label', 'Ordonnance');
+              const ordBtn = document.createElement('button');
+              ordBtn.textContent = 'Ordonnance PDF';
+              ordBtn.onclick = () =>
+                generatePrescriptionPDF(
+                  app.id,
+                  app.patientId || app.genidocId || app.id
+                );
+              ordTd.appendChild(ordBtn);
+              tr.appendChild(ordTd);
+              // Historique
+              const histTd = document.createElement('td');
+              histTd.setAttribute('data-label', 'Historique');
+              const histBtn = document.createElement('button');
+              histBtn.textContent = 'Voir historique';
+              histBtn.onclick = () =>
+                viewPatientHistory(app.patientId || app.genidocId || app.id);
+              histTd.appendChild(histBtn);
+              tr.appendChild(histTd);
+              // Teleconsult quick action
+              const teleTd = document.createElement('td');
+              teleTd.setAttribute('data-label', 'Téléconsult');
+              const teleBtn = document.createElement('button');
+              teleBtn.textContent = 'Rejoindre';
+              teleBtn.style.background = '#10b981';
+              teleBtn.style.color = '#fff';
+              teleBtn.onclick = () => {
+                const room = 'genidoc-' + (app.id || Date.now());
+                window.open('https://meet.jit.si/' + room, '_blank');
+              };
+              teleTd.appendChild(teleBtn);
+              tr.appendChild(teleTd);
+              // Mark attended / completed
+              const doneTd = document.createElement('td');
+              doneTd.setAttribute('data-label', 'Statut action');
+              const doneBtn = document.createElement('button');
+              doneBtn.textContent =
+                app.status === 'terminé' ? 'Ré-ouvir' : 'Marquer terminé';
+              doneBtn.onclick = async () => {
+                try {
+                  doneBtn.disabled = true;
+                  await updateAppointmentStatus(
+                    app.id,
+                    app.status === 'terminé' ? 'confirmé' : 'terminé'
+                  );
+                } finally {
+                  doneBtn.disabled = false;
+                }
+              };
+              doneTd.appendChild(doneBtn);
+              tr.appendChild(doneTd);
               tbody.appendChild(tr);
             });
           } else {
-            tbody.innerHTML =
-              '<tr><td colspan="5">Aucun rendez-vous à venir.</td></tr>';
+            // If there are no real appointments, show a demo/example row
+            // requested by the user for quick access: Anas Senhaji
+            const demo = {
+              id: 'demo-anas-1',
+              fullName: 'Anas Senhaji',
+              date: '2025-11-18',
+              time: '05:00',
+              service: 'Suivi de traitement',
+              reason: 'Suivi de traitement',
+              status: 'CONFIRMED',
+              patientId: 'GD-000001',
+              genidocId: 'GD-000001',
+            };
+            const tr = document.createElement('tr');
+            // Patient
+            const tdPatient = document.createElement('td');
+            tdPatient.setAttribute('data-label', 'Patient');
+            tdPatient.textContent = demo.fullName;
+            tr.appendChild(tdPatient);
+            // Date
+            const tdDate = document.createElement('td');
+            tdDate.setAttribute('data-label', 'Date');
+            tdDate.textContent = demo.date;
+            tr.appendChild(tdDate);
+            // Heure
+            const tdTime = document.createElement('td');
+            tdTime.setAttribute('data-label', 'Heure');
+            tdTime.textContent = demo.time;
+            tr.appendChild(tdTime);
+            // Motif
+            const tdReason = document.createElement('td');
+            tdReason.setAttribute('data-label', 'Motif');
+            tdReason.textContent = demo.service;
+            tr.appendChild(tdReason);
+            // Statut
+            const tdStatus = document.createElement('td');
+            tdStatus.setAttribute('data-label', 'Statut');
+            tdStatus.textContent = demo.status;
+            tr.appendChild(tdStatus);
+            const actionTd = document.createElement('td');
+            actionTd.setAttribute('data-label', 'Action');
+            actionTd.textContent = '-';
+            tr.appendChild(actionTd);
+            // Diagnostic
+            const diagTd = document.createElement('td');
+            diagTd.setAttribute('data-label', 'Diagnostic');
+            const diagBtn = document.createElement('button');
+            diagBtn.textContent = 'Ajouter diagnostic';
+            diagBtn.onclick = () =>
+              openDiagnosticModal(
+                demo.id,
+                demo.patientId || demo.genidocId || demo.id
+              );
+            diagTd.appendChild(diagBtn);
+            tr.appendChild(diagTd);
+            // Prescription
+            const prescTd = document.createElement('td');
+            prescTd.setAttribute('data-label', 'Prescription');
+            const prescBtn = document.createElement('button');
+            prescBtn.textContent = 'Prescrire examen';
+            prescBtn.onclick = () =>
+              openPrescriptionModal(
+                demo.id,
+                demo.patientId || demo.genidocId || demo.id
+              );
+            prescTd.appendChild(prescBtn);
+            tr.appendChild(prescTd);
+            // Ordonnance
+            const ordTd = document.createElement('td');
+            ordTd.setAttribute('data-label', 'Ordonnance');
+            const ordBtn = document.createElement('button');
+            ordBtn.textContent = 'Ordonnance PDF';
+            ordBtn.onclick = () =>
+              generatePrescriptionPDF(
+                demo.id,
+                demo.patientId || demo.genidocId || demo.id
+              );
+            ordTd.appendChild(ordBtn);
+            tr.appendChild(ordTd);
+            // Historique
+            const histTd = document.createElement('td');
+            histTd.setAttribute('data-label', 'Historique');
+            const histBtn = document.createElement('button');
+            histBtn.textContent = 'Voir historique';
+            histBtn.onclick = () =>
+              viewPatientHistory(demo.patientId || demo.genidocId || demo.id);
+            histTd.appendChild(histBtn);
+            tr.appendChild(histTd);
+            // Téléconsult demo button
+            const teleTd = document.createElement('td');
+            teleTd.setAttribute('data-label', 'Téléconsult');
+            const teleBtn = document.createElement('button');
+            teleBtn.textContent = 'Rejoindre';
+            teleBtn.style.background = '#10b981';
+            teleBtn.style.color = '#fff';
+            teleBtn.onclick = () => {
+              window.open(
+                'https://meet.jit.si/genidoc-' + (demo.id || Date.now()),
+                '_blank'
+              );
+            };
+            teleTd.appendChild(teleBtn);
+            tr.appendChild(teleTd);
+            // Statut action demo
+            const doneTd = document.createElement('td');
+            doneTd.setAttribute('data-label', 'Statut action');
+            const doneBtn = document.createElement('button');
+            doneBtn.textContent =
+              demo.status === 'terminé' ? 'Ré-ouvir' : 'Marquer terminé';
+            doneBtn.onclick = async () => {
+              await updateAppointmentStatus(
+                demo.id,
+                demo.status === 'terminé' ? 'confirmé' : 'terminé'
+              );
+            };
+            doneTd.appendChild(doneBtn);
+            tr.appendChild(doneTd);
+            tbody.innerHTML = '';
+            tbody.appendChild(tr);
           }
+          // navigation functions defined in global scope (moved)
         } catch (e) {
           tbody.innerHTML =
-            '<tr><td colspan="5">Erreur de chargement : ' +
+            '<tr><td colspan="12">Erreur de chargement : ' +
             (e.message || e) +
-            "</td></tr>";
+            '</td></tr>';
         }
       }
 
       function logout() {
-        localStorage.removeItem("doctorId");
-        window.location.href = "auth.html";
+        try {
+          localStorage.removeItem('token');
+          localStorage.removeItem('doctorId');
+          localStorage.removeItem('user');
+        } catch (e) {}
+        window.location.href = 'auth.html';
+      }
+
+      // --- Global navigation helpers (used by quick-actions and row buttons) ---
+      function createPatientRecord() {
+        window.location.href = 'patient-record.html?doctorId=' + getDoctorId();
+      }
+      function uploadMedicalDocument() {
+        window.location.href = 'upload-document.html?doctorId=' + getDoctorId();
+      }
+      function openTeleconsultation() {
+        window.location.href =
+          'teleconsultation.html?doctorId=' + getDoctorId();
+      }
+      function openMessaging() {
+        window.location.href = 'messagerie.html?doctorId=' + getDoctorId();
+      }
+      function showStats() {
+        window.location.href = 'stats.html?doctorId=' + getDoctorId();
+      }
+      function openDiagnosticModal(appointmentId, patientIdentifier) {
+        // Open an in-page modal to add diagnostic
+        const title = 'Ajouter diagnostic';
+        const body = document.getElementById('modal-body');
+        body.innerHTML = `
+          <div>
+            <div style="margin-bottom:8px"><strong>Patient:</strong> ${
+              patientIdentifier || ''
+            }</div>
+            <label>Résumé du diagnostic</label>
+            <textarea id="diag-text" style="width:100%;min-height:120px;padding:8px;margin-top:6px"></textarea>
+          </div>
+        `;
+        openModal(title, async () => {
+          const text = document.getElementById('diag-text').value.trim();
+          if (!text) return alert('Veuillez saisir le diagnostic.');
+          try {
+            const payload = {
+              appointmentId: appointmentId,
+              patient: patientIdentifier,
+              text,
+            };
+            const res = await secureFetch('/api/diagnostics', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+            });
+            const j = await res.json();
+            if (j.success) {
+              closeModal();
+              fetchAppointments();
+            } else {
+              alert(j.message || "Erreur lors de l'enregistrement");
+            }
+          } catch (e) {
+            alert('Erreur réseau');
+          }
+        });
+      }
+      function openPrescriptionModal(appointmentId, patientIdentifier) {
+        // Open in-page modal to create prescription (exam or meds)
+        const title = 'Prescrire un examen / médicament';
+        const body = document.getElementById('modal-body');
+        body.innerHTML = `
+          <div>
+            <div style="margin-bottom:8px"><strong>Patient:</strong> ${
+              patientIdentifier || ''
+            }</div>
+            <label>Prescription (détails)</label>
+            <textarea id="presc-text" style="width:100%;min-height:120px;padding:8px;margin-top:6px"></textarea>
+          </div>
+        `;
+        openModal(title, async () => {
+          const text = document.getElementById('presc-text').value.trim();
+          if (!text) return alert('Veuillez saisir la prescription.');
+          try {
+            const payload = {
+              appointmentId: appointmentId,
+              patient: patientIdentifier,
+              text,
+            };
+            const res = await secureFetch('/api/prescriptions', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+            });
+            const j = await res.json();
+            if (j.success) {
+              closeModal();
+              fetchAppointments();
+            } else {
+              alert(j.message || "Erreur lors de l'enregistrement");
+            }
+          } catch (e) {
+            alert('Erreur réseau');
+          }
+        });
+      }
+      function generatePrescriptionPDF(appointmentId, patientIdentifier) {
+        // Open ordonnance page in a new tab so the doctor doesn't lose context
+        const q = new URLSearchParams();
+        if (appointmentId) q.set('appointmentId', appointmentId);
+        if (patientIdentifier) q.set('patient', patientIdentifier);
+        const url = 'ordonnance.html?' + q.toString();
+        window.open(url, '_blank');
+      }
+      async function viewPatientHistory(patientIdentifier) {
+        // patientIdentifier can be a patientId, genidocId or appointmentId
+        if (String(patientIdentifier || '').startsWith('GD-')) {
+          const q = new URLSearchParams();
+          q.set('genidocId', patientIdentifier);
+          window.location.href = 'index-dashbord.html?' + q.toString();
+        } else {
+          const q = new URLSearchParams();
+          q.set('patientId', patientIdentifier);
+          // Open history in modal for quick review
+          openModal('Historique patient', async () => {
+            closeModal();
+          });
+          const body = document.getElementById('modal-body');
+          body.innerHTML = "<div>Chargement de l'historique...</div>";
+          try {
+            const res = await secureFetch(
+              '/api/patient/' +
+                encodeURIComponent(patientIdentifier) +
+                '/history'
+            );
+            const j = await res.json();
+            if (j.success) {
+              const html = j.data
+                .map(
+                  (h) =>
+                    `<div style="padding:8px;border-bottom:1px solid #eee"><strong>${
+                      h.date || ''
+                    }</strong><div>${(h.note || h.summary || '').replace(
+                      /\n/g,
+                      '<br>'
+                    )}</div></div>`
+                )
+                .join('');
+              body.innerHTML = html || '<div>Aucun historique trouvé</div>';
+            } else {
+              body.innerHTML =
+                '<div>Erreur: ' +
+                (j.message || 'Impossible de charger') +
+                '</div>';
+            }
+          } catch (e) {
+            body.innerHTML = '<div>Erreur réseau</div>';
+          }
+        }
+      }
+
+      // Modal helpers
+      let _modalSaveHandler = null;
+      function openModal(title, onSave) {
+        const backdrop = document.getElementById('modal-backdrop');
+        const titleEl = document.getElementById('modal-title');
+        const saveBtn = document.getElementById('modal-save');
+        const closeBtn = document.getElementById('modal-close');
+        titleEl.textContent = title || '';
+        backdrop.style.display = 'flex';
+        _modalSaveHandler = onSave;
+        saveBtn.onclick = async function () {
+          if (typeof _modalSaveHandler === 'function') {
+            try {
+              saveBtn.disabled = true;
+              await _modalSaveHandler();
+            } finally {
+              saveBtn.disabled = false;
+            }
+          }
+        };
+        closeBtn.onclick = closeModal;
+      }
+      function closeModal() {
+        const backdrop = document.getElementById('modal-backdrop');
+        const body = document.getElementById('modal-body');
+        backdrop.style.display = 'none';
+        body.innerHTML = '';
+        _modalSaveHandler = null;
       }
 
       // Initialisation
       async function updateAppointmentStatus(appointmentId, newStatus) {
         try {
-          const res = await fetch(`/api/appointments/${appointmentId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
+          // If this is a demo row id, simulate success without calling API
+          if (String(appointmentId || '').startsWith('demo-')) {
+            alert('Simulation: statut mis à jour (demo)');
+            // Update local agendaAppointments for calendar view
+            agendaAppointments = (agendaAppointments || []).map((a) => {
+              if (a.id === appointmentId) a.status = newStatus;
+              return a;
+            });
+            fetchAppointments();
+            return;
+          }
+          const res = await secureFetch(`/api/appointments/${appointmentId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status: newStatus }),
           });
           const result = await res.json();
@@ -249,16 +1066,62 @@
             fetchAppointments();
           } else {
             alert(
-              result.message || "Erreur lors de la mise à jour du rendez-vous"
+              result.message || 'Erreur lors de la mise à jour du rendez-vous'
             );
           }
         } catch (e) {
-          alert("Erreur réseau lors de la mise à jour du rendez-vous");
+          if (e.message === 'Déconnecté') return;
+          alert('Erreur réseau lors de la mise à jour du rendez-vous');
         }
       }
 
       fetchDoctorProfile();
       fetchAppointments();
+      // Initialiser l'agenda au chargement
+      document.addEventListener('DOMContentLoaded', updateAgendaCalendar);
+    </script>
+    <script>
+      // PWA: improved install flow + redirect to genidoc.ma
+      (function () {
+        let deferredPrompt = null;
+        const installBtn = document.getElementById('install-app-btn');
+
+        function openGenidoc() {
+          try { window.location.href = 'https://genidoc.ma'; } catch (e) { window.open('https://genidoc.ma', '_blank'); }
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          deferredPrompt = e;
+          if (installBtn) installBtn.style.display = 'inline-block';
+        });
+
+        if (installBtn) {
+          installBtn.style.display = 'inline-block';
+          installBtn.addEventListener('click', async (ev) => {
+            ev.preventDefault();
+            installBtn.disabled = true;
+            if (deferredPrompt) {
+              try { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; } catch (err) { console.warn(err); }
+              installBtn.disabled = false;
+              openGenidoc();
+              return;
+            }
+            if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+              alert("Pour ajouter GeniDoc à l'écran d'accueil : appuyez sur le bouton 'Partager' puis 'Ajouter à l'écran d'accueil'. Vous serez ensuite redirigé vers genidoc.ma.");
+              openGenidoc();
+              installBtn.disabled = false;
+              return;
+            }
+            openGenidoc();
+            installBtn.disabled = false;
+          });
+        }
+
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+        }
+      })();
     </script>
   </body>
 </html>

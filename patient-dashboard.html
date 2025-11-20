@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tableau de Bord Patient — GeniDoc</title>
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#4d3aff" />
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -30,7 +32,7 @@
       }
 
       body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         background-color: var(--light-bg);
         color: var(--dark-text);
       }
@@ -354,6 +356,15 @@
                 <i class="fas fa-sign-out-alt"></i> Déconnexion
               </a>
             </li>
+            <li class="nav-item">
+              <button
+                id="install-app-btn"
+                class="btn-custom"
+                style="margin-left: 8px; display: none"
+              >
+                Installer
+              </button>
+            </li>
           </ul>
         </div>
       </div>
@@ -446,29 +457,49 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+      // secureFetch helper (attach token and handle 401/403)
+      async function secureFetch(url, options = {}, errorMsg) {
+        options = options || {};
+        options.headers = options.headers || {};
+        try {
+          const token = localStorage.getItem('token');
+          if (token) options.headers['Authorization'] = 'Bearer ' + token;
+        } catch (e) {}
+        const res = await fetch(url, options);
+        if (res.status === 401 || res.status === 403) {
+          try {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+          } catch (e) {}
+          window.location.href = '/auth.html';
+          throw new Error('Déconnecté');
+        }
+        return res;
+      }
+
       // Load patient data
       function loadPatientData() {
-        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
         const appointments = JSON.parse(
-          localStorage.getItem("appointments") || "[]"
+          localStorage.getItem('appointments') || '[]'
         );
 
         if (!user.id) {
-          window.location.href = "/auth.html";
+          window.location.href = '/auth.html';
           return;
         }
 
         // Update welcome name
-        document.getElementById("patient-name").textContent =
-          user.firstName || "Patient";
-        document.getElementById("profile-email").textContent =
-          user.email || "--";
-        document.getElementById("profile-phone").textContent =
-          user.phone || "--";
-        document.getElementById("profile-id").textContent =
-          user.genidocId || "GD-000000";
-        document.getElementById("profile-date").textContent =
-          new Date().toLocaleDateString("fr-FR");
+        document.getElementById('patient-name').textContent =
+          user.firstName || 'Patient';
+        document.getElementById('profile-email').textContent =
+          user.email || '--';
+        document.getElementById('profile-phone').textContent =
+          user.phone || '--';
+        document.getElementById('profile-id').textContent =
+          user.genidocId || 'GD-000000';
+        document.getElementById('profile-date').textContent =
+          new Date().toLocaleDateString('fr-FR');
 
         // Update stats
         const userAppointments = appointments.filter(
@@ -479,10 +510,10 @@
         ).length;
         const completed = userAppointments.length - upcoming;
 
-        document.getElementById("total-appointments").textContent =
+        document.getElementById('total-appointments').textContent =
           userAppointments.length;
-        document.getElementById("upcoming-appointments").textContent = upcoming;
-        document.getElementById("completed-appointments").textContent =
+        document.getElementById('upcoming-appointments').textContent = upcoming;
+        document.getElementById('completed-appointments').textContent =
           completed;
 
         // Load appointments
@@ -490,7 +521,7 @@
       }
 
       function loadAppointments(appointments) {
-        const list = document.getElementById("appointments-list");
+        const list = document.getElementById('appointments-list');
         if (appointments.length === 0) {
           list.innerHTML = `
                     <div class="no-appointments">
@@ -510,16 +541,16 @@
                 <div class="appointment-item">
                     <div class="appointment-info">
                         <h6><i class="fas fa-hospital"></i> ${
-                          apt.establishment || "Établissement"
+                          apt.establishment || 'Établissement'
                         }</h6>
                         <p><i class="fas fa-calendar"></i> ${new Date(
                           apt.date
-                        ).toLocaleDateString("fr-FR")}</p>
+                        ).toLocaleDateString('fr-FR')}</p>
                         <p><i class="fas fa-clock"></i> ${
-                          apt.time || "Heure à définir"
+                          apt.time || 'Heure à définir'
                         }</p>
                         <p><i class="fas fa-user-md"></i> ${
-                          apt.doctor || "Médecin"
+                          apt.doctor || 'Médecin'
                         }</p>
                     </div>
                     <div>
@@ -537,31 +568,72 @@
                 </div>
             `
           )
-          .join("");
+          .join('');
       }
 
       function editAppointment(id) {
-        alert("Modification du rendez-vous: " + id);
+        alert('Modification du rendez-vous: ' + id);
       }
 
       function deleteAppointment(id) {
-        if (confirm("Êtes-vous sûr de vouloir supprimer ce rendez-vous?")) {
-          alert("Rendez-vous supprimé");
+        if (confirm('Êtes-vous sûr de vouloir supprimer ce rendez-vous?')) {
+          alert('Rendez-vous supprimé');
         }
       }
 
       function editProfile() {
-        alert("Redirection vers modification du profil");
+        alert('Redirection vers modification du profil');
       }
 
       function logout() {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.href = "/auth.html";
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/auth.html';
       }
 
       // Load data on page load
-      document.addEventListener("DOMContentLoaded", loadPatientData);
+      document.addEventListener('DOMContentLoaded', loadPatientData);
+      // PWA: improved install flow + redirect to genidoc.ma
+      (function () {
+        let deferredPrompt = null;
+        const installBtn = document.getElementById('install-app-btn');
+
+        function openGenidoc() {
+          try { window.location.href = 'https://genidoc.ma'; } catch (e) { window.open('https://genidoc.ma', '_blank'); }
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          deferredPrompt = e;
+          if (installBtn) installBtn.style.display = 'inline-block';
+        });
+
+        if (installBtn) {
+          installBtn.style.display = 'inline-block';
+          installBtn.addEventListener('click', async (ev) => {
+            ev.preventDefault();
+            installBtn.disabled = true;
+            if (deferredPrompt) {
+              try { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; } catch (err) { console.warn(err); }
+              installBtn.disabled = false;
+              openGenidoc();
+              return;
+            }
+            if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+              alert("Pour ajouter GeniDoc à l'écran d'accueil : appuyez sur le bouton 'Partager' puis 'Ajouter à l'écran d'accueil'. Vous serez ensuite redirigé vers genidoc.ma.");
+              openGenidoc();
+              installBtn.disabled = false;
+              return;
+            }
+            openGenidoc();
+            installBtn.disabled = false;
+          });
+        }
+
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+        }
+      })();
     </script>
   </body>
 </html>

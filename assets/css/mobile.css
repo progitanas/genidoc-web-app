@@ -1,0 +1,179 @@
+/* Mobile utility and responsive overrides for GeniDoc
+   Placed as a light-weight override after main.css
+   Focus: touch targets, stacked layouts, responsive tables -> cards
+*/
+
+:root {
+  --touch-target: 44px;
+  --mobile-gap: 12px;
+  --container-padding-mobile: 16px;
+}
+
+/* Global mobile adjustments */
+html,
+body {
+  height: 100%;
+}
+.container {
+  padding-left: var(--container-padding-mobile);
+  padding-right: var(--container-padding-mobile);
+}
+
+img,
+video,
+iframe {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Buttons & touch targets */
+button,
+.btn,
+.quick-btn,
+.logout-btn {
+  min-height: var(--touch-target);
+  padding: 12px 14px !important;
+  font-size: 16px !important;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.06);
+}
+
+.quick-actions {
+  gap: var(--mobile-gap);
+}
+
+/* Improve form controls spacing */
+input[type='text'],
+input[type='email'],
+input[type='password'],
+select,
+textarea {
+  padding: 12px 14px;
+  font-size: 16px;
+  border-radius: 10px;
+}
+
+/* Responsive stacking for layout */
+@media (max-width: 768px) {
+  .dashboard-container {
+    margin: 18px;
+    padding: 18px;
+  }
+  .hero {
+    min-height: 360px;
+  }
+  .site-header {
+    height: 56px;
+  }
+}
+
+/* Appointments: convert table to stacked cards on small screens */
+@media (max-width: 760px) {
+  .appointments-table,
+  .appointments-table thead,
+  .appointments-table tbody,
+  .appointments-table th,
+  .appointments-table td,
+  .appointments-table tr {
+    display: block;
+  }
+  .appointments-table thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+  .appointments-table tr {
+    margin: 0 0 16px 0;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    background: #fff;
+    padding: 12px;
+  }
+  .appointments-table td {
+    border: none;
+    padding: 8px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+  }
+  .appointments-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #374151;
+    margin-right: 8px;
+    flex: 1 1 55%;
+  }
+  .appointments-table td .btn,
+  .appointments-table td button {
+    min-width: 120px;
+  }
+}
+
+/* Make iframes (Jitsi) responsive with ratio wrapper */
+.responsive-embed {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+}
+.responsive-embed iframe,
+.responsive-embed video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Utility: visually-hidden for accessibility */
+.visually-hidden {
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+}
+
+/* Small typography tweaks */
+h1,
+h2,
+h3 {
+  line-height: 1.2;
+}
+
+/* Session banner (non-blocking) */
+.session-banner {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 18px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  z-index: 12000;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.session-banner .actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+/* Reduce heavy visuals on low-width devices */
+@media (max-width: 420px) {
+  .quick-btn {
+    min-width: unset;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+  .logout-btn {
+    padding: 8px 12px;
+  }
+}

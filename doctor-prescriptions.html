@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Émettre une ordonnance - GeniDoc</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        padding: 16px;
+      }
+      label {
+        display: block;
+        margin-top: 8px;
+      }
+      input,
+      textarea,
+      select {
+        width: 100%;
+        padding: 6px;
+        margin-top: 4px;
+      }
+      button {
+        margin-top: 10px;
+        padding: 8px 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Émettre une ordonnance</h1>
+    <div id="info"></div>
+    <form id="form">
+      <label>Doctor ID (doctorId en query): <input id="doctorId" /></label>
+      <label
+        >Patient GeniDoc ID:
+        <input id="patientGenidocId" placeholder="GD-123456"
+      /></label>
+      <label
+        >Service:
+        <input id="service" placeholder="consultation / téléconsultation"
+      /></label>
+      <label
+        >Médicaments (séparez par des retours):
+        <textarea id="medications"></textarea>
+      </label>
+      <label>Instructions: <textarea id="instructions"></textarea></label>
+      <button type="submit">Envoyer ordonnance</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+      function qs(name) {
+        return new URLSearchParams(window.location.search).get(name);
+      }
+      const dQ = qs('doctorId');
+      if (dQ) document.getElementById('doctorId').value = dQ;
+      document.getElementById('info').innerText =
+        'Utilisez ce formulaire pour créer une ordonnance (doctorId requis).';
+      document.getElementById('form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const doctorId = document.getElementById('doctorId').value.trim();
+        const patientGenidocId = document
+          .getElementById('patientGenidocId')
+          .value.trim();
+        const service = document.getElementById('service').value.trim();
+        const medications = document.getElementById('medications').value.trim();
+        const instructions = document
+          .getElementById('instructions')
+          .value.trim();
+        if (!doctorId || !patientGenidocId || !medications) {
+          document.getElementById('result').innerText =
+            'DoctorId, patientGenidocId et médicaments requis.';
+          return;
+        }
+        try {
+          const resp = await fetch(
+            `/api/doctor/${encodeURIComponent(doctorId)}/prescriptions`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                patientGenidocId,
+                service,
+                medications,
+                instructions,
+              }),
+            }
+          );
+          const j = await resp.json();
+          if (!j.success) {
+            document.getElementById('result').innerText =
+              'Erreur: ' + (j.message || '');
+            return;
+          }
+          document.getElementById('result').innerHTML =
+            '<div style="padding:8px;border:1px solid #4caf50;color:#0a4;">Ordonnance créée: ' +
+            (j.data && j.data.id ? j.data.id : '') +
+            '</div>';
+        } catch (e) {
+          console.error(e);
+          document.getElementById('result').innerText = 'Erreur réseau';
+        }
+      });
+    </script>
+  </body>
+</html>

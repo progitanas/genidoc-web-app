@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Noter le rendez-vous</title>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        padding: 20px;
+      }
+      .stars span {
+        font-size: 2rem;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Noter le rendez-vous</h1>
+    <p>Paramètre: `?appointmentId=123` dans l'URL</p>
+    <div class="stars" id="stars">
+      <span data-value="1">☆</span>
+      <span data-value="2">☆</span>
+      <span data-value="3">☆</span>
+      <span data-value="4">☆</span>
+      <span data-value="5">☆</span>
+    </div>
+    <textarea
+      id="comment"
+      rows="4"
+      cols="50"
+      placeholder="Commentaire (optionnel)"
+    ></textarea>
+    <br />
+    <button id="submit">Envoyer la note</button>
+    <div id="result"></div>
+
+    <script>
+      const stars = document.getElementById('stars');
+      let rating = 5;
+      stars.addEventListener('click', (e) => {
+        if (!e.target.dataset.value) return;
+        rating = Number(e.target.dataset.value);
+        for (const s of stars.querySelectorAll('span')) {
+          s.textContent = Number(s.dataset.value) <= rating ? '★' : '☆';
+        }
+      });
+
+      document.getElementById('submit').addEventListener('click', async () => {
+        const params = new URLSearchParams(location.search);
+        const appointmentId = params.get('appointmentId');
+        if (!appointmentId) {
+          alert("appointmentId manquant dans l'URL");
+          return;
+        }
+        const comment = document.getElementById('comment').value;
+        const res = await fetch(`/api/appointments/${appointmentId}/rate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rating, comment }),
+        });
+        const data = await res.json();
+        document.getElementById('result').textContent = JSON.stringify(data);
+      });
+    </script>
+  </body>
+</html>

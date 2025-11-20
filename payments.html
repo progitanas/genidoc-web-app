@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Paiement & Facture</title>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        padding: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Paiement (simulate)</h1>
+    <p>Utilisez `?appointmentId=123&amount=30`</p>
+    <label>Montant: <input id="amount" type="number" value="30" /></label>
+    <br />
+    <label>AppointmentId: <input id="appointmentId" type="text" /></label>
+    <br />
+    <button id="pay">Payer</button>
+    <div id="res"></div>
+    <script>
+      document.getElementById('pay').addEventListener('click', async () => {
+        const appointmentId = document.getElementById('appointmentId').value;
+        const amount = Number(document.getElementById('amount').value) || 0;
+        if (!appointmentId) {
+          alert('appointmentId required');
+          return;
+        }
+        const res = await fetch('/api/payments/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            appointmentId,
+            amount,
+            currency: 'EUR',
+            method: 'card',
+          }),
+        });
+        const data = await res.json();
+        document.getElementById('res').textContent = JSON.stringify(data);
+        if (data && data.invoiceUrl) {
+          const a = document.createElement('a');
+          a.href = data.invoiceUrl;
+          a.textContent = 'Télécharger la facture';
+          a.target = '_blank';
+          document
+            .getElementById('res')
+            .appendChild(document.createElement('br'));
+          document.getElementById('res').appendChild(a);
+        } else {
+          const dl = document.createElement('a');
+          dl.href = `/api/appointments/${appointmentId}/invoice`;
+          dl.textContent = 'Télécharger facture (endpoint)';
+          dl.target = '_blank';
+          document
+            .getElementById('res')
+            .appendChild(document.createElement('br'));
+          document.getElementById('res').appendChild(dl);
+        }
+      });
+      // Pre-fill from query
+      const p = new URLSearchParams(location.search);
+      if (p.get('appointmentId'))
+        document.getElementById('appointmentId').value = p.get('appointmentId');
+      if (p.get('amount'))
+        document.getElementById('amount').value = p.get('amount');
+    </script>
+  </body>
+</html>

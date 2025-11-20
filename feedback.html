@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feedback — GeniDoc</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <nav class="main-navbar">
+      <a href="index.html" class="navbar-brand">GeniDoc</a>
+      <a href="appintment.html" class="nav-link">Prendre rendez-vous</a>
+      <a href="documents.html" class="nav-link">Mes documents</a>
+      <a href="messagerie.html" class="nav-link">Messagerie</a>
+      <a href="profile.html" class="nav-link">Mon profil</a>
+      <a href="historique.html" class="nav-link">Historique médical</a>
+      <a href="establishments.html" class="nav-link">Établissements</a>
+      <a href="feedback.html" class="nav-link active">Feedback</a>
+    </nav>
+    <main class="container">
+      <h1>Donner votre avis</h1>
+      <form id="feedback-form">
+        <label for="feedback-message">Votre message :</label><br />
+        <textarea
+          id="feedback-message"
+          name="feedback-message"
+          rows="6"
+          cols="50"
+          required
+        ></textarea
+        ><br />
+        <button type="submit">Envoyer</button>
+      </form>
+      <div id="feedback-result"></div>
+    </main>
+    <script>
+      document
+        .getElementById('feedback-form')
+        .addEventListener('submit', function (e) {
+          e.preventDefault();
+          document.getElementById('feedback-result').textContent =
+            'Merci pour votre retour !';
+          document.getElementById('feedback-form').reset();
+        });
+    </script>
+  </body>
+</html>

@@ -3,6 +3,11 @@
   <head>
     <link rel="icon" type="image/png" href="/static/ong_GeniDoc1preview.png" />
     <meta charset="UTF-8" />
+    <!-- Content Security Policy: restrict sources to self and trusted hosts -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://meet.jit.si; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://meet.jit.si ws:; frame-src https://meet.jit.si;"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard Patient — GeniDoc</title>
     <style>
@@ -12,7 +17,7 @@
         box-sizing: border-box;
       }
       body {
-        font-family: "Space Grotesk", "Segoe UI", Tahoma, Geneva, Verdana,
+        font-family: 'Space Grotesk', 'Segoe UI', Tahoma, Geneva, Verdana,
           sans-serif;
         background: #f5f7fa;
         margin: 0;
@@ -49,7 +54,7 @@
         font-size: 1.1em;
         font-weight: 600;
         color: #1f1f1f;
-        font-family: "Space Grotesk", "Segoe UI", Tahoma, Geneva, Verdana,
+        font-family: 'Space Grotesk', 'Segoe UI', Tahoma, Geneva, Verdana,
           sans-serif;
         letter-spacing: 0.01em;
       }
@@ -432,7 +437,7 @@
         cursor: pointer;
         transition: all 0.3s;
         box-shadow: 0 4px 16px rgba(32, 86, 174, 0.25);
-        font-family: "Space Grotesk", sans-serif;
+        font-family: 'Space Grotesk', sans-serif;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -459,7 +464,7 @@
       }
 
       .vitale-card::before {
-        content: "";
+        content: '';
         position: absolute;
         top: -50%;
         right: -50%;
@@ -517,7 +522,7 @@
         color: #fff;
         margin-bottom: 12px;
         letter-spacing: 2px;
-        font-family: "Courier New", monospace;
+        font-family: 'Courier New', monospace;
       }
 
       .vitale-card .date-inscription {
@@ -609,6 +614,15 @@
     </style>
   </head>
   <body>
+    <script>
+      // Session/authentication check for index-dashbord.html
+      (function () {
+        var genidocId = localStorage.getItem('genidocId');
+        if (!genidocId || !/^GD-\d{6}$/.test(genidocId)) {
+          window.location.href = 'auth.html';
+        }
+      })();
+    </script>
     <!-- Sidebar Chatbot Professionnel -->
     <div
       id="chatbotSidebar"
@@ -783,54 +797,54 @@
       </svg>
     </button>
     <script>
-      document.getElementById("openYallahBtn").onclick = function () {
-        window.open("genidocyallah1.0.html", "_blank");
+      document.getElementById('openYallahBtn').onclick = function () {
+        window.open('genidocyallah1.0.html', '_blank');
       };
     </script>
 
     <script>
       // Sidebar open/close logic
-      const sidebar = document.getElementById("chatbotSidebar");
-      const openBtn = document.getElementById("openChatbotSidebarBtn");
+      const sidebar = document.getElementById('chatbotSidebar');
+      const openBtn = document.getElementById('openChatbotSidebarBtn');
       function openChatbotSidebar() {
-        sidebar.style.left = "0";
+        sidebar.style.left = '0';
       }
       function closeChatbotSidebar() {
-        sidebar.style.left = "-340px";
+        sidebar.style.left = '-340px';
       }
       openBtn.onclick = openChatbotSidebar;
       // Chatbot form logic (demo only)
-      document.getElementById("chatbotForm").onsubmit = function (e) {
+      document.getElementById('chatbotForm').onsubmit = function (e) {
         e.preventDefault();
-        const input = document.getElementById("chatbotInput");
-        const messages = document.getElementById("chatbotMessages");
+        const input = document.getElementById('chatbotInput');
+        const messages = document.getElementById('chatbotMessages');
         const userMsg = input.value.trim();
         if (userMsg) {
-          const msg = document.createElement("div");
-          msg.textContent = "👤 " + userMsg;
-          msg.style.marginBottom = "6px";
+          const msg = document.createElement('div');
+          msg.textContent = '👤 ' + userMsg;
+          msg.style.marginBottom = '6px';
           messages.appendChild(msg);
           messages.scrollTop = messages.scrollHeight;
-          input.value = "";
+          input.value = '';
           // Appel API /api/chat demo
-          fetch("/api/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
+          fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: userMsg }),
           })
             .then((r) => r.json())
             .then((data) => {
-              const bot = document.createElement("div");
-              bot.textContent = data.success ? data.response : "Erreur IA";
-              bot.style.color = "#2056ae";
-              bot.style.marginBottom = "10px";
+              const bot = document.createElement('div');
+              bot.textContent = data.success ? data.response : 'Erreur IA';
+              bot.style.color = '#2056ae';
+              bot.style.marginBottom = '10px';
               messages.appendChild(bot);
               messages.scrollTop = messages.scrollHeight;
             })
             .catch(() => {
-              const bot = document.createElement("div");
-              bot.textContent = "Erreur de connexion au serveur IA";
-              bot.style.color = "red";
+              const bot = document.createElement('div');
+              bot.textContent = 'Erreur de connexion au serveur IA';
+              bot.style.color = 'red';
               messages.appendChild(bot);
               messages.scrollTop = messages.scrollHeight;
             });
@@ -903,13 +917,13 @@
         </button>
         <script>
           // Always open settings.html with genidocId in URL
-          document.getElementById("settingsBtn").onclick = function () {
+          document.getElementById('settingsBtn').onclick = function () {
             const params = new URLSearchParams(window.location.search);
-            const genidocId = params.get("genidocId");
+            const genidocId = params.get('genidocId');
             if (genidocId) {
               window.location.href = `settings.html?genidocId=${genidocId}`;
             } else {
-              window.location.href = "settings.html";
+              window.location.href = 'settings.html';
             }
           };
         </script>
@@ -970,35 +984,35 @@
         </button>
       </div>
       <script>
-        document.getElementById("btn-patient-dashboard").onclick = function () {
-          console.log("[LOG] Bouton Mon espace patient cliqué");
+        document.getElementById('btn-patient-dashboard').onclick = function () {
+          console.log('[LOG] Bouton Mon espace patient cliqué');
           const params = new URLSearchParams(window.location.search);
-          const genidocId = params.get("genidocId");
-          let url = "patients/dashboard-patient.html";
+          const genidocId = params.get('genidocId');
+          let url = 'patients/dashboard-patient.html';
           if (genidocId) {
             url += `?genidocId=${genidocId}`;
-            console.log("[LOG] genidocId trouvé:", genidocId);
+            console.log('[LOG] genidocId trouvé:', genidocId);
           } else {
             console.warn("[LOG] Aucun genidocId trouvé dans l'URL");
           }
-          console.log("[LOG] Redirection vers:", url);
+          console.log('[LOG] Redirection vers:', url);
           window.location.href = url;
         };
       </script>
       <!-- Bouton dashboard patient : redirige avec genidocId -->
       <script>
-        document.getElementById("btn-patient-dashboard").onclick = function () {
-          console.log("[DEBUG] Bouton Mon espace patient cliqué");
+        document.getElementById('btn-patient-dashboard').onclick = function () {
+          console.log('[DEBUG] Bouton Mon espace patient cliqué');
           const params = new URLSearchParams(window.location.search);
-          const genidocId = params.get("genidocId");
-          let url = "patients/dashboard-patient.html";
+          const genidocId = params.get('genidocId');
+          let url = 'patients/dashboard-patient.html';
           if (genidocId) {
             url += `?genidocId=${genidocId}`;
-            console.log("[DEBUG] genidocId trouvé:", genidocId);
+            console.log('[DEBUG] genidocId trouvé:', genidocId);
           } else {
             console.warn("[DEBUG] Aucun genidocId trouvé dans l'URL");
           }
-          console.log("[DEBUG] Redirection vers:", url);
+          console.log('[DEBUG] Redirection vers:', url);
           window.location.href = url;
         };
       </script>
@@ -1454,29 +1468,67 @@
 
     <script>
       // ========== SÉCURITÉ SESSION ========== //
+      // Non-blocking banner for logout/notice
+      function showBanner(message, secs = 2) {
+        let b = document.getElementById('genidoc-banner');
+        if (!b) {
+          b = document.createElement('div');
+          b.id = 'genidoc-banner';
+          b.style.position = 'fixed';
+          b.style.top = '0';
+          b.style.left = '0';
+          b.style.right = '0';
+          b.style.background = '#fffbeb';
+          b.style.color = '#7a4f01';
+          b.style.padding = '12px 16px';
+          b.style.zIndex = '9999';
+          b.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+          b.style.fontWeight = '600';
+          document.body.appendChild(b);
+        }
+        b.textContent = message;
+        b.style.display = 'block';
+        if (secs > 0) setTimeout(() => (b.style.display = 'none'), secs * 1000);
+      }
+
       function forceLogout(msg) {
-        localStorage.clear();
-        alert(
-          msg || "Session expirée ou accès interdit. Veuillez vous reconnecter."
+        // Clear sensitive local storage keys (token, doctorId, user info)
+        try {
+          localStorage.removeItem('token');
+          localStorage.removeItem('doctorId');
+          localStorage.removeItem('user');
+        } catch (e) {
+          console.warn('Erreur clear localStorage', e);
+        }
+        showBanner(
+          msg ||
+            'Votre session a expiré. Redirection vers la page de connexion...',
+          2
         );
-        window.location.href = "auth.html";
+        setTimeout(() => (window.location.href = 'auth.html'), 1500);
       }
 
       async function secureFetch(url, options = {}, errorMsg) {
+        // Attach bearer token if available
+        options = options || {};
+        options.headers = options.headers || {};
+        try {
+          const token = localStorage.getItem('token');
+          if (token) options.headers['Authorization'] = 'Bearer ' + token;
+        } catch (e) {
+          console.warn('Unable to read token from localStorage', e);
+        }
         const res = await fetch(url, options);
         if (res.status === 401 || res.status === 403) {
-          forceLogout(
-            errorMsg ||
-              "Session expirée ou accès interdit. Veuillez vous reconnecter."
-          );
-          throw new Error("Déconnecté");
+          forceLogout(errorMsg || 'Accès refusé ou session expirée.');
+          throw new Error('Déconnecté');
         }
         return res;
       }
 
       // Récupération du GeniDoc ID depuis l'URL
       const params = new URLSearchParams(window.location.search);
-      const genidocId = params.get("genidocId");
+      const genidocId = params.get('genidocId');
 
       // Fonction pour rediriger avec genidocId
       function redirectToPage(page) {
@@ -1494,24 +1546,24 @@
           const data = await res.json();
           if (data.success && data.data) {
             const patient = data.data;
-            document.getElementById("patient-name").textContent =
-              patient.username || "Patient";
-            document.getElementById("profile-email").textContent =
-              patient.email || "Non renseigné";
-            document.getElementById("profile-birth").textContent =
-              patient.birthdate || "Non renseignée";
-            document.getElementById("profile-username").textContent =
-              patient.username || "Non renseigné";
+            document.getElementById('patient-name').textContent =
+              patient.username || 'Patient';
+            document.getElementById('profile-email').textContent =
+              patient.email || 'Non renseigné';
+            document.getElementById('profile-birth').textContent =
+              patient.birthdate || 'Non renseignée';
+            document.getElementById('profile-username').textContent =
+              patient.username || 'Non renseigné';
             if (patient.createdAt) {
               const date = new Date(patient.createdAt);
-              document.getElementById("date-inscription").textContent =
-                date.toLocaleDateString("fr-FR");
+              document.getElementById('date-inscription').textContent =
+                date.toLocaleDateString('fr-FR');
             }
           }
         } catch (e) {
-          if (e.message !== "Déconnecté") {
+          if (e.message !== 'Déconnecté') {
             console.error(
-              "Erreur lors de la récupération des données patient:",
+              'Erreur lors de la récupération des données patient:',
               e
             );
           }
@@ -1519,52 +1571,52 @@
       }
 
       if (!genidocId) {
-        window.location.href = "auth.html";
+        window.location.href = 'auth.html';
       } else {
-        document.getElementById("genidoc-id-display").textContent = genidocId;
-        document.getElementById("profile-gd").textContent = genidocId;
+        document.getElementById('genidoc-id-display').textContent = genidocId;
+        document.getElementById('profile-gd').textContent = genidocId;
         refreshPatientHeaderAndProfile();
       }
 
       // Rafraîchir le header/profil si retour de la page paramètres
-      window.addEventListener("focus", function () {
+      window.addEventListener('focus', function () {
         refreshPatientHeaderAndProfile();
       });
 
       // Toggle menu profil
-      const profileBtn = document.getElementById("profileBtn");
-      const profileDropdown = document.getElementById("profileDropdown");
+      const profileBtn = document.getElementById('profileBtn');
+      const profileDropdown = document.getElementById('profileDropdown');
 
-      profileBtn.addEventListener("click", (e) => {
+      profileBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        profileDropdown.classList.toggle("active");
-        notificationDropdown.classList.remove("active");
+        profileDropdown.classList.toggle('active');
+        notificationDropdown.classList.remove('active');
       });
 
       // Toggle notifications
-      const notificationBtn = document.getElementById("notificationBtn");
+      const notificationBtn = document.getElementById('notificationBtn');
       const notificationDropdown = document.getElementById(
-        "notificationDropdown"
+        'notificationDropdown'
       );
 
-      notificationBtn.addEventListener("click", (e) => {
+      notificationBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        notificationDropdown.classList.toggle("active");
-        profileDropdown.classList.remove("active");
+        notificationDropdown.classList.toggle('active');
+        profileDropdown.classList.remove('active');
         loadNotifications();
       });
 
       // Fermer les dropdowns si on clique ailleurs
-      document.addEventListener("click", () => {
-        profileDropdown.classList.remove("active");
-        notificationDropdown.classList.remove("active");
+      document.addEventListener('click', () => {
+        profileDropdown.classList.remove('active');
+        notificationDropdown.classList.remove('active');
       });
 
-      profileDropdown.addEventListener("click", (e) => {
+      profileDropdown.addEventListener('click', (e) => {
         e.stopPropagation();
       });
 
-      notificationDropdown.addEventListener("click", (e) => {
+      notificationDropdown.addEventListener('click', (e) => {
         e.stopPropagation();
       });
 
@@ -1578,21 +1630,21 @@
             updateNotificationBadge(data.unreadCount || 0);
           }
         } catch (error) {
-          if (error.message !== "Déconnecté") {
-            console.error("Erreur chargement notifications:", error);
+          if (error.message !== 'Déconnecté') {
+            console.error('Erreur chargement notifications:', error);
           }
         }
       }
 
       // Afficher les notifications
       function displayNotifications(notifications) {
-        const listEl = document.getElementById("notificationList");
+        const listEl = document.getElementById('notificationList');
 
         listEl.innerHTML = notifications
           .map(
             (notif) => `
           <div class="notification-item ${
-            notif.read ? "" : "unread"
+            notif.read ? '' : 'unread'
           }" onclick="markAsRead('${notif.id}')">
             <div class="notification-item-header">
               <div class="notification-title">${notif.title}</div>
@@ -1604,17 +1656,17 @@
           </div>
         `
           )
-          .join("");
+          .join('');
       }
 
       // Mettre à jour le badge
       function updateNotificationBadge(count) {
-        const badge = document.getElementById("notificationBadge");
+        const badge = document.getElementById('notificationBadge');
         if (count > 0) {
-          badge.textContent = count > 9 ? "9+" : count;
-          badge.classList.add("active");
+          badge.textContent = count > 9 ? '9+' : count;
+          badge.classList.add('active');
         } else {
-          badge.classList.remove("active");
+          badge.classList.remove('active');
         }
       }
 
@@ -1622,12 +1674,12 @@
       async function markAsRead(notificationId) {
         try {
           await secureFetch(`/api/notifications/${notificationId}/read`, {
-            method: "PUT",
+            method: 'PUT',
           });
           loadNotifications();
         } catch (error) {
-          if (error.message !== "Déconnecté") {
-            console.error("Erreur:", error);
+          if (error.message !== 'Déconnecté') {
+            console.error('Erreur:', error);
           }
         }
       }
@@ -1636,12 +1688,12 @@
       async function markAllAsRead() {
         try {
           await secureFetch(`/api/notifications/${genidocId}/read-all`, {
-            method: "PUT",
+            method: 'PUT',
           });
           loadNotifications();
         } catch (error) {
-          if (error.message !== "Déconnecté") {
-            console.error("Erreur:", error);
+          if (error.message !== 'Déconnecté') {
+            console.error('Erreur:', error);
           }
         }
       }
@@ -1659,7 +1711,7 @@
         if (diffMins < 60) return `Il y a ${diffMins} min`;
         if (diffHours < 24) return `Il y a ${diffHours}h`;
         if (diffDays < 7) return `Il y a ${diffDays}j`;
-        return date.toLocaleDateString("fr-FR");
+        return date.toLocaleDateString('fr-FR');
       }
 
       // Charger les notifications au démarrage
@@ -1674,22 +1726,22 @@
       // Normaliser les statuts (anglais -> français)
       function normalizeStatus(status) {
         const statusMap = {
-          pending: "en attente",
-          confirmed: "confirmé",
-          cancelled: "annulé",
-          canceled: "annulé",
-          "en attente": "en attente",
-          confirmé: "confirmé",
-          annulé: "annulé",
+          pending: 'en attente',
+          confirmed: 'confirmé',
+          cancelled: 'annulé',
+          canceled: 'annulé',
+          'en attente': 'en attente',
+          confirmé: 'confirmé',
+          annulé: 'annulé',
         };
         return statusMap[status?.toLowerCase()] || status;
       }
 
       // Charger les rendez-vous du patient
-      async function loadPatientAppointments(filter = "all") {
+      async function loadPatientAppointments(filter = 'all') {
         if (!genidocId) {
           console.log(
-            "Aucun genidocId - impossible de charger les rendez-vous"
+            'Aucun genidocId - impossible de charger les rendez-vous'
           );
           return;
         }
@@ -1701,16 +1753,16 @@
           if (result.success && result.data) {
             allPatientAppointments = result.data;
             // Mettre à jour le compteur
-            document.getElementById("appointments-count").textContent =
+            document.getElementById('appointments-count').textContent =
               allPatientAppointments.length;
             if (allPatientAppointments.length > 0) {
-              document.getElementById("appointments-section").style.display =
-                "block";
+              document.getElementById('appointments-section').style.display =
+                'block';
               displayPatientAppointments(filter);
             } else {
-              document.getElementById("appointments-section").style.display =
-                "block";
-              document.getElementById("patient-appointments-list").innerHTML = `
+              document.getElementById('appointments-section').style.display =
+                'block';
+              document.getElementById('patient-appointments-list').innerHTML = `
                 <div class="empty-appointments-dashboard">
                   <img src="/static/rendez-vous.png" alt="Aucun rendez-vous">
                   <p>Vous n'avez pas encore de rendez-vous.</p>
@@ -1722,15 +1774,15 @@
             }
           }
         } catch (error) {
-          if (error.message !== "Déconnecté") {
-            console.error("Erreur lors du chargement des rendez-vous:", error);
+          if (error.message !== 'Déconnecté') {
+            console.error('Erreur lors du chargement des rendez-vous:', error);
           }
         }
       }
 
       // Afficher les rendez-vous
-      function displayPatientAppointments(filter = "all") {
-        const container = document.getElementById("patient-appointments-list");
+      function displayPatientAppointments(filter = 'all') {
+        const container = document.getElementById('patient-appointments-list');
 
         // Normaliser les statuts
         const normalizedAppointments = allPatientAppointments.map((apt) => ({
@@ -1739,14 +1791,14 @@
         }));
 
         const filtered =
-          filter === "all"
+          filter === 'all'
             ? normalizedAppointments
             : normalizedAppointments.filter((apt) => apt.status === filter);
 
         if (filtered.length === 0) {
           container.innerHTML = `
             <div class="empty-appointments-dashboard">
-              <p>Aucun rendez-vous ${filter === "all" ? "" : filter}.</p>
+              <p>Aucun rendez-vous ${filter === 'all' ? '' : filter}.</p>
             </div>
           `;
           return;
@@ -1754,37 +1806,37 @@
 
         container.innerHTML = filtered
           .map((apt) => {
-            const statusClass = apt.status.replace(" ", "-");
+            const statusClass = apt.status.replace(' ', '-');
             const statusText =
               apt.status.charAt(0).toUpperCase() + apt.status.slice(1);
 
             return `
             <div class="patient-appointment-card ${statusClass}">
               <div class="apt-header">
-                <div class="apt-title">${apt.service || "Consultation"}</div>
+                <div class="apt-title">${apt.service || 'Consultation'}</div>
                 <span class="apt-status-badge ${statusClass}">${statusText}</span>
               </div>
               <div class="apt-details">
                 <div class="apt-detail">
                   <strong>📅 Date:</strong> ${new Date(
                     apt.date
-                  ).toLocaleDateString("fr-FR")}
+                  ).toLocaleDateString('fr-FR')}
                 </div>
                 <div class="apt-detail">
                   <strong>🕐 Heure:</strong> ${apt.time}
                 </div>
                 <div class="apt-detail">
                   <strong>🏥 Lieu:</strong> ${
-                    apt.establishment_name || apt.location || "Non spécifié"
+                    apt.establishment_name || apt.location || 'Non spécifié'
                   }
                 </div>
                 <div class="apt-detail">
                   <strong>📍 Ville:</strong> ${
-                    apt.establishment_ville || "Non spécifié"
+                    apt.establishment_ville || 'Non spécifié'
                   }
                 </div>
                 <div class="apt-detail">
-                  <strong>🩺 Mode:</strong> ${apt.mode || "Présentiel"}
+                  <strong>🩺 Mode:</strong> ${apt.mode || 'Présentiel'}
                 </div>
                 ${
                   apt.consultationType
@@ -1793,7 +1845,7 @@
                   <strong>💉 Type:</strong> ${apt.consultationType}
                 </div>
                 `
-                    : ""
+                    : ''
                 }
               </div>
               ${
@@ -1803,38 +1855,38 @@
                   <strong>📝 Notes:</strong> ${apt.notes}
                 </div>
               `
-                  : ""
+                  : ''
               }
               ${
-                apt.status === "annulé" && apt.cancellationReason
+                apt.status === 'annulé' && apt.cancellationReason
                   ? `
                 <div style="margin-top: 10px; padding: 10px; background: #fff3cd; border-radius: 4px;">
                   <strong>⚠️ Raison d'annulation:</strong> ${apt.cancellationReason}
                 </div>
               `
-                  : ""
+                  : ''
               }
               <div style="margin-top: 12px; font-size: 0.85em; color: #999;">
                 Créé le ${new Date(apt.createdAt).toLocaleDateString(
-                  "fr-FR"
-                )} à ${new Date(apt.createdAt).toLocaleTimeString("fr-FR")}
+                  'fr-FR'
+                )} à ${new Date(apt.createdAt).toLocaleTimeString('fr-FR')}
               </div>
             </div>
           `;
           })
-          .join("");
+          .join('');
       }
 
       // Gestion des filtres de rendez-vous
-      document.querySelectorAll(".filter-apt-btn").forEach((btn) => {
-        btn.addEventListener("click", (e) => {
+      document.querySelectorAll('.filter-apt-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
           const filter = e.target.dataset.filter;
 
           // Mettre à jour le bouton actif
           document
-            .querySelectorAll(".filter-apt-btn")
-            .forEach((b) => b.classList.remove("active"));
-          e.target.classList.add("active");
+            .querySelectorAll('.filter-apt-btn')
+            .forEach((b) => b.classList.remove('active'));
+          e.target.classList.add('active');
 
           // Afficher les rendez-vous filtrés
           displayPatientAppointments(filter);
@@ -1845,29 +1897,29 @@
       loadPatientAppointments();
 
       // Fermer le dropdown si on clique ailleurs
-      document.addEventListener("click", () => {
-        profileDropdown.classList.remove("active");
+      document.addEventListener('click', () => {
+        profileDropdown.classList.remove('active');
       });
 
-      profileDropdown.addEventListener("click", (e) => {
+      profileDropdown.addEventListener('click', (e) => {
         e.stopPropagation();
       });
 
       // Bouton déconnexion sécurisé
-      document.getElementById("logoutBtn").addEventListener("click", () => {
-        if (confirm("Voulez-vous vraiment vous déconnecter ?")) {
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
           forceLogout();
         }
       });
 
       // Toggle carte vitale
-      const vitaleBtn = document.getElementById("vitaleBtn");
-      const vitaleCard = document.getElementById("vitaleCard");
+      const vitaleBtn = document.getElementById('vitaleBtn');
+      const vitaleCard = document.getElementById('vitaleCard');
       let vitaleVisible = false;
 
-      vitaleBtn.addEventListener("click", () => {
+      vitaleBtn.addEventListener('click', () => {
         vitaleVisible = !vitaleVisible;
-        vitaleCard.classList.toggle("active");
+        vitaleCard.classList.toggle('active');
 
         // Mise à jour du texte et de l'icône
         const svg = vitaleVisible
@@ -1875,8 +1927,8 @@
           : '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right: 8px;"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>';
 
         vitaleBtn.innerHTML = vitaleVisible
-          ? svg + "Masquer ma Carte Vitale"
-          : svg + "Afficher ma Carte Vitale GeniDoc";
+          ? svg + 'Masquer ma Carte Vitale'
+          : svg + 'Afficher ma Carte Vitale GeniDoc';
       });
     </script>
   </body>

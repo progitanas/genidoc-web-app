@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Export CSV - Admin</title>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        padding: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Export CSV</h1>
+    <label>From: <input id="from" type="date" /></label>
+    <label>To: <input id="to" type="date" /></label>
+    <button id="export">Générer CSV</button>
+    <div id="out"></div>
+    <script>
+      document.getElementById('export').addEventListener('click', async () => {
+        const from = document.getElementById('from').value;
+        const to = document.getElementById('to').value;
+        let url = '/api/admin/export';
+        const q = [];
+        if (from) q.push('from=' + encodeURIComponent(from));
+        if (to) q.push('to=' + encodeURIComponent(to));
+        if (q.length) url += '?' + q.join('&');
+        const res = await fetch(url);
+        if (res.ok) {
+          const blob = await res.blob();
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = 'export.csv';
+          link.textContent = 'Télécharger export.csv';
+          document.getElementById('out').innerHTML = '';
+          document.getElementById('out').appendChild(link);
+        } else {
+          const txt = await res.text();
+          document.getElementById('out').textContent = txt;
+        }
+      });
+    </script>
+  </body>
+</html>

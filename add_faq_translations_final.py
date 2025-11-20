@@ -1,14 +1,9 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import re
 
-# Lire le fichier
 with open('index.html', 'r', encoding='utf-8') as f:
     content = f.read()
 
-# Ajouter les traductions FAQ à la section FR (avant la virgule de fermeture)
-fr_faq = ''',
+fr_faq = '''
             "faq-genidoc-title": "Questions Fréquentes sur GeniDoc",
             "faq-genidoc-subtitle": "Trouvez les réponses aux questions les plus posées sur notre plateforme",
             "faq-q1": "Comment puis-je prendre un rendez-vous en ligne avec GeniDoc?",
@@ -33,7 +28,7 @@ content = content.replace(
 print('✅ Traductions FAQ FR ajoutées')
 
 # Ajouter les traductions FAQ à la section EN
-en_faq = ''',
+en_faq = '''
             "faq-genidoc-title": "Frequently Asked Questions about GeniDoc",
             "faq-genidoc-subtitle": "Find answers to the most asked questions about our platform",
             "faq-q1": "How can I book an appointment online with GeniDoc?",

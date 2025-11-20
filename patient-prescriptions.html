@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Mes ordonnances - GeniDoc</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        padding: 16px;
+      }
+      h1 {
+        font-size: 20px;
+      }
+      label {
+        display: block;
+        margin-top: 8px;
+      }
+      textarea {
+        width: 100%;
+        height: 80px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Mes ordonnances</h1>
+    <div id="info"></div>
+    <div id="list"></div>
+
+    <script>
+      function qs(name) {
+        return new URLSearchParams(window.location.search).get(name);
+      }
+      const genidocId = qs('genidocId') || '';
+      document.getElementById('info').innerText = genidocId
+        ? `Compte: ${genidocId}`
+        : 'Aucun genidocId fourni en query string. Ex: ?genidocId=GD-123456';
+
+      async function load() {
+        if (!genidocId) return;
+        try {
+          const resp = await fetch(
+            `/api/patient/${encodeURIComponent(genidocId)}/prescriptions`
+          );
+          const json = await resp.json();
+          if (!json.success) {
+            document.getElementById('list').innerText =
+              'Erreur: ' + (json.message || '');
+            return;
+          }
+          const data = json.data || [];
+          if (!data.length) {
+            document.getElementById('list').innerHTML =
+              '<p>Aucune ordonnance.</p>';
+            return;
+          }
+          const html = data
+            .map((p) => {
+              return `<div style="border:1px solid #ddd;padding:8px;margin:8px 0">
+            <strong>Service:</strong> ${p.service || 'N/A'}<br>
+            <strong>Prescrit le:</strong> ${p.issuedAt || p.createdAt || ''}<br>
+            <strong>Médicaments:</strong><pre style="white-space:pre-wrap">${
+              p.medications || ''
+            }</pre>
+            <strong>Instructions:</strong><div>${p.instructions || ''}</div>
+          </div>`;
+            })
+            .join('');
+          document.getElementById('list').innerHTML = html;
+        } catch (e) {
+          console.error(e);
+          document.getElementById('list').innerText = 'Erreur réseau';
+        }
+      }
+      window.addEventListener('load', load);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,62 @@
+name: EAS Build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  eas-build-android:
+    name: EAS Build Android (preview)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+      - name: Login to Expo
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          echo $EXPO_TOKEN | eas login --token
+      - name: Install dependencies
+        run: |
+          cd mobile
+          npm ci
+      - name: Run EAS build (Android preview)
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          cd mobile
+          eas build -p android --profile preview --non-interactive
+
+  eas-build-ios:
+    name: EAS Build iOS (preview)
+    runs-on: ubuntu-latest
+    needs: eas-build-android
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+      - name: Login to Expo
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          echo $EXPO_TOKEN | eas login --token
+      - name: Install dependencies
+        run: |
+          cd mobile
+          npm ci
+      - name: Run EAS build (iOS preview)
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          cd mobile
+          eas build -p ios --profile preview --non-interactive

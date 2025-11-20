@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tableau de Bord Admin - GeniDoc</title>
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#4d3aff" />
     <style>
       :root {
         --primary: #4d3aff;
@@ -22,7 +24,7 @@
       }
 
       body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         background: var(--light-bg);
         color: var(--dark-text);
       }
@@ -373,11 +375,27 @@
     </style>
   </head>
   <body>
+    <script>
+      // Session/authentication check for admin-dashboard.html
+      (function () {
+        var adminToken = localStorage.getItem('adminToken');
+        if (!adminToken) {
+          window.location.href = 'auth.html';
+        }
+      })();
+    </script>
     <div class="header">
       <h1>📊 Tableau de Bord Admin</h1>
       <div class="user-info">
         <div class="user-avatar" id="avatar-init">A</div>
         <span id="user-name">Admin</span>
+        <button
+          id="install-app-btn"
+          class="btn btn-primary"
+          style="margin-right: 8px; display: none"
+        >
+          Installer
+        </button>
         <button class="logout-btn" onclick="logout()">Déconnexion</button>
       </div>
     </div>
@@ -485,6 +503,55 @@
       <div id="tab-2" class="tab-content">
         <div class="card">
           <h2>Tous les Rendez-vous</h2>
+          <div
+            style="
+              margin-bottom: 16px;
+              display: flex;
+              gap: 16px;
+              align-items: center;
+            "
+          >
+            <label for="filter-specialty">Filtrer par spécialité :</label>
+            <select id="filter-specialty" onchange="loadDashboard()">
+              <option value="">Toutes</option>
+              <option value="Cardiologie">Cardiologie</option>
+              <option value="Dermatologie">Dermatologie</option>
+              <option value="Neurologie">Neurologie</option>
+              <option value="Pédiatrie">Pédiatrie</option>
+              <option value="Orthopédie">Orthopédie</option>
+              <option value="Gynécologie">Gynécologie</option>
+            </select>
+            <label for="filter-date" style="margin-left: 16px">Date :</label>
+            <input
+              type="date"
+              id="filter-date"
+              onchange="loadDashboard()"
+              style="padding: 4px 8px"
+            />
+            <input
+              id="search-appointment"
+              type="text"
+              placeholder="Recherche patient ou médecin..."
+              style="margin-left: 16px; padding: 4px 8px; width: 200px"
+              oninput="loadDashboard()"
+            />
+            <button
+              id="filter-unassigned"
+              type="button"
+              style="margin-left: 16px; padding: 4px 12px"
+              onclick="toggleUnassigned()"
+            >
+              Afficher uniquement les non attribués
+            </button>
+            <button
+              id="export-csv"
+              type="button"
+              style="margin-left: 16px; padding: 4px 12px"
+              onclick="exportAppointmentsCSV()"
+            >
+              Exporter CSV
+            </button>
+          </div>
           <table>
             <thead>
               <tr>
@@ -494,6 +561,7 @@
                 <th>Type</th>
                 <th>Statut</th>
                 <th>Actions</th>
+                <th>RDV/jour</th>
               </tr>
             </thead>
             <tbody id="appointment-list">
@@ -661,47 +729,47 @@
     </div>
 
     <script>
-      const API = "http://localhost:3000/api";
+      const API = 'http://localhost:3000/api';
 
       function switchTab(index) {
         document
-          .querySelectorAll(".tab-content")
-          .forEach((el) => el.classList.remove("active"));
+          .querySelectorAll('.tab-content')
+          .forEach((el) => el.classList.remove('active'));
         document
-          .querySelectorAll(".tab-btn")
-          .forEach((el) => el.classList.remove("active"));
+          .querySelectorAll('.tab-btn')
+          .forEach((el) => el.classList.remove('active'));
 
-        const contents = document.querySelectorAll(".tab-content");
-        const buttons = document.querySelectorAll(".tab-btn");
+        const contents = document.querySelectorAll('.tab-content');
+        const buttons = document.querySelectorAll('.tab-btn');
 
-        if (contents[index]) contents[index].classList.add("active");
-        if (buttons[index]) buttons[index].classList.add("active");
+        if (contents[index]) contents[index].classList.add('active');
+        if (buttons[index]) buttons[index].classList.add('active');
       }
 
       function openModal(modalId) {
-        document.getElementById(modalId).classList.add("active");
+        document.getElementById(modalId).classList.add('active');
       }
 
       function closeModal(modalId) {
-        document.getElementById(modalId).classList.remove("active");
+        document.getElementById(modalId).classList.remove('active');
       }
 
       function openAddDoctorModal() {
-        openModal("add-doctor-modal");
+        openModal('add-doctor-modal');
       }
 
       // ========== SÉCURITÉ SESSION ========== //
       function forceLogout(msg) {
         localStorage.clear();
         // Session expired logic removed as requested
-        window.location.href = "/auth.html";
+        window.location.href = '/auth.html';
       }
 
       async function secureFetch(url, options = {}, errorMsg) {
         const res = await fetch(url, options);
         if (res.status === 401 || res.status === 403) {
           forceLogout();
-          throw new Error("Déconnecté");
+          throw new Error('Déconnecté');
         }
         return res;
       }
@@ -712,20 +780,20 @@
 
       async function addDoctor(e) {
         e.preventDefault();
-        const firstName = document.getElementById("doctor-first-name").value;
-        const lastName = document.getElementById("doctor-last-name").value;
-        const email = document.getElementById("doctor-email").value;
-        const license = document.getElementById("doctor-license").value;
-        const specialty = document.getElementById("doctor-specialty").value;
-        const phone = document.getElementById("doctor-phone").value;
+        const firstName = document.getElementById('doctor-first-name').value;
+        const lastName = document.getElementById('doctor-last-name').value;
+        const email = document.getElementById('doctor-email').value;
+        const license = document.getElementById('doctor-license').value;
+        const specialty = document.getElementById('doctor-specialty').value;
+        const phone = document.getElementById('doctor-phone').value;
         try {
           const response = await secureFetch(
             `${API}/doctors`,
             {
-              method: "POST",
+              method: 'POST',
               headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
               },
               body: JSON.stringify({
                 firstName,
@@ -740,138 +808,245 @@
           );
           const data = await response.json();
           if (data.success) {
-            document.getElementById("doctor-success").textContent =
-              "Médecin ajouté avec succès!";
-            document.getElementById("doctor-success").classList.add("show");
+            document.getElementById('doctor-success').textContent =
+              'Médecin ajouté avec succès!';
+            document.getElementById('doctor-success').classList.add('show');
             setTimeout(() => {
-              closeModal("add-doctor-modal");
+              closeModal('add-doctor-modal');
               location.reload();
             }, 1500);
           }
         } catch (error) {
-          if (error.message !== "Déconnecté") {
-            console.error("Error:", error);
+          if (error.message !== 'Déconnecté') {
+            console.error('Error:', error);
           }
         }
       }
 
       async function loadDashboard() {
         try {
-          const token = localStorage.getItem("token");
-          const user = JSON.parse(localStorage.getItem("user") || "{}");
+          const token = localStorage.getItem('token');
+          const user = JSON.parse(localStorage.getItem('user') || '{}');
           if (!token) {
             forceLogout();
             return;
           }
-          document.getElementById("user-name").textContent =
-            user.firstName || "Admin";
-          document.getElementById("avatar-init").textContent =
-            (user.firstName || "A")[0].toUpperCase();
+          document.getElementById('user-name').textContent =
+            user.firstName || 'Admin';
+          document.getElementById('avatar-init').textContent =
+            (user.firstName || 'A')[0].toUpperCase();
+
           // Load stats
-          const statsResponse = await secureFetch(`${API}/admin/stats`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          const stats = await statsResponse.json();
-          if (stats.success) {
-            document.getElementById("doctor-count").textContent =
-              stats.data.doctorCount || 0;
-            document.getElementById("patient-count").textContent =
-              stats.data.patientCount || 0;
-            document.getElementById("appointment-count").textContent =
-              stats.data.appointmentCount || 0;
-            document.getElementById("revenue").textContent = (
-              stats.data.revenue || 0
-            ).toFixed(0);
-          }
-          // Load recent appointments
-          const appointmentsResponse = await secureFetch(
-            `${API}/admin/appointments`,
-            {
+          try {
+            const statsResponse = await secureFetch(`${API}/admin/stats`, {
               headers: { Authorization: `Bearer ${token}` },
+            });
+            const stats = await statsResponse.json();
+            if (stats.success) {
+              document.getElementById('doctor-count').textContent =
+                stats.data.doctorCount || 0;
+              document.getElementById('patient-count').textContent =
+                stats.data.patientCount || 0;
+              document.getElementById('appointment-count').textContent =
+                stats.data.appointmentCount || 0;
+              document.getElementById('revenue').textContent = (
+                stats.data.revenue || 0
+              ).toFixed(0);
             }
-          );
-          const appointmentsData = await appointmentsResponse.json();
-          if (
-            appointmentsData.success &&
-            appointmentsData.data &&
-            appointmentsData.data.length > 0
-          ) {
-            const tbody = document.getElementById("recent-appointments");
-            tbody.innerHTML = appointmentsData.data
-              .slice(0, 5)
-              .map(
-                (apt) => `
-                        <tr>
-                            <td>${apt.patientName || "N/A"}</td>
-                            <td>${apt.doctorName || "N/A"}</td>
-                            <td>${new Date(apt.date).toLocaleDateString(
-                              "fr-FR"
-                            )}</td>
-                            <td><span style=\"color: var(--primary);\">${
-                              apt.status || "Pending"
-                            }</span></td>
-                            <td>${
-                              apt.establishment_name &&
-                              apt.establishment_name.trim() !== ""
-                                ? apt.establishment_name
-                                : "Non spécifié"
-                            }</td>
-                        </tr>
-                    `
-              )
-              .join("");
-          }
-          // Load doctors
-          const doctorsResponse = await secureFetch(`${API}/doctors`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          const doctorsData = await doctorsResponse.json();
-          if (
-            doctorsData.success &&
-            doctorsData.data &&
-            doctorsData.data.length > 0
-          ) {
-            const doctorList = document.getElementById("doctor-list");
-            doctorList.innerHTML = doctorsData.data
-              .map(
-                (doctor) => `
-                        <div class=\"doctor-card\">\n                            <h3>${doctor.firstName} ${doctor.lastName}</h3>\n                            <p><strong>${doctor.specialization}</strong></p>\n                            <p>📧 ${doctor.email}</p>\n                            <p>📞 ${doctor.phone}</p>\n                            <div class=\"doctor-card-actions\">\n                                <button class=\"btn btn-secondary\" onclick=\"editDoctor('${doctor.id}')\">Modifier</button>\n                                <button class=\"btn btn-danger\" onclick=\"deleteDoctor('${doctor.id}')\">Supprimer</button>\n                            </div>\n                        </div>\n                    `
-              )
-              .join("");
+          } catch (e) {
+            console.warn('Could not load stats', e);
           }
 
-          // Load social requests (admin only)
+          // Load doctors first (needed for selects)
+          let doctors = [];
+          try {
+            const doctorsResponse = await secureFetch(`${API}/doctors`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            const doctorsData = await doctorsResponse.json();
+            if (doctorsData.success && Array.isArray(doctorsData.data)) {
+              doctors = doctorsData.data;
+              const doctorList = document.getElementById('doctor-list');
+              if (doctors.length) {
+                doctorList.innerHTML = doctors
+                  .map(
+                    (doctor) => `
+                        <div class="doctor-card">
+                            <h3>${doctor.firstName} ${doctor.lastName}</h3>
+                            <p><strong>${
+                              doctor.specialization || '-'
+                            }</strong></p>
+                            <p>📧 ${doctor.email || '-'}</p>
+                            <p>📞 ${doctor.phone || '-'}</p>
+                            <div class="doctor-card-actions">
+                                <button class="btn btn-secondary" onclick="editDoctor('${
+                                  doctor.id
+                                }')">Modifier</button>
+                                <button class="btn btn-danger" onclick="deleteDoctor('${
+                                  doctor.id
+                                }')">Supprimer</button>
+                            </div>
+                        </div>
+                    `
+                  )
+                  .join('');
+              } else {
+                doctorList.innerHTML =
+                  '<div style="grid-column:1/-1;text-align:center;color:#999;padding:40px">Aucun médecin</div>';
+              }
+            }
+          } catch (e) {
+            console.warn('Could not load doctors', e);
+          }
+
+          // Load appointments
+          let appointments = [];
+          try {
+            const appointmentsResponse = await secureFetch(
+              `${API}/admin/appointments`,
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+            const appointmentsData = await appointmentsResponse.json();
+            if (
+              appointmentsData.success &&
+              Array.isArray(appointmentsData.data)
+            ) {
+              appointments = appointmentsData.data;
+            }
+          } catch (e) {
+            console.warn('Could not load appointments', e);
+          }
+
+          // Recent appointments
+          const recentTbody = document.getElementById('recent-appointments');
+          if (appointments.length) {
+            recentTbody.innerHTML = appointments
+              .slice(0, 5)
+              .map((apt) => {
+                const doctorCell =
+                  apt.doctorName ||
+                  (apt.doctorId ? apt.doctorId : '<em>Non attribué</em>');
+                return `
+                <tr>
+                  <td>${apt.patientName || 'N/A'}</td>
+                  <td>${doctorCell}</td>
+                  <td>${
+                    apt.date
+                      ? new Date(apt.date).toLocaleDateString('fr-FR')
+                      : '-'
+                  }</td>
+                  <td><span style="color: var(--primary);">${
+                    apt.status || 'Pending'
+                  }</span></td>
+                  <td>${apt.establishment_name || 'Non spécifié'}</td>
+                </tr>
+              `;
+              })
+              .join('');
+          } else {
+            recentTbody.innerHTML =
+              '<tr><td colspan="5" style="text-align:center;color:#999">Aucun rendez-vous récent</td></tr>';
+          }
+
+          // Full appointment list rendering (simple)
+          const appointmentList = document.getElementById('appointment-list');
+          appointmentList.innerHTML = '';
+          window._lastFilteredAppointments = appointments;
+          if (appointments.length) {
+            appointments.forEach((appt) => {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+                <td>${appt.fullName || appt.patientName || '-'}</td>
+                <td>${appt.doctorName || '-'}</td>
+                <td>${appt.date || '-'} ${appt.time || ''}</td>
+                <td>${appt.service || '-'}</td>
+                <td>${appt.status || '-'}</td>
+                <td></td>
+                <td class="rdv-count-cell">-</td>
+              `;
+              // if unassigned, add select
+              if (!appt.doctorId && doctors.length) {
+                const select = document.createElement('select');
+                select.innerHTML =
+                  `<option value="">Attribuer à...</option>` +
+                  doctors
+                    .map(
+                      (d) =>
+                        `<option value="${d.id}">${d.firstName} ${
+                          d.lastName
+                        } (${d.specialization || '-'})</option>`
+                    )
+                    .join('');
+                select.onchange = async function () {
+                  if (!this.value) return;
+                  try {
+                    const res = await secureFetch(
+                      `${API}/appointments/${appt.id}/assign`,
+                      {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          Authorization: `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({ doctorId: this.value }),
+                      }
+                    );
+                    const result = await res.json();
+                    if (result.success) {
+                      alert('Rendez-vous attribué !');
+                      loadDashboard();
+                    } else {
+                      alert(result.message || "Erreur lors de l'attribution");
+                    }
+                  } catch (e) {
+                    console.error(e);
+                  }
+                };
+                tr.querySelector('td:nth-child(6)').innerHTML = '';
+                tr.querySelector('td:nth-child(6)').appendChild(select);
+              }
+              appointmentList.appendChild(tr);
+            });
+          } else {
+            appointmentList.innerHTML =
+              '<tr><td colspan="7" style="text-align:center;color:#999">Aucun rendez-vous</td></tr>';
+          }
+
+          // Load social requests
           try {
             const sr = await secureFetch(`${API}/social-requests`, {
               headers: { Authorization: `Bearer ${token}` },
             });
             const srj = await sr.json();
-            if (srj.success) {
-              const el = document.getElementById("social-requests-list");
-              if (!srj.data.length)
-                el.innerHTML =
-                  '<tr><td colspan="6" style="text-align:center;color:#999">Aucune demande</td></tr>';
-              else
-                el.innerHTML = srj.data
-                  .map(
-                    (r) => `
-                    <tr>
-                      <td>${r.id}</td>
-                      <td>${r.fullname}</td>
-                      <td>${r.uniqueid}</td>
-                      <td>${r.coverageType}</td>
-                      <td>${r.status}</td>
-                      <td>
-                        <button class="btn btn-primary" title="Marquer ticket en cours" onclick="adminUpdateSupport('${s.id}','in_progress')">En cours</button>
-                        <button class="btn btn-secondary" title="Clôturer le ticket" onclick="adminUpdateSupport('${s.id}','closed')">Clôturer</button>
-                      </td>
-                    </tr>
-                  `
-                  )
-                  .join("");
+            const el = document.getElementById('social-requests-list');
+            if (srj.success && Array.isArray(srj.data) && srj.data.length) {
+              el.innerHTML = srj.data
+                .map(
+                  (r) => `
+                <tr>
+                  <td>${r.id}</td>
+                  <td>${r.fullname}</td>
+                  <td>${r.uniqueid}</td>
+                  <td>${r.coverageType || '-'}</td>
+                  <td>${r.status || '-'}</td>
+                  <td>
+                    <button class="btn btn-primary" onclick="adminUpdateSupport('${
+                      r.id
+                    }','in_progress')">En cours</button>
+                    <button class="btn btn-secondary" onclick="adminUpdateSupport('${
+                      r.id
+                    }','closed')">Clôturer</button>
+                  </td>
+                </tr>
+              `
+                )
+                .join('');
+            } else {
+              el.innerHTML =
+                '<tr><td colspan="6" style="text-align:center;color:#999">Aucune demande</td></tr>';
             }
           } catch (e) {
-            console.warn("Could not load social requests:", e);
+            console.warn('Could not load social requests:', e);
           }
 
           // Load support tickets
@@ -880,70 +1055,100 @@
               headers: { Authorization: `Bearer ${token}` },
             });
             const spj = await sp.json();
-            if (spj.success) {
-              const el = document.getElementById("support-list");
-              if (!spj.data.length)
-                el.innerHTML =
-                  '<tr><td colspan="6" style="text-align:center;color:#999">Aucun ticket</td></tr>';
-              else
-                el.innerHTML = spj.data
-                  .map(
-                    (s) => `
-                    <tr>
-                      <td>${s.id}</td>
-                      <td>${s.userId || "Anonyme"}</td>
-                      <td>${s.subject}</td>
-                      <td>${s.message}</td>
-                      <td>${s.status}</td>
-                      <td>
-                        <button class="btn btn-primary" onclick="adminUpdateSupport('${
-                          s.id
-                        }','in_progress')">En cours</button>
-                        <button class="btn btn-secondary" onclick="adminUpdateSupport('${
-                          s.id
-                        }','closed')">Clôturer</button>
-                      </td>
-                    </tr>
-                  `
-                  )
-                  .join("");
+            const elSupport = document.getElementById('support-list');
+            if (spj.success && Array.isArray(spj.data) && spj.data.length) {
+              elSupport.innerHTML = spj.data
+                .map(
+                  (s) => `
+                <tr>
+                  <td>${s.id}</td>
+                  <td>${s.userName || s.user || '-'}</td>
+                  <td>${s.subject || '-'}</td>
+                  <td>${s.message || '-'}</td>
+                  <td>${s.status || '-'}</td>
+                  <td>
+                    <button class="btn btn-primary" onclick="adminUpdateSupport('${
+                      s.id
+                    }','in_progress')">En cours</button>
+                    <button class="btn btn-secondary" onclick="adminUpdateSupport('${
+                      s.id
+                    }','closed')">Clôturer</button>
+                  </td>
+                </tr>
+              `
+                )
+                .join('');
+            } else {
+              elSupport.innerHTML =
+                '<tr><td colspan="6" style="text-align:center;color:#999">Aucun ticket</td></tr>';
             }
           } catch (e) {
-            console.warn("Could not load support tickets", e);
+            console.warn('Could not load support tickets:', e);
           }
-        } catch (error) {
-          if (error.message !== "Déconnecté") {
-            console.error("Error loading dashboard:", error);
-          }
+        } catch (e) {
+          console.error('loadDashboard error', e);
         }
       }
 
-      function editDoctor(doctorId) {
-        alert("Fonction modifier médecin à implémenter");
+      // Utility: export filtered appointments to CSV
+      let showUnassignedOnly = false;
+      function exportAppointmentsCSV() {
+        const arr = window._lastFilteredAppointments || [];
+        let csv = 'Patient,Medecin,Date/Heure,Type,Statut\n';
+        arr.forEach((appt) => {
+          const row = [
+            '"' +
+              (appt.fullName || appt.patientName || '').replace(/"/g, '""') +
+              '"',
+            '"' + (appt.doctorName || '-') + '"',
+            '"' +
+              ((appt.date || '-') + ' ' + (appt.time || '')).replace(
+                /"/g,
+                '""'
+              ) +
+              '"',
+            '"' + (appt.service || '-') + '"',
+            '"' + (appt.status || '-') + '"',
+          ];
+          csv += row.join(',') + '\n';
+        });
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'rendezvous.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
       }
 
-      function deleteDoctor(doctorId) {
-        if (confirm("Êtes-vous sûr de vouloir supprimer ce médecin?")) {
-          alert("Fonction supprimer médecin à implémenter");
-        }
+      function toggleUnassigned() {
+        showUnassignedOnly = !showUnassignedOnly;
+        const btn = document.getElementById('filter-unassigned');
+        if (btn)
+          btn.textContent = showUnassignedOnly
+            ? 'Afficher tous les rendez-vous'
+            : 'Afficher uniquement les non attribués';
+        loadDashboard();
       }
 
       // Admin actions for social requests
       async function adminUpdateSocial(id, status) {
-        if (!confirm("Confirmer la mise à jour du statut ?")) return;
+        if (!confirm('Confirmer la mise à jour du statut ?')) return;
         try {
-          const token = localStorage.getItem("token");
+          const token = localStorage.getItem('token');
           const res = await secureFetch(`${API}/social-requests/${id}/status`, {
-            method: "PUT",
+            method: 'PUT',
             headers: {
               Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
+              'Content-Type': 'application/json',
             },
             body: JSON.stringify({ status }),
           });
           const j = await res.json();
           if (j.success) {
-            alert("Statut mis à jour");
+            alert('Statut mis à jour');
             loadDashboard();
           }
         } catch (e) {
@@ -952,20 +1157,20 @@
       }
 
       async function adminUpdateSupport(id, status) {
-        if (!confirm("Confirmer la mise à jour du ticket ?")) return;
+        if (!confirm('Confirmer la mise à jour du ticket ?')) return;
         try {
-          const token = localStorage.getItem("token");
+          const token = localStorage.getItem('token');
           const res = await secureFetch(`${API}/support/${id}/status`, {
-            method: "PUT",
+            method: 'PUT',
             headers: {
               Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
+              'Content-Type': 'application/json',
             },
             body: JSON.stringify({ status }),
           });
           const j = await res.json();
           if (j.success) {
-            alert("Ticket mis à jour");
+            alert('Ticket mis à jour');
             loadDashboard();
           }
         } catch (e) {
@@ -975,11 +1180,52 @@
 
       async function saveSettings(e) {
         e.preventDefault();
-        alert("Paramètres sauvegardés (fonction à implémenter)");
+        alert('Paramètres sauvegardés (fonction à implémenter)');
       }
 
       // Load dashboard on page load
-      document.addEventListener("DOMContentLoaded", loadDashboard);
+      document.addEventListener('DOMContentLoaded', loadDashboard);
+      // PWA: improved install flow + redirect to genidoc.ma
+      (function () {
+        let deferredPrompt = null;
+        const installBtn = document.getElementById('install-app-btn');
+
+        function openGenidoc() {
+          try { window.location.href = 'https://genidoc.ma'; } catch (e) { window.open('https://genidoc.ma', '_blank'); }
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          deferredPrompt = e;
+          if (installBtn) installBtn.style.display = 'inline-block';
+        });
+
+        if (installBtn) {
+          installBtn.style.display = 'inline-block';
+          installBtn.addEventListener('click', async (ev) => {
+            ev.preventDefault();
+            installBtn.disabled = true;
+            if (deferredPrompt) {
+              try { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; } catch (err) { console.warn(err); }
+              installBtn.disabled = false;
+              openGenidoc();
+              return;
+            }
+            if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+              alert("Pour ajouter GeniDoc à l'écran d'accueil : appuyez sur le bouton 'Partager' puis 'Ajouter à l'écran d'accueil'. Vous serez ensuite redirigé vers genidoc.ma.");
+              openGenidoc();
+              installBtn.disabled = false;
+              return;
+            }
+            openGenidoc();
+            installBtn.disabled = false;
+          });
+        }
+
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+        }
+      })();
     </script>
   </body>
 </html>

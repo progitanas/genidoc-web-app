@@ -606,20 +606,23 @@
               body: JSON.stringify({ email, password }),
             });
             const result = await res.json();
-            if (
-              result.success &&
-              result.data &&
-              result.data.role === "DOCTOR"
-            ) {
-              localStorage.setItem("userId", result.data.userId || "");
-              localStorage.setItem("role", "DOCTOR");
-              window.location.href = `dashboard-medecin.html?doctorId=${result.data.userId}`;
-            } else {
-              alert(
-                result.message ||
-                  "Identifiants invalides ou accès non autorisé."
-              );
-            }
+              if (
+                result.success &&
+                result.data &&
+                (result.data.role === "DOCTOR" || result.data.role === "doctor")
+              ) {
+                localStorage.setItem("userId", result.data.userId || "");
+                localStorage.setItem("role", "DOCTOR");
+                if (result.data.doctorId) {
+                  localStorage.setItem("doctorId", result.data.doctorId);
+                }
+                window.location.href = `dashboard-medecin.html?doctorId=${result.data.doctorId || result.data.userId}`;
+              } else {
+                alert(
+                  result.message ||
+                    "Identifiants invalides ou accès non autorisé."
+                );
+              }
           } catch {
             alert("Erreur réseau");
           }
