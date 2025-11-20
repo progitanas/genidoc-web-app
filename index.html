@@ -3763,6 +3763,11 @@
               <button class="btn btn-outline" data-i18n="btn-demo">
                 See How It Works
               </button>
+              <!-- Hero install button (triggers same handler as #install-app-btn) -->
+              <button class="btn btn-ghost install-app-action" aria-label="Télécharger GeniDoc" title="Ajouter GeniDoc à l'écran d'accueil" style="margin-left:12px;display:none;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;font-weight:700;">
+                <img src="static/ong_GeniDoc1preview.png" alt="GeniDoc" style="height:20px;" />
+                <span>Télécharger / Ajouter</span>
+              </button>
             </div>
 
             <!-- App Store Buttons -->
@@ -6398,22 +6403,25 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-          const installBtn = document.getElementById('install-app-btn');
-          if (!installBtn) return;
+          const canonicalInstallBtn = document.getElementById('install-app-btn');
+          const actionButtons = Array.from(document.querySelectorAll('.install-app-action'));
+          const triggers = actionButtons.concat(canonicalInstallBtn ? [canonicalInstallBtn] : []);
+          if (triggers.length === 0) return;
 
-          // Show button by default for discoverability
-          installBtn.style.display = 'inline-flex';
+          // Show all triggers by default for discoverability (they may be hidden by CSS)
+          triggers.forEach((btn)=>{ try{ btn.style.display = 'inline-flex'; }catch(e){} });
 
           window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            installBtn.style.display = 'inline-flex';
+            triggers.forEach((btn)=>{ try{ btn.style.display = 'inline-flex'; }catch(e){} });
             console.log('beforeinstallprompt captured');
           });
 
-          installBtn.addEventListener('click', async function(ev) {
+          async function handleInstallClick(ev) {
             ev.preventDefault();
-            installBtn.disabled = true;
+            const btn = ev.currentTarget;
+            btn.disabled = true;
             console.log('install button clicked, deferredPrompt=', !!deferredPrompt);
 
             if (deferredPrompt) {
@@ -6425,7 +6433,7 @@
               } catch (err) {
                 console.warn('PWA prompt error', err);
               }
-              installBtn.disabled = false;
+              btn.disabled = false;
               openGenidoc();
               return;
             }
@@ -6433,12 +6441,18 @@
             // iOS specific hint
             if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
               showIOSInstallHint();
-              installBtn.disabled = false;
+              btn.disabled = false;
               return;
             }
 
             openGenidoc();
-            installBtn.disabled = false;
+            btn.disabled = false;
+          }
+
+          triggers.forEach((t)=>{
+            try{
+              t.addEventListener('click', handleInstallClick);
+            }catch(e){}
           });
         });
 
