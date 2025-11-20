@@ -6373,76 +6373,92 @@
       });
     </script>
     <script>
-        // PWA install + service worker registration
+      // Improved PWA install handler: wait for DOM, attach listeners, provide clearer iOS fallback
       (function() {
         let deferredPrompt = null;
-        const installBtn = document.getElementById('install-app-btn');
 
-        // Helper: open genidoc.ma in the same tab (user requested behaviour)
         function openGenidoc() {
-          try {
-            window.location.href = 'https://genidoc.ma';
-          } catch (err) {
-            window.open('https://genidoc.ma', '_blank');
-          }
+          try { window.location.href = 'https://genidoc.ma'; }
+          catch (err) { window.open('https://genidoc.ma', '_blank'); }
         }
 
-        // If browser supports beforeinstallprompt, capture event and allow prompt
-        window.addEventListener('beforeinstallprompt', (e) => {
-          e.preventDefault();
-          deferredPrompt = e;
-          if (installBtn) {
-            installBtn.style.display = 'inline-flex';
-          }
-        });
+        function showIOSInstallHint() {
+          // create a small temporary overlay with instructions
+          const id = 'ios-install-hint';
+          if (document.getElementById(id)) return;
+          const container = document.createElement('div');
+          container.id = id;
+          container.style.position = 'fixed';
+          container.style.left = '12px';
+          container.style.right = '12px';
+          container.style.bottom = '120px';
+          container.style.zIndex = '2147483648';
+          container.style.background = 'rgba(0,0,0,0.85)';
+          container.style.color = '#fff';
+          container.style.padding = '12px 14px';
+          container.style.borderRadius = '12px';
+          container.style.boxShadow = '0 6px 20px rgba(0,0,0,0.35)';
+          container.style.fontSize = '14px';
+          container.style.lineHeight = '1.2';
+          container.innerHTML = "<strong>Ajouter GeniDoc à l'écran d'accueil</strong><div style='margin-top:6px'>Appuyez sur le bouton " +
+            "<svg width='14' height='14' viewBox='0 0 24 24' style='vertical-align:middle;margin:0 6px;'><path d='M4 12h16' stroke='white' stroke-width='2' fill='none'/></svg> 'Partager' puis 'Ajouter à l'écran d'accueil'.</div>" +
+            "<div style='margin-top:8px;text-align:right'><button id='close_ios_install' style='background:#fff;color:#000;border:none;padding:6px 10px;border-radius:8px;font-weight:700'>Fermer</button></div>";
+          document.body.appendChild(container);
+          document.getElementById('close_ios_install').onclick = function(){ container.remove(); openGenidoc(); };
+          setTimeout(()=>{ try{ container.remove(); }catch(e){} }, 12000);
+        }
 
-        // Always show the button near the store badges for discoverability
-        if (installBtn) {
+        document.addEventListener('DOMContentLoaded', function() {
+          const installBtn = document.getElementById('install-app-btn');
+          if (!installBtn) return;
+
+          // Show button by default for discoverability
           installBtn.style.display = 'inline-flex';
-          installBtn.addEventListener('click', async (ev) => {
+
+          window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'inline-flex';
+            console.log('beforeinstallprompt captured');
+          });
+
+          installBtn.addEventListener('click', async function(ev) {
             ev.preventDefault();
             installBtn.disabled = true;
+            console.log('install button clicked, deferredPrompt=', !!deferredPrompt);
 
-            // If we have a deferred prompt (Chrome/Android PWA flow)
             if (deferredPrompt) {
               try {
                 deferredPrompt.prompt();
-                const choiceResult = await deferredPrompt.userChoice;
-                // clear the saved prompt since it can only be used once
+                const choice = await deferredPrompt.userChoice;
                 deferredPrompt = null;
+                console.log('PWA choice', choice);
               } catch (err) {
-                console.warn('PWA prompt failed:', err);
+                console.warn('PWA prompt error', err);
               }
               installBtn.disabled = false;
-              // After prompting, go to genidoc.ma as requested
               openGenidoc();
               return;
             }
 
-            // Fallback for iOS / browsers without beforeinstallprompt:
-            // show short instructions then navigate to genidoc.ma
+            // iOS specific hint
             if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-              // Small instruction overlay (simple alert to avoid extra markup)
-              alert("Pour ajouter GeniDoc à l'écran d'accueil : appuyez sur le bouton 'Partager' puis 'Ajouter à l'écran d'accueil'. Vous serez ensuite redirigé vers genidoc.ma.");
-              openGenidoc();
+              showIOSInstallHint();
               installBtn.disabled = false;
               return;
             }
 
-            // Generic fallback: just navigate to genidoc.ma
+            // generic fallback - navigate to main site
             openGenidoc();
             installBtn.disabled = false;
           });
-        }
+        });
 
         // Register service worker (if present)
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.register('/service-worker.js')
-            .then((reg) => {
-              console.log('ServiceWorker registered', reg);
-            }).catch((err) => {
-              console.warn('ServiceWorker registration failed:', err);
-            });
+            .then((reg) => console.log('ServiceWorker registered', reg))
+            .catch((err) => console.warn('ServiceWorker registration failed:', err));
         }
       })();
     </script>
