@@ -2659,10 +2659,10 @@ app.use((req, res) => {
 });
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Serveur GeniDoc démarré sur http://localhost:${PORT}`);
-  console.log(`📱 Interface web: http://localhost:${PORT}`);
-  console.log(`👨‍⚕️ Gestion médecins: http://localhost:${PORT}/doctors`);
-  console.log(`🏥 Gestion établissements: http://localhost:${PORT}/facilities`);
-  console.log(`⚙️ Administration: http://localhost:${PORT}/admin`);
-  console.log(`🔗 API: http://localhost:${PORT}/api`);
+  console.log(`🚀 Serveur GeniDoc démarré sur http://47.84.127.55:${PORT}`);
+  console.log(`📱 Interface web: http://47.84.127.55:${PORT}`);
+  console.log(`👨‍⚕️ Gestion médecins: http://47.84.127.55:${PORT}/doctors`);
+  console.log(`🏥 Gestion établissements: http://47.84.127.55:${PORT}/facilities`);
+  console.log(`⚙️ Administration: http://47.84.127.55:${PORT}/admin`);
+  console.log(`🔗 API: http://47.84.127.55:${PORT}/api`);
 });
