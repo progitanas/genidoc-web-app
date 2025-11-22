@@ -734,6 +734,12 @@ const upload = multer({
   },
 });
 
+
+// Serve index.html as the default homepage
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // Middleware
 app.use(express.json());
 
