@@ -241,6 +241,7 @@
         border-radius: var(--border-radius);
         box-shadow: var(--box-shadow);
         text-align: center;
+        margin-bottom: 15px;
       }
 
       .stat-card .stat-number {
@@ -270,9 +271,76 @@
         margin-right: 10px;
       }
 
+      /* Add horizontal scroll for appointments table */
+      .appointments-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .appointments-container table {
+        min-width: 600px; /* Ensure table doesn't shrink below a readable size */
+      }
+
+      /* Style for the service filter dropdown */
+      .filter-container {
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: flex-end;
+      }
+      .filter-container select {
+        padding: 8px;
+        border-radius: var(--border-radius);
+        border: 1px solid #ccc;
+      }
+
+      /* Style for monthly navigation */
+      .month-navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .month-navigation button {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        transition: var(--transition);
+      }
+      .month-navigation button:hover {
+        background: #5a48ff;
+      }
+      .month-navigation span {
+        font-size: 16px;
+        font-weight: bold;
+      }
+
       @media (max-width: 768px) {
         .container-main {
           margin: 20px auto;
+        }
+
+        .filter-container {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .filter-container select {
+          width: 100%;
+          margin-bottom: 10px;
+        }
+
+        .month-navigation {
+          flex-direction: column;
+          align-items: center;
+        }
+        .month-navigation button {
+          width: 100%;
+          margin-bottom: 10px;
+        }
+
+        .appointments-container {
+          overflow-x: auto;
         }
 
         .profile-section {
@@ -332,23 +400,8 @@
               </a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link"
-                href="settings.html"
-                title="Paramètres"
-                style="display: flex; align-items: center; gap: 6px"
-              >
-                <img
-                  src="images-keyfeatures/parametres.png"
-                  alt="Paramètres"
-                  style="
-                    width: 20px;
-                    height: 20px;
-                    vertical-align: middle;
-                    margin-right: 4px;
-                  "
-                />
-                <span style="vertical-align: middle">Paramètres</span>
+              <a class="nav-link" href="settings.html" title="Paramètres">
+                <i class="fas fa-cog"></i> Paramètres
               </a>
             </li>
             <li class="nav-item">
@@ -395,6 +448,14 @@
           <div class="stat-number" id="completed-appointments">0</div>
           <div class="stat-label">Complétés</div>
         </div>
+        <div class="stat-card">
+          <div class="stat-number" id="canceled-appointments">0</div>
+          <div class="stat-label">Annulés</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="rescheduled-appointments">0</div>
+          <div class="stat-label">Replanifiés</div>
+        </div>
       </div>
 
       <!-- My Appointments Section -->
@@ -403,17 +464,37 @@
           <h5><i class="fas fa-calendar-check"></i> Mes Rendez-vous</h5>
         </div>
         <div class="card-body">
-          <div id="appointments-list">
-            <div class="no-appointments">
-              <i class="fas fa-calendar-times"></i>
-              <p>Aucun rendez-vous programmé</p>
-              <a
-                href="/appintment.html"
-                class="btn-custom"
-                style="margin-top: 15px"
-              >
-                <i class="fas fa-plus"></i> Prendre un rendez-vous
-              </a>
+          <div class="filter-container">
+            <select
+              id="service-filter"
+              onchange="filterAppointmentsByService()"
+            >
+              <option value="">Tous les services</option>
+              <option value="Cardiologie">Cardiologie</option>
+              <option value="Dermatologie">Dermatologie</option>
+              <option value="Pédiatrie">Pédiatrie</option>
+              <!-- Add more services as needed -->
+            </select>
+          </div>
+          <!-- Monthly Navigation -->
+          <div class="month-navigation">
+            <button onclick="navigateMonth(-1)">&lt; Mois précédent</button>
+            <span id="current-month">Novembre 2025</span>
+            <button onclick="navigateMonth(1)">Mois suivant &gt;</button>
+          </div>
+          <div class="appointments-container">
+            <div id="appointments-list">
+              <div class="no-appointments">
+                <i class="fas fa-calendar-times"></i>
+                <p>Aucun rendez-vous programmé</p>
+                <a
+                  href="/appintment.html"
+                  class="btn-custom"
+                  style="margin-top: 15px"
+                >
+                  <i class="fas fa-plus"></i> Prendre un rendez-vous
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -442,6 +523,23 @@
               <label><i class="fas fa-calendar-alt"></i> Inscription</label>
               <p id="profile-date">--/--/----</p>
             </div>
+          </div>
+          <!-- Ajout d'une carte pour le statut de couverture sociale -->
+          <div
+            class="profile-item"
+            style="
+              grid-column: span 2;
+              background: #e3f2fd;
+              border: 1px solid #90caf9;
+            "
+          >
+            <label style="color: #1565c0">
+              <i class="fas fa-shield-alt"></i> Statut Couverture (AMO-Tadamon)
+            </label>
+            <p style="color: #0d47a1; font-weight: bold">
+              <i class="fas fa-check-circle text-success"></i> Droits Actifs
+              (Valide jusqu'au 31/12/2025)
+            </p>
           </div>
           <button class="btn-custom" onclick="editProfile()">
             <i class="fas fa-edit"></i> Modifier le profil
@@ -478,48 +576,317 @@
       }
 
       // Load patient data
-      function loadPatientData() {
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        const appointments = JSON.parse(
-          localStorage.getItem('appointments') || '[]'
-        );
+      async function loadPatientData() {
+        try {
+          const response = await secureFetch('/api/patient/me');
+          const data = await response.json();
+          const user = data.user;
+          const appointments = data.appointments;
 
-        if (!user.id) {
-          window.location.href = '/auth.html';
-          return;
+          // Mise à jour du DOM
+          document.getElementById('patient-name').textContent =
+            user.firstName || 'Patient';
+          document.getElementById('profile-email').textContent =
+            user.email || '--';
+          document.getElementById('profile-phone').textContent =
+            user.phone || '--';
+          document.getElementById('profile-id').textContent =
+            user.genidocId || 'GD-000000';
+          document.getElementById('profile-date').textContent = new Date(
+            user.registrationDate
+          ).toLocaleDateString('fr-FR');
+
+          // Mise à jour des statistiques
+          const upcoming = appointments.filter(
+            (apt) => new Date(apt.date) > new Date()
+          ).length;
+          const completed = appointments.filter(
+            (apt) => apt.status === 'completed'
+          ).length;
+          const canceled = appointments.filter(
+            (apt) => apt.status === 'canceled'
+          ).length;
+          const rescheduled = appointments.filter(
+            (apt) => apt.status === 'rescheduled'
+          ).length;
+
+          document.getElementById('total-appointments').textContent =
+            appointments.length;
+          document.getElementById('upcoming-appointments').textContent =
+            upcoming;
+          document.getElementById('completed-appointments').textContent =
+            completed;
+          document.getElementById('canceled-appointments').textContent =
+            canceled;
+          document.getElementById('rescheduled-appointments').textContent =
+            rescheduled;
+
+          // Chargement des rendez-vous
+          loadAppointments(appointments);
+        } catch (error) {
+          console.error('Erreur lors du chargement des données', error);
         }
-
-        // Update welcome name
-        document.getElementById('patient-name').textContent =
-          user.firstName || 'Patient';
-        document.getElementById('profile-email').textContent =
-          user.email || '--';
-        document.getElementById('profile-phone').textContent =
-          user.phone || '--';
-        document.getElementById('profile-id').textContent =
-          user.genidocId || 'GD-000000';
-        document.getElementById('profile-date').textContent =
-          new Date().toLocaleDateString('fr-FR');
-
-        // Update stats
-        const userAppointments = appointments.filter(
-          (apt) => apt.patientId === user.id
-        );
-        const upcoming = userAppointments.filter(
-          (apt) => new Date(apt.date) > new Date()
-        ).length;
-        const completed = userAppointments.length - upcoming;
-
-        document.getElementById('total-appointments').textContent =
-          userAppointments.length;
-        document.getElementById('upcoming-appointments').textContent = upcoming;
-        document.getElementById('completed-appointments').textContent =
-          completed;
-
-        // Load appointments
-        loadAppointments(userAppointments);
       }
 
+      // Function to mark an appointment as completed
+      async function markAppointmentCompleted(id) {
+        try {
+          console.log(`Marking appointment as completed with ID: ${id}`);
+          const response = await secureFetch(
+            `/api/appointments/${id}/complete`,
+            {
+              method: 'PUT',
+            }
+          );
+
+          if (response.ok) {
+            alert('Rendez-vous marqué comme terminé.');
+            loadPatientData();
+          } else {
+            const errorData = await response.json();
+            console.error('Erreur API (markAppointmentCompleted):', errorData);
+            alert(
+              `Erreur: ${
+                errorData.message ||
+                'Impossible de marquer le rendez-vous comme terminé.'
+              }`
+            );
+          }
+        } catch (error) {
+          console.error(
+            'Erreur lors de la tentative de marquer le rendez-vous comme terminé:',
+            error
+          );
+          alert('Une erreur est survenue. Veuillez réessayer.');
+        }
+      }
+
+      // Function to handle diagnostic addition
+      async function addDiagnostic(id) {
+        try {
+          console.log(`Adding diagnostic for appointment ID: ${id}`);
+          const response = await secureFetch(
+            `/api/appointments/${id}/diagnostic`,
+            {
+              method: 'POST',
+            }
+          );
+
+          if (response.ok) {
+            alert('Diagnostic ajouté avec succès.');
+            loadPatientData();
+          } else {
+            const errorData = await response.json();
+            console.error('Erreur API (addDiagnostic):', errorData);
+            alert(
+              `Erreur: ${
+                errorData.message || "Impossible d'ajouter le diagnostic."
+              }`
+            );
+          }
+        } catch (error) {
+          console.error("Erreur lors de l'ajout du diagnostic:", error);
+          alert('Une erreur est survenue. Veuillez réessayer.');
+        }
+      }
+
+      // Function to prescribe an exam
+      async function prescribeExam(id) {
+        try {
+          console.log(`Prescribing exam for appointment ID: ${id}`);
+          const response = await secureFetch(
+            `/api/appointments/${id}/prescribe-exam`,
+            {
+              method: 'POST',
+            }
+          );
+
+          if (response.ok) {
+            alert('Examen prescrit avec succès.');
+            loadPatientData();
+          } else {
+            const errorData = await response.json();
+            console.error('Erreur API (prescribeExam):', errorData);
+            alert(
+              `Erreur: ${
+                errorData.message || "Impossible de prescrire l'examen."
+              }`
+            );
+          }
+        } catch (error) {
+          console.error("Erreur lors de la prescription de l'examen:", error);
+          alert('Une erreur est survenue. Veuillez réessayer.');
+        }
+      }
+
+      // Function to generate PDF prescription
+      async function generatePrescriptionPDF(id) {
+        try {
+          console.log(`Generating prescription PDF for appointment ID: ${id}`);
+          const response = await secureFetch(
+            `/api/appointments/${id}/generate-pdf`,
+            {
+              method: 'GET',
+            }
+          );
+
+          if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Ordonnance_${id}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            alert('Ordonnance PDF générée avec succès.');
+          } else {
+            const errorData = await response.json();
+            console.error('Erreur API (generatePrescriptionPDF):', errorData);
+            alert(
+              `Erreur: ${
+                errorData.message || "Impossible de générer l'ordonnance PDF."
+              }`
+            );
+          }
+        } catch (error) {
+          console.error(
+            "Erreur lors de la génération de l'ordonnance PDF:",
+            error
+          );
+          alert('Une erreur est survenue. Veuillez réessayer.');
+        }
+      }
+
+      // Function to view appointment history
+      async function viewHistory(id) {
+        try {
+          console.log(`Viewing history for appointment ID: ${id}`);
+          const response = await secureFetch(
+            `/api/appointments/${id}/history`,
+            {
+              method: 'GET',
+            }
+          );
+
+          if (response.ok) {
+            const history = await response.json();
+            console.log('Historique:', history);
+            alert(
+              'Historique chargé avec succès. Consultez la console pour les détails.'
+            );
+          } else {
+            const errorData = await response.json();
+            console.error('Erreur API (viewHistory):', errorData);
+            alert(
+              `Erreur: ${
+                errorData.message || "Impossible de charger l'historique."
+              }`
+            );
+          }
+        } catch (error) {
+          console.error("Erreur lors du chargement de l'historique:", error);
+          alert('Une erreur est survenue. Veuillez réessayer.');
+        }
+      }
+
+      // Function to join an appointment
+      async function joinAppointment(id) {
+        try {
+          console.log(`Joining appointment with ID: ${id}`);
+          const response = await secureFetch(`/api/appointments/${id}/join`, {
+            method: 'POST',
+          });
+
+          if (response.ok) {
+            alert('Rejoint avec succès.');
+            loadPatientData();
+          } else {
+            const errorData = await response.json();
+            console.error('Erreur API (joinAppointment):', errorData);
+            alert(
+              `Erreur: ${
+                errorData.message || 'Impossible de rejoindre le rendez-vous.'
+              }`
+            );
+          }
+        } catch (error) {
+          console.error(
+            'Erreur lors de la tentative de rejoindre le rendez-vous:',
+            error
+          );
+          alert('Une erreur est survenue. Veuillez réessayer.');
+        }
+      }
+
+      // Function to fetch available slots for a specific date
+      async function fetchAvailableSlots(date) {
+        try {
+          const response = await secureFetch(`/api/available-slots/${date}`);
+          if (response.ok) {
+            const slots = await response.json();
+            console.log('Available slots:', slots);
+            return slots;
+          } else {
+            const errorData = await response.json();
+            console.error('Erreur API (fetchAvailableSlots):', errorData);
+            alert(
+              `Erreur: ${
+                errorData.message ||
+                'Impossible de charger les créneaux disponibles.'
+              }`
+            );
+          }
+        } catch (error) {
+          console.error(
+            'Erreur lors du chargement des créneaux disponibles:',
+            error
+          );
+          alert('Une erreur est survenue. Veuillez réessayer.');
+        }
+      }
+
+      // Function to fetch appointment statistics
+      async function fetchAppointmentStats() {
+        try {
+          const response = await secureFetch('/api/stats');
+          if (response.ok) {
+            const stats = await response.json();
+            console.log('Appointment stats:', stats);
+            // Update stats in the DOM
+            document.getElementById('total-appointments').textContent =
+              stats.total;
+            document.getElementById('upcoming-appointments').textContent =
+              stats.upcoming;
+            document.getElementById('completed-appointments').textContent =
+              stats.completed;
+            document.getElementById('canceled-appointments').textContent =
+              stats.canceled;
+            document.getElementById('rescheduled-appointments').textContent =
+              stats.rescheduled;
+          } else {
+            const errorData = await response.json();
+            console.error('Erreur API (fetchAppointmentStats):', errorData);
+            alert(
+              `Erreur: ${
+                errorData.message ||
+                'Impossible de charger les statistiques des rendez-vous.'
+              }`
+            );
+          }
+        } catch (error) {
+          console.error(
+            'Erreur lors du chargement des statistiques des rendez-vous:',
+            error
+          );
+          alert('Une erreur est survenue. Veuillez réessayer.');
+        }
+      }
+
+      // Call fetchAppointmentStats on page load
+      document.addEventListener('DOMContentLoaded', fetchAppointmentStats);
+
+      // LoadAppointments function remains unchanged
       function loadAppointments(appointments) {
         const list = document.getElementById('appointments-list');
         if (appointments.length === 0) {
@@ -564,6 +931,11 @@
                         }')">
                             <i class="fas fa-trash"></i> Supprimer
                         </button>
+                        <button class="btn btn-sm btn-success" onclick="markAppointmentCompleted('${
+                          apt.id
+                        }')">
+                            <i class="fas fa-check"></i> Marquer terminé
+                        </button>
                     </div>
                 </div>
             `
@@ -571,13 +943,95 @@
           .join('');
       }
 
-      function editAppointment(id) {
-        alert('Modification du rendez-vous: ' + id);
+      // Function to delete an appointment
+      async function deleteAppointment(id) {
+        if (!confirm('Êtes-vous sûr de vouloir supprimer ce rendez-vous?')) {
+          return;
+        }
+
+        try {
+          console.log(`Attempting to delete appointment with ID: ${id}`);
+          const response = await secureFetch(`/api/appointments/${id}`, {
+            method: 'DELETE',
+          });
+
+          if (response.ok) {
+            alert('Rendez-vous supprimé avec succès.');
+            loadPatientData();
+          } else {
+            const errorData = await response.json();
+            console.error('Erreur API:', errorData);
+            alert(
+              `Erreur: ${
+                errorData.message || 'Impossible de supprimer le rendez-vous.'
+              }`
+            );
+          }
+        } catch (error) {
+          console.error('Erreur lors de la suppression du rendez-vous:', error);
+          alert('Une erreur est survenue. Veuillez réessayer.');
+        }
       }
 
-      function deleteAppointment(id) {
-        if (confirm('Êtes-vous sûr de vouloir supprimer ce rendez-vous?')) {
-          alert('Rendez-vous supprimé');
+      // Enhanced edit appointment function with debugging
+      async function editAppointment(id) {
+        try {
+          console.log(`Editing appointment with ID: ${id}`);
+          alert(`Redirection vers la modification du rendez-vous: ${id}`);
+          // Implement redirection or modal logic here
+        } catch (error) {
+          console.error(
+            'Erreur lors de la modification du rendez-vous:',
+            error
+          );
+          alert('Une erreur est survenue. Veuillez réessayer.');
+        }
+      }
+
+      // Function to load doctor dashboard data
+      async function loadDoctorDashboard() {
+        try {
+          const doctorId = new URLSearchParams(window.location.search).get(
+            'doctorId'
+          );
+          if (!doctorId) {
+            console.error('Doctor ID not found in URL parameters.');
+            alert('Erreur: ID du médecin manquant.');
+            return;
+          }
+
+          console.log(`Fetching data for doctor ID: ${doctorId}`);
+          const response = await secureFetch(`/api/doctor/${doctorId}`);
+
+          if (response.ok) {
+            const doctorData = await response.json();
+
+            // Update the dashboard with doctor data
+            document.getElementById(
+              'doctor-name'
+            ).textContent = `${doctorData.doctorFirstName} ${doctorData.doctorLastName}`;
+            document.getElementById('doctor-email').textContent =
+              doctorData.email || '--';
+            document.getElementById('doctor-specialty').textContent =
+              doctorData.specialty || '--';
+            document.getElementById('doctor-establishment').textContent =
+              doctorData.establishmentName || '--';
+          } else {
+            const errorData = await response.json();
+            console.error('Erreur API (loadDoctorDashboard):', errorData);
+            alert(
+              `Erreur: ${
+                errorData.message ||
+                'Impossible de charger les données du médecin.'
+              }`
+            );
+          }
+        } catch (error) {
+          console.error(
+            'Erreur lors du chargement des données du médecin:',
+            error
+          );
+          alert('Une erreur est survenue. Veuillez réessayer.');
         }
       }
 
@@ -598,8 +1052,15 @@
         let deferredPrompt = null;
         const installBtn = document.getElementById('install-app-btn');
 
+        // Modification de la redirection PWA pour vérifier l'environnement
         function openGenidoc() {
-          try { window.location.href = 'https://genidoc.ma'; } catch (e) { window.open('https://genidoc.ma', '_blank'); }
+          const isLocal = window.location.hostname === 'localhost';
+          const targetUrl = isLocal ? '/' : 'https://genidoc.ma';
+          try {
+            window.location.href = targetUrl;
+          } catch (e) {
+            window.open(targetUrl, '_blank');
+          }
         }
 
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -614,13 +1075,21 @@
             ev.preventDefault();
             installBtn.disabled = true;
             if (deferredPrompt) {
-              try { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; } catch (err) { console.warn(err); }
+              try {
+                deferredPrompt.prompt();
+                await deferredPrompt.userChoice;
+                deferredPrompt = null;
+              } catch (err) {
+                console.warn(err);
+              }
               installBtn.disabled = false;
               openGenidoc();
               return;
             }
             if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-              alert("Pour ajouter GeniDoc à l'écran d'accueil : appuyez sur le bouton 'Partager' puis 'Ajouter à l'écran d'accueil'. Vous serez ensuite redirigé vers genidoc.ma.");
+              alert(
+                "Pour ajouter GeniDoc à l'écran d'accueil : appuyez sur le bouton 'Partager' puis 'Ajouter à l'écran d'accueil'. Vous serez ensuite redirigé vers genidoc.ma."
+              );
               openGenidoc();
               installBtn.disabled = false;
               return;
@@ -631,9 +1100,73 @@
         }
 
         if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+          navigator.serviceWorker
+            .register('/service-worker.js')
+            .catch(() => {});
         }
       })();
+
+      // Function to filter appointments by service
+      function filterAppointmentsByService() {
+        const filterValue = document
+          .getElementById('service-filter')
+          .value.toLowerCase();
+        const appointments = document.querySelectorAll('.appointment-item');
+
+        appointments.forEach((appointment) => {
+          const service = appointment
+            .querySelector('.appointment-info h6')
+            .textContent.toLowerCase();
+          if (!filterValue || service.includes(filterValue)) {
+            appointment.style.display = '';
+          } else {
+            appointment.style.display = 'none';
+          }
+        });
+      }
+
+      let currentMonth = new Date();
+
+      // Function to navigate between months
+      function navigateMonth(direction) {
+        currentMonth.setMonth(currentMonth.getMonth() + direction);
+        updateMonthDisplay();
+        loadAppointmentsForMonth();
+      }
+
+      // Update the displayed month
+      function updateMonthDisplay() {
+        const monthNames = [
+          'Janvier',
+          'Février',
+          'Mars',
+          'Avril',
+          'Mai',
+          'Juin',
+          'Juillet',
+          'Août',
+          'Septembre',
+          'Octobre',
+          'Novembre',
+          'Décembre',
+        ];
+        const month = monthNames[currentMonth.getMonth()];
+        const year = currentMonth.getFullYear();
+        document.getElementById(
+          'current-month'
+        ).textContent = `${month} ${year}`;
+      }
+
+      // Load appointments for the selected month
+      function loadAppointmentsForMonth() {
+        // Placeholder: Filter appointments based on the currentMonth
+        console.log('Loading appointments for:', currentMonth);
+        // You can integrate this with your API or filtering logic
+      }
+
+      // Initialize the month display on page load
+      document.addEventListener('DOMContentLoaded', updateMonthDisplay);
     </script>
   </body>
 </html>
+

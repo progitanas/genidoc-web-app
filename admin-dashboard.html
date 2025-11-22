@@ -1191,7 +1191,11 @@
         const installBtn = document.getElementById('install-app-btn');
 
         function openGenidoc() {
-          try { window.location.href = 'https://genidoc.ma'; } catch (e) { window.open('https://genidoc.ma', '_blank'); }
+          try {
+            window.location.href = 'https://genidoc.ma';
+          } catch (e) {
+            window.open('https://genidoc.ma', '_blank');
+          }
         }
 
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -1206,13 +1210,21 @@
             ev.preventDefault();
             installBtn.disabled = true;
             if (deferredPrompt) {
-              try { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; } catch (err) { console.warn(err); }
+              try {
+                deferredPrompt.prompt();
+                await deferredPrompt.userChoice;
+                deferredPrompt = null;
+              } catch (err) {
+                console.warn(err);
+              }
               installBtn.disabled = false;
               openGenidoc();
               return;
             }
             if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-              alert("Pour ajouter GeniDoc à l'écran d'accueil : appuyez sur le bouton 'Partager' puis 'Ajouter à l'écran d'accueil'. Vous serez ensuite redirigé vers genidoc.ma.");
+              alert(
+                "Pour ajouter GeniDoc à l'écran d'accueil : appuyez sur le bouton 'Partager' puis 'Ajouter à l'écran d'accueil'. Vous serez ensuite redirigé vers genidoc.ma."
+              );
               openGenidoc();
               installBtn.disabled = false;
               return;
@@ -1223,7 +1235,9 @@
         }
 
         if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+          navigator.serviceWorker
+            .register('/service-worker.js')
+            .catch(() => {});
         }
       })();
     </script>

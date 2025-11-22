@@ -3,142 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>GeniDoc — Your health deserves better than a waiting room</title>
-    <meta
-      name="description"
-      content="Find a doctor, university hospital, or clinic in Morocco in seconds. Book appointments online easily."   
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="icon" type="image/png" href="static/ong_GeniDoc1preview.png" />
-    <link rel="stylesheet" href="styles/main.css" />
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#2563eb" />
-
-    <style>
-      :root {
-        --color-primary: #c71f37;
-        --color-primary-dark: #a01829;
-        --color-primary-light: #e8394d;
-        --color-secondary-green: #22c55e;
-        --color-secondary-blue: #2563eb;
-        --color-secondary-cyan: #06b6d4;
-        
-        --color-text-primary: #1f1f1f;
-        --color-text-secondary: #6a7a8a;
-        --color-text-light: #9ca3af;
-        --color-bg-primary: #ffffff;
-        --color-bg-secondary: #f9fafb;
-        --color-bg-tertiary: #fafbf8;
-        --color-border: #e5e7eb;
-        
-        --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
-        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(34, 197, 94, 0.08);
-        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(34, 197, 94, 0.12);
-        --shadow-lg: 0 8px 24px rgba(34, 197, 94, 0.18), 0 12px 40px rgba(34, 197, 94, 0.12), 0 16px 56px rgba(10, 61, 26, 0.08);
-        --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.15), 0 20px 64px rgba(0, 0, 0, 0.1);
-        
-        --space-xs: 4px;
-        --space-sm: 8px;
-        --space-md: 16px;
-        --space-lg: 24px;
-        --space-xl: 32px;
-        --space-2xl: 48px;
-        --space-3xl: 64px;
-        --space-4xl: 96px;
-        
-        --transition-fast: 0.15s ease;
-        --transition-base: 0.3s ease;
-        --transition-slow: 0.5s ease;
-        --transition-slower: 0.7s ease;
-        
-        --radius-sm: 6px;
-        --radius-md: 12px;
-        --radius-lg: 20px;
-        --radius-full: 9999px;
-        
-        /* ===== TYPOGRAPHY ===== */
-        --font-family-sans: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        --font-family-mono: "JetBrains Mono", monospace;
-        --font-weight-regular: 400;
-        --font-weight-medium: 500;
-        --font-weight-semibold: 600;
-        --font-weight-bold: 700;
-        --font-weight-extrabold: 800;
-      }
-
-      /* ========================================================================
-         🎯 MICRO-INTERACTIONS & ANIMATIONS HUMANISANTES
-         ======================================================================== */
-      @keyframes fadeInUp {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      @keyframes slideInLeft {
-        from {
-          opacity: 0;
-          transform: translateX(-30px);
-        }
-        to {
-          opacity: 1;
-          transform: translateX(0);
-        }
-      }
-
-      @keyframes pulse-subtle {
-        0%, 100% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.7;
-        }
-      }
-
-      @keyframes bounce-gentle {
-        0%, 100% {
-          transform: translateY(0);
-        }
-        50% {
-          transform: translateY(-8px);
-        }
-      }
-
-      @keyframes shimmer {
-        0% {
-          background-position: -1000px 0;
-        }
-        100% {
-          background-position: 1000px 0;
-        }
-      }
-
-      /* ===== SECTION SPÉCIALITÉS - DESIGN HUMAIN & PRO ===== */
-      .specialties-section {
-        background: #fafbf8;
-        padding: 96px 0 88px 0;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .specialties-section::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+    <!-- Cookie consent moved to external file to avoid parsing issues -->
+    <script src="/gd-cookie.js"></script>
         background: 
           radial-gradient(circle at 85% 20%, rgba(34, 197, 94, 0.03) 0%, transparent 50%),
           radial-gradient(circle at 10% 80%, rgba(79, 70, 229, 0.02) 0%, transparent 50%);
@@ -2488,6 +2354,8 @@
         position: relative;
       }
 
+
+
       .step-number {
                       width: 56px;
         height: 56px;
@@ -3203,142 +3071,6 @@
           opacity: 1;
           transform: translate(-50%, -50%) scale(1);
         }
-      }
-
-      /* Typing Animation for Hero */
-      .typing-effect {
-        border-right: 3px solid var(--color-primary);
-        animation: typing 3.5s steps(40, end), blink 0.75s step-end infinite;
-      }
-
-      @keyframes typing {
-        from {
-          width: 0;
-        }
-        to {
-          width: 100%;
-        }
-      }
-
-      @keyframes blink {
-        from,
-        to {
-          border-color: transparent;
-        }
-        50% {
-          border-color: var(--color-primary);
-        }
-      }
-
-      /* Secret Rainbow Mode */
-      body.rainbow-mode {
-        background: linear-gradient(
-          45deg,
-          #ff6b6b,
-          #4ecdc4,
-          #45b7d1,
-          #96ceb4,
-          #ffeaa7,
-          #dda0dd
-        );
-        background-size: 300% 300%;
-        animation: rainbowShift 3s ease infinite;
-      }
-
-      @keyframes rainbowShift {
-        0% {
-          background-position: 0% 50%;
-        }
-        50% {
-          background-position: 100% 50%;
-        }
-        100% {
-          background-position: 0% 50%;
-        }
-      }
-
-      body.rainbow-mode .hero-title {
-        background: linear-gradient(
-          45deg,
-          #ff6b6b,
-          #4ecdc4,
-          #45b7d1,
-          #96ceb4,
-          #ffeaa7
-        );
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-
-      /* Debug Mode Grid */
-      body.debug-mode {
-        background-image: linear-gradient(
-            0deg,
-            transparent 24%,
-            rgba(79, 70, 229, 0.05) 25%,
-            rgba(79, 70, 229, 0.05) 26%,
-            transparent 27%,
-            transparent 74%,
-            rgba(79, 70, 229, 0.05) 75%,
-            rgba(79, 70, 229, 0.05) 76%,
-            transparent 77%,
-            transparent
-          ),
-          linear-gradient(
-            90deg,
-            transparent 24%,
-            rgba(79, 70, 229, 0.05) 25%,
-            rgba(79, 70, 229, 0.05) 26%,
-            transparent 27%,
-            transparent 74%,
-            rgba(79, 70, 229, 0.05) 75%,
-            rgba(79, 70, 229, 0.05) 76%,
-            transparent 77%,
-            transparent
-          );
-        background-size: 50px 50px;
-      }
-
-      body.debug-mode * {
-        outline: 1px dashed rgba(79, 70, 229, 0.2);
-      }
-
-      /* Konami Code Message */
-      .konami-message {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: white;
-        padding: 40px;
-        border-radius: 20px;
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-        text-align: center;
-        z-index: 10000;
-        animation: konamiPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-      }
-
-      @keyframes konamiPop {
-        from {
-          opacity: 0;
-          transform: translate(-50%, -50%) scale(0.5);
-        }
-        to {
-          opacity: 1;
-          transform: translate(-50%, -50%) scale(1);
-        }
-      }
-
-      .konami-message h2 {
-        color: var(--color-primary);
-        margin-bottom: 10px;
-        font-size: 32px;
-      }
-
-      .konami-message p {
-        color: var(--color-text-secondary);
-        margin-bottom: 20px;
       }
 
       /* Live Activity Section (for future "Journée du recruteur") */
@@ -4651,7 +4383,7 @@
               <button id="install-app-btn" aria-label="Télécharger GeniDoc" title="Ajouter GeniDoc à l'écran d'accueil"
                       style="display:inline-flex;align-items:center;gap:10px;background:#ff6b00;color:#fff;border:none;border-radius:10px;padding:10px 14px;font-weight:800;box-shadow:0 8px 24px rgba(0,0,0,0.12);cursor:pointer;font-size:15px;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 3v12"/>
+                  <path d="M4 12h16"/>
                   <path d="M8 7l4-4 4 4"/>
                   <path d="M21 21H3"/>
                 </svg>
@@ -4764,6 +4496,11 @@
               </svg>
               <p class="testimonial-text">
                 "The interface is intuitive and the results are
+
+
+
+
+
                 impressive. Our asynchronous video interviews have significantly reduced
                 our hiring time."
               </p>
@@ -4954,7 +4691,7 @@
                 </li>
               </ul>
               
-              <button style="width: 100%; padding: 14px 24px; background: white; border: none; color: #2563eb; border-radius: 12px; font-weight: 600; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.2s ease;">
+              <button style="width: 100%; padding: 14px 24px; background: #2563eb; border: none; color: white; border-radius: 12px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.2s ease;">
                 Try 30 days free
               </button>
             </div>
@@ -5236,7 +4973,7 @@
                 >
                   <path
                     d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
-                  />
+                />
                 </svg>
               </a>
               <a href="#" aria-label="LinkedIn" class="social-link">
@@ -5314,1120 +5051,148 @@
       </footer>
     </main>
 
-    <script>
-      /* ============================================================
-       JAVASCRIPT - ALL INTERACTIONS
-       ============================================================ */
-      (function () {
-        "use strict";
+    <!-- Image affichée au chargement de la page -->
+    <div id="image-chargement" style="width:100%;text-align:center;margin-top:20px;">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/Bitmap_Icon.png" alt="Image chargement" style="max-width:300px;width:100%;height:auto;" />
+    </div>
 
-        // ============================================================
-        // MOBILE MENU TOGGLE
-        // ============================================================
-        const menuToggle = document.getElementById("menuToggle");
-        const mobileMenu = document.getElementById("mobileMenu");
-        const drawerClose = document.getElementById("drawerClose");
-        const drawerOverlay = document.getElementById("drawerOverlay");
-        const drawerLinks = document.querySelectorAll("[data-drawer-close]");
+    
 
-        function openDrawer() {
-          mobileMenu.classList.add("active");
-          drawerOverlay.classList.add("active");
-          menuToggle.setAttribute("aria-expanded", "true");
-          mobileMenu.setAttribute("aria-hidden", "false");
-          document.body.style.overflow = "hidden";
-        }
+<!-- Cookie consent: gestion complète améliorée -->
+<script>
+  (function(){
+    // supprime ancienne bannière (id "cookie-banner") si présente
+    document.addEventListener('DOMContentLoaded', function(){ try{ var old = document.getElementById('cookie-banner'); if(old) old.parentNode && old.parentNode.removeChild(old); }catch(e){} });
 
-        function closeDrawer() {
-          mobileMenu.classList.remove("active");
-          drawerOverlay.classList.remove("active");
-          menuToggle.setAttribute("aria-expanded", "false");
-          mobileMenu.setAttribute("aria-hidden", "true");
-          document.body.style.overflow = "";
-        }
+    var TEMPLATE = '\
+      <style id="gd-cookie-style">\
+        @keyframes gd-slide-up{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}\
+        #gd-cookie-banner{position:fixed;bottom:18px;left:18px;right:18px;max-width:1200px;margin:0 auto;background:#000;color:#fff;z-index:999999;padding:28px 28px;border-radius:12px;box-shadow:0 20px 40px rgba(0,0,0,0.45);font-family:Inter, Arial, Helvetica, sans-serif;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;animation:gd-slide-up .35s cubic-bezier(.2,.9,.3,1)}\
+        #gd-cookie-banner .gd-content{display:flex;gap:18px;align-items:flex-start;flex:1;min-width:0}\
+        #gd-cookie-banner h3{margin:0;font-size:1.15rem;font-weight:700}\
+        #gd-cookie-banner p{margin:6px 0 0 0;color:#ddd;line-height:1.5;font-size:0.98rem;max-width:780px;overflow:hidden;text-overflow:ellipsis}\
+        #gd-cookie-banner .gd-actions{display:flex;gap:12px;align-items:center;margin-left:12px}\
+        #gd-cookie-banner button{border:none;cursor:pointer;padding:12px 28px;border-radius:999px;font-weight:600;font-size:0.98rem}\
+        #gd-cookie-banner .gd-btn-primary{background:#fff;color:#000;box-shadow:0 4px 10px rgba(0,0,0,0.12)}\
+        #gd-cookie-banner .gd-btn-outline{background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.12)}\
+        #gd-cookie-banner .gd-close{position:absolute;top:10px;right:12px;color:#fff;background:transparent;border:none;font-size:22px;cursor:pointer}\
+        /* Modal */\
+        #gd-cookie-modal{position:fixed;left:0;top:0;width:100%;height:100%;display:none;align-items:center;justify-content:center;z-index:100000}\
+        #gd-cookie-modal .gd-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.6)}\
+        #gd-cookie-modal .gd-panel{position:relative;background:#111;color:#fff;padding:20px;border-radius:8px;max-width:720px;width:96%;z-index:2}\
+        #gd-cookie-modal label{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid rgba(255,255,255,0.03);font-size:0.98rem}\
+        /* small reopen button */\
+        #gd-reopen-btn{position:fixed;left:16px;bottom:16px;z-index:999999;background:rgba(0,0,0,0.6);color:#fff;border:1px solid rgba(255,255,255,0.08);padding:8px 12px;border-radius:999px;cursor:pointer;font-size:0.95rem}\
+      </style>\
+      <div id="gd-cookie-banner" role="dialog" aria-live="polite" aria-label="Bannière cookies">\
+        <button class="gd-close" id="gd-close" aria-label="Fermer">&times;</button>\
+        <div class="gd-content">\
+          <div>\
+            <h3>Cookies et confidentialité</h3>\
+            <p>Nous utilisons des cookies pour assurer le bon fonctionnement du site web, personnaliser votre expérience et analyser votre navigation. Nous partageons également des données avec nos partenaires publicitaires. Vous pouvez gérer vos préférences ou retirer votre consentement à tout moment.</p>\
+            <div style="margin-top:10px"><a href="#" id="gd-open-settings" style="color:#bbb;text-decoration:underline">Changer les réglages</a></div>\
+          </div>\
+        </div>\
+        <div class="gd-actions">\
+          <button id="gd-reject" class="gd-btn-outline" aria-label="Tout refuser">Tout refuser</button>\
+          <button id="gd-accept" class="gd-btn-primary" aria-label="Tout autoriser">Tout autoriser</button>\
+        </div>\
+      </div>\
+      <div id="gd-cookie-modal" role="dialog" aria-modal="true" aria-hidden="true">\
+        <div class="gd-backdrop" id="gd-backdrop"></div>\
+        <div class="gd-panel" role="document" aria-labelledby="gd-modal-title">\
+          <h2 id="gd-modal-title">Réglages des cookies</h2>\
+          <p style="color:#ccc;margin-top:6px">Choisissez les cookies que vous autorisez.</p>\
+          <form id="gd-settings-form">\
+            <label> <span>Cookies nécessaires</span> <input type="checkbox" disabled checked /> </label>\
+            <label> <span>Cookies analytiques</span> <input type="checkbox" id="gd-analytics" /> </label>\
+            <label> <span>Cookies publicitaires</span> <input type="checkbox" id="gd-ads" /> </label>\
+            <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:12px">\
+              <button type="button" id="gd-save" class="gd-btn-primary">Enregistrer</button>\
+              <button type="button" id="gd-cancel" class="gd-btn-outline">Annuler</button>\
+            </div>\
+          </form>\
+        </div>\
+      </div>\
+      <button id="gd-reopen-btn" aria-label="Gérer mes cookies" title="Gérer mes cookies" style="display:none">Gérer mes cookies</button>\
+    ';
 
-        if (menuToggle) {
-          menuToggle.addEventListener("click", function () {
-            const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
-            if (isOpen) {
-              closeDrawer();
-            } else {
-              openDrawer();
-            }
-          });
-        }
+    function loadAnalyticsScript(){
+      try{
+        if(window.__gd_gtag_loaded) return;
+        window.__gd_gtag_loaded = true;
+        var GA_ID = 'G-XXXXXXXXXX'; // <- Remplacez par votre ID G-...
+        var s = document.createElement('script'); s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id='+GA_ID; document.head.appendChild(s);
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);} window.gtag = window.gtag || gtag;
+        gtag('js', new Date());
+        gtag('config', GA_ID, { 'anonymize_ip': true });
+      }catch(e){console.warn('GA load failed', e);}    }
 
-        if (drawerClose) {
-          drawerClose.addEventListener("click", closeDrawer);
-        }
+    function readConsent(){ try{var v=localStorage.getItem('gd_cookie_consent'); return v?JSON.parse(v):null;}catch(e){return null;} }
+    function writeConsent(obj){ try{localStorage.setItem('gd_cookie_consent', JSON.stringify(obj)); }catch(e){console.warn('Storage failed',e);} }
 
-        if (drawerOverlay) {
-          drawerOverlay.addEventListener("click", closeDrawer);
-        }
+    function applyConsentEffects(consent){ if(document && document.body){ document.body.setAttribute('data-gd-cookie-analytics', !!(consent && consent.analytics)); document.body.setAttribute('data-gd-cookie-ads', !!(consent && consent.ads)); if(consent && consent.analytics){ loadAnalyticsScript(); } } }
 
-        drawerLinks.forEach(function (link) {
-          link.addEventListener("click", closeDrawer);
-        });
+    function showModal(){ var modal=document.getElementById('gd-cookie-modal'); if(!modal) return; modal.style.display='flex'; modal.setAttribute('aria-hidden','false'); var consent=readConsent()||{analytics:false,ads:false}; var a=document.getElementById('gd-analytics'), b=document.getElementById('gd-ads'); if(a) a.checked=!!consent.analytics; if(b) b.checked=!!consent.ads; document.getElementById('gd-save').focus(); }
+    function hideModal(){ var modal=document.getElementById('gd-cookie-modal'); if(!modal) return; modal.style.display='none'; modal.setAttribute('aria-hidden','true'); }
 
-        // Drawer Dropdown Toggle
-        const drawerDropdownToggles = document.querySelectorAll(
-          ".drawer-dropdown-toggle"
-        );
-        drawerDropdownToggles.forEach((toggle) => {
-          toggle.addEventListener("click", function (e) {
-            e.preventDefault();
-            const submenu =
-              this.closest(".drawer-dropdown").querySelector(".drawer-submenu");
-            if (submenu) {
-              submenu.classList.toggle("hidden");
-            }
-          });
-        });
+    function addReopenUI(){
+      // try add to header
+      var header = document.querySelector('.site-header, header');
+      if(header){
+        var link = document.createElement('button');
+        link.textContent = 'Gérer mes cookies';
+        link.style.cssText = 'background:transparent;border:none;color:inherit;cursor:pointer;margin-left:12px;font-size:0.95rem;text-decoration:underline';
+        link.addEventListener('click', function(){ var b=document.getElementById('gd-cookie-banner'); if(b) b.style.display='flex'; else installUI(); });
+        // try to append into header inner
+        var spot = header.querySelector('.header-inner') || header;
+        spot.appendChild(link);
+        return;
+      }
+      // fallback: show small fixed button bottom-left
+      var reopen = document.getElementById('gd-reopen-btn'); if(reopen){ reopen.style.display='block'; reopen.addEventListener('click', function(){ var b=document.getElementById('gd-cookie-banner'); if(b) b.style.display='flex'; else installUI(); }); }
+    }
 
-        // Desktop Dropdown - Prevent default for dropdown toggle
-        const dropdownToggles = document.querySelectorAll(".dropdown-toggle");
-        dropdownToggles.forEach((toggle) => {
-          toggle.addEventListener("click", function (e) {
-            e.preventDefault();
-          });
-        });
+    function installUI(){
+      // remove any previous injected gd elements
+      var e=document.getElementById('gd-cookie-banner'); if(e) e.parentNode && e.parentNode.removeChild(e);
+      var m=document.getElementById('gd-cookie-modal'); if(m) m.parentNode && m.parentNode.removeChild(m);
+      var styleOld=document.getElementById('gd-cookie-style'); if(styleOld) styleOld.parentNode && styleOld.parentNode.removeChild(styleOld);
+      var reopenOld=document.getElementById('gd-reopen-btn'); if(reopenOld) reopenOld.parentNode && reopenOld.parentNode.removeChild(reopenOld);
 
-        // Close on ESC key
-        document.addEventListener("keydown", function (e) {
-          if (e.key === "Escape") {
-            closeDrawer();
-          }
-        });
+      var container=document.createElement('div'); container.innerHTML=TEMPLATE; document.body.appendChild(container);
 
-        // ============================================================
-        // SMOOTH SCROLL
-        // ============================================================
-        const scrollLinks = document.querySelectorAll('a[href^="#"]');
+      var btnAccept=document.getElementById('gd-accept'); var btnReject=document.getElementById('gd-reject'); var btnSettings=document.getElementById('gd-open-settings'); var btnSave=document.getElementById('gd-save'); var btnCancel=document.getElementById('gd-cancel'); var backdrop=document.getElementById('gd-backdrop'); var btnClose=document.getElementById('gd-close');
 
-        scrollLinks.forEach(function (link) {
-          link.addEventListener("click", function (e) {
-            const href = this.getAttribute("href");
+      btnAccept && btnAccept.addEventListener('click', function(){ var consent={necessary:true,analytics:true,ads:true,ts:Date.now()}; writeConsent(consent); applyConsentEffects(consent); var b=document.getElementById('gd-cookie-banner'); if(b) b.style.display='none'; });
+      btnReject && btnReject.addEventListener('click', function(){ var consent={necessary:true,analytics:false,ads:false,ts:Date.now()}; writeConsent(consent); applyConsentEffects(consent); var b=document.getElementById('gd-cookie-banner'); if(b) b.style.display='none'; });
+      btnSettings && btnSettings.addEventListener('click', function(e){ e.preventDefault(); showModal(); });
+      btnSave && btnSave.addEventListener('click', function(){ var consent={necessary:true,analytics:!!document.getElementById('gd-analytics').checked,ads:!!document.getElementById('gd-ads').checked,ts:Date.now()}; writeConsent(consent); applyConsentEffects(consent); hideModal(); var b=document.getElementById('gd-cookie-banner'); if(b) b.style.display='none'; });
+      btnCancel && btnCancel.addEventListener('click', function(){ hideModal(); });
+      backdrop && backdrop.addEventListener('click', function(){ hideModal(); });
+      btnClose && btnClose.addEventListener('click', function(){ var b=document.getElementById('gd-cookie-banner'); if(b) b.style.display='none'; });
+      document.addEventListener('keydown', function(e){ if(e.key==='Escape') hideModal(); });
 
-            // Ignore empty anchors
-            if (href === "#" || href === "#!") {
-              e.preventDefault();
-              return;
-            }
+      // show reopen control in header or fixed button
+      addReopenUI();
+    }
 
-            const target = document.querySelector(href);
-
-            if (target) {
-              e.preventDefault();
-              const headerHeight = 72;
-              const targetPosition =
-                target.getBoundingClientRect().top +
-                window.pageYOffset -
-                headerHeight;
-
-              window.scrollTo({
-                top: targetPosition,
-                behavior: "smooth",
-              });
-            }
-          });
-        });
-
-        // ============================================================
-        // HEADER SCROLL EFFECT
-        // ============================================================
-        const header = document.querySelector("[data-scroll-header]");
-        let lastScroll = 0;
-
-        window.addEventListener("scroll", function () {
-          const currentScroll = window.pageYOffset;
-
-          if (currentScroll > 50) {
-            header.classList.add("scrolled");
-          } else {
-            header.classList.remove("scrolled");
-          }
-
-          lastScroll = currentScroll;
-        });
-
-        // ============================================================
-        // PRICING TOGGLE (MONTHLY/ANNUAL)
-        // ============================================================
-        const billingToggle = document.querySelector("[data-billing-toggle]");
-        const priceElements = document.querySelectorAll(
-          ".price[data-price-monthly]"
-        );
-        const saveBadge = document.getElementById("saveBadge");
-        const proNote = document.getElementById("proNote");
-
-        if (billingToggle) {
-          billingToggle.addEventListener("click", function () {
-            const currentState = this.getAttribute("data-state");
-            const newState = currentState === "monthly" ? "annual" : "monthly";
-
-            this.setAttribute("data-state", newState);
-
-            // Update prices with animation
-            priceElements.forEach(function (priceEl) {
-              const monthlyPrice = priceEl.getAttribute("data-price-monthly");
-              const annualPrice = priceEl.getAttribute("data-price-annual");
-
-              // Add animation class
-              priceEl.style.animation = "none";
-              setTimeout(() => {
-                priceEl.style.animation =
-                  "priceFlip 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)";
-              }, 10);
-
-              if (newState === "annual") {
-                const annualMonthly = Math.round(annualPrice / 12);
-                setTimeout(() => {
-                  priceEl.textContent = annualMonthly;
-                }, 200);
-              } else {
-                setTimeout(() => {
-                  priceEl.textContent = monthlyPrice;
-                }, 200);
-              }
-            });
-
-            // Show/hide save badge with animation
-            if (saveBadge) {
-              if (newState === "annual") {
-                saveBadge.style.display = "inline-block";
-                saveBadge.style.animation = "slideIn 0.4s ease-out";
-              } else {
-                saveBadge.style.animation = "slideOut 0.3s ease-in";
-                setTimeout(() => {
-                  saveBadge.style.display = "none";
-                }, 300);
-              }
-            }
-
-            // Update Pro plan note with animation
-            if (proNote) {
-              proNote.style.opacity = "0.5";
-              setTimeout(() => {
-                if (newState === "annual") {
-                  proNote.textContent =
-                    "Soit 825 د.م./mois facturé annuellement";
-                } else {
-                  proNote.textContent = "Facturation mensuelle";
-                }
-                proNote.style.opacity = "1";
-              }, 200);
-            }
-          });
-        }
-
-        // Animation CSS for price flip
-        const style = document.createElement("style");
-        style.textContent = `
-        @keyframes priceFlip {
-          0% {
-            opacity: 1;
-            transform: rotateX(0deg);
-          }
-          50% {
-            opacity: 0;
-            transform: rotateX(90deg);
-          }
-          100% {
-            opacity: 1;
-            transform: rotateX(0deg);
-          }
-        }
-
-        @keyframes slideOut {
-          from {
-            opacity: 1;
-            transform: translateX(0);
-          }
-          to {
-            opacity: 0;
-            transform: translateX(-10px);
-          }
-        }
-
-        .price {
-          transform-style: preserve-3d;
-        }
-
-        #proNote {
-          transition: opacity 0.3s ease;
-        }
-      `;
-        document.head.appendChild(style);
-
-        // ============================================================
-        // SCROLL ANIMATIONS (FADE IN)
-        // ============================================================
-        const observerOptions = {
-          threshold: 0.1,
-          rootMargin: "0px 0px -50px 0px",
-        };
-
-        const observer = new IntersectionObserver(function (entries) {
-          entries.forEach(function (entry) {
-            if (entry.isIntersecting) {
-              entry.target.classList.add("visible");
-              observer.unobserve(entry.target);
-            }
-          });
-        }, observerOptions);
-
-        const fadeElements = document.querySelectorAll(".fade-in");
-        fadeElements.forEach(function (el) {
-          observer.observe(el);
-        });
-
-        // ============================================================
-        // LANGUAGE SELECTOR (ENG/FR)
-        // ============================================================
-        const langBtns = document.querySelectorAll(".lang-btn");
-        let currentLang = localStorage.getItem("language") || "fr";
-
-        // Set initial language
-        langBtns.forEach(function (btn) {
-          if (btn.getAttribute("data-lang") === currentLang) {
-            btn.classList.add("active");
-          } else {
-            btn.classList.remove("active");
-          }
-        });
-
-        langBtns.forEach(function (btn) {
-          btn.addEventListener("click", function () {
-            const lang = this.getAttribute("data-lang");
-            currentLang = lang;
-            localStorage.setItem("language", lang);
-
-            // Update active state
-            langBtns.forEach(function (b) {
-              b.classList.remove("active");
-            });
-            btn.classList.add("active");
-
-            // You can add language switching logic here
-            console.log("Language changed to:", lang);
-          });
-        });
-
-        // ============================================================
-        // WORKFLOW TOGGLE (RECRUITER / CANDIDATE)
-        // ============================================================
-        const workflowBtns = document.querySelectorAll(".workflow-btn");
-
-        workflowBtns.forEach(function (btn) {
-          btn.addEventListener("click", function () {
-            const workflow = this.getAttribute("data-workflow");
-
-            // Update button states
-            workflowBtns.forEach(function (b) {
-              b.classList.remove("active");
-            });
-            btn.classList.add("active");
-
-            // Update workflow content with smooth transition
-            const workflows = document.querySelectorAll(
-              "[data-workflow-content]"
-            );
-            workflows.forEach(function (content) {
-              const contentWorkflow = content.getAttribute(
-                "data-workflow-content"
-              );
-
-              if (contentWorkflow === workflow) {
-                content.classList.remove("hidden");
-                content.style.animation = "fadeInUp 0.4s ease-out";
-              } else {
-                content.style.animation = "fadeOutDown 0.3s ease-in";
-                setTimeout(function () {
-                  content.classList.add("hidden");
-                }, 300);
-              }
-            });
-          });
-        });
-
-        // Add animations for workflow switching
-        const workflowStyle = document.createElement("style");
-        workflowStyle.textContent = `
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes fadeOutDown {
-          from {
-            opacity: 1;
-            transform: translateY(0);
-          }
-          to {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-        }
-
-        [data-workflow-content] {
-          transition: opacity 0.3s ease;
-        }
-      `;
-        document.head.appendChild(workflowStyle);
-
-        // ============================================================
-        // ACCESSIBILITY: Focus visible
-        // ============================================================
-        document.addEventListener("keydown", function (e) {
-          if (e.key === "Tab") {
-            document.body.classList.add("user-is-tabbing");
-          }
-        });
-
-        document.addEventListener("mousedown", function () {
-          document.body.classList.remove("user-is-tabbing");
-        });
-
-        // ============================================================
-        // PERFORMANCE: Lazy load images (if any)
-        // ============================================================
-        if ("loading" in HTMLImageElement.prototype) {
-          const images = document.querySelectorAll('img[loading="lazy"]');
-          images.forEach(function (img) {
-            img.src = img.dataset.src;
-          });
-        }
-
-        // ============================================================
-        // EASTER EGGS & UNIQUE INTERACTIONS
-        // ============================================================
-
-        // 0. DARK MODE TOGGLE
-        function initChatbot() {
-          const chatbotBtn = document.getElementById("chatbotBtn");
-
-          if (!chatbotBtn) return;
-
-          chatbotBtn.addEventListener("click", function () {
-            // Ouvrir le chat.html dans une nouvelle fenêtre
-            window.open(
-              "chat.html",
-              "chatbot",
-              "width=400,height=600,resizable=yes,scrollbars=yes"
-            );
-          });
-        }
-
-        // Initialize chatbot when DOM is ready
-        if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", initChatbot);
+    // init
+    document.addEventListener('DOMContentLoaded', function(){
+      try{
+        var consent = readConsent();
+        installUI();
+        if(consent){
+          applyConsentEffects(consent);
+          var b=document.getElementById('gd-cookie-banner'); if(b) b.style.display='none';
         } else {
-          initChatbot();
+          var b=document.getElementById('gd-cookie-banner'); if(b) b.style.display='flex';
         }
+      }catch(err){ console.error('GD cookie init error', err); }
+    });
 
-        document.querySelectorAll(".search-tab").forEach((tab) => {
-          tab.addEventListener("click", function () {
-            document
-              .querySelectorAll(".search-tab")
-              .forEach((t) => t.classList.remove("active"));
-            document
-              .querySelectorAll(".search-tab-content")
-              .forEach((c) => c.classList.remove("active"));
-
-            // Add active class to clicked tab and corresponding content
-            this.classList.add("active");
-            const tabId = this.getAttribute("data-tab");
-            document.getElementById(tabId).classList.add("active");
-          });
-        });
-
-        // ============================================================
-        // MULTI-LANGUAGE SUPPORT (i18n)
-        // ============================================================
-        const translations = {
-          fr: {
-            "nav-home": "Accueil",
-            "nav-features": "Fonctionnalités",
-            "nav-services": "Services",
-            "nav-pricing": "Tarifs",
-            "nav-faq": "FAQ",
-            "nav-testimonials": "Témoignages",
-            "btn-login": "Connexion",
-            "btn-signup": "Inscription",
-            "hero-title": "Votre Santé Intelligente avec GeniDoc",
-            "hero-subtitle":
-              "Trouvez les meilleurs médecins 10x plus vite grâce à notre plateforme IA",
-            "btn-start": "Commencer Gratuitement",
-            "btn-demo": "Demander une Démo",
-            "search-talent": "Rechercher un talent",
-            "search-job": "Parcourir les emplois",
-            "features-title": "Pourquoi choisir RecruitAI?",
-            "features-subtitle":
-              "Des outils puissants pour transformer votre recrutement",
-            "feature-1": "Matching IA Avancé",
-            "feature-1-desc":
-              "Algorithme qui analyse 200+ critères pour trouver les meilleurs matchs",
-            "feature-2": "Entretiens Vidéo",
-            "feature-2-desc": "Entretiens asynchrones pour plus de flexibilité",
-            "feature-3": "Réduction du Temps",
-            "feature-3-desc": "Réduisez votre cycle de recrutement de 50%",
-            "feature-4": "Analyse Prédictive",
-            "feature-4-desc":
-              "Prédisez le succès des candidats avant l'embauche",
-            "feature-5": "Gestion Facile",
-            "feature-5-desc": "Interface simple et intuitive pour tous",
-            "feature-6": "Support 24/7",
-            "feature-6-desc": "Équipe d'experts toujours disponible",
-            "services-title": "Nos Services",
-            "cat-programming": "Médecine Générale",
-            "cat-design": "Cardiologie",
-            "cat-marketing": "Pédiatrie",
-            "cat-writing": "Dermatologie",
-            "cat-video": "Gynécologie",
-            "cat-business": "Ophtalmologie",
-            "cat-ai": "Psychiatrie",
-            "cat-music": "ORL",
-            "cat-consulting": "Radiologie",
-            "testimonials-title":
-              "Découvrez comment nos clients recrutent mieux",
-            "testimonials-subtitle":
-              "Des recruteurs de startups à des grands groupes, tous font confiance à RecruitAI.",
-            "faq-title": "Questions fréquemment posées",
-            "faq-1": "Comment fonctionne l'algorithme de matching IA ?",
-            "faq-1-answer":
-              "Notre IA analyse les CV des candidats et les compare avec les profils recherchés. Elle évalue plus de 200 critères (compétences, expérience, localisation, etc.) pour identifier les meilleurs matchs avec un score de pertinence.",
-            "faq-2": "Combien de temps faut-il pour recruter via RecruitAI ?",
-            "faq-2-answer":
-              "En moyenne, nos clients réduisent le cycle de recrutement de 50%. Au lieu de 4-6 semaines, vous pouvez compléter votre embauche en 2 semaines grâce à l'automatisation et au matching IA.",
-            "faq-3":
-              "Les entretiens vidéo asynchrones sont-ils vraiment efficaces ?",
-            "faq-3-answer":
-              "Absolument. Les entretiens asynchrones offrent plus de flexibilité aux candidats, réduisent les no-show de 80%, et permettent aux recruteurs de mieux évaluer les réponses sans les contraintes de temps en direct.",
-            "faq-4":
-              "Comment mes données de recrutement sont-elles protégées ?",
-            "faq-4-answer":
-              "Nous utilisons le chiffrement de bout en bout et respectons les normes RGPD. Vos données sont stockées dans des serveurs sécurisés et vous gardez le contrôle total de vos informations.",
-            "faq-genidoc-title": "Questions Fréquentes sur GeniDoc",
-            "faq-genidoc-subtitle": "Trouvez les réponses aux questions les plus posées sur notre plateforme",
-            "faq-q1": "Comment puis-je prendre un rendez-vous en ligne avec GeniDoc?",
-            "faq-a1": "Vous pouvez prendre un rendez-vous en ligne en quelques étapes simples: 1) Recherchez votre médecin ou spécialité, 2) Consultez les créneaux disponibles, 3) Sélectionnez la date et l'heure préférées, 4) Confirmez votre rendez-vous. Vous recevrez une confirmation par email avec tous les détails.",
-            "faq-q2": "Mes données médicales sont-elles sécurisées?",
-            "faq-a2": "Oui, la sécurité de vos données est notre priorité absolue. GeniDoc utilise le chiffrement SSL/TLS, le stockage crypté et respecte les normes de conformité HIPAA et RGPD. Vos informations médicales ne sont jamais partagées sans votre consentement explicite.",
-            "faq-q3": "Puis-je consulter un médecin par téléconsultation?",
-            "faq-a3": "Oui! GeniDoc propose des consultations à distance par vidéo pour de nombreuses spécialités. Vous pouvez choisir la téléconsultation lors de la réservation de votre rendez-vous. Il suffit d'avoir une connexion Internet et une caméra web.",
-            "faq-q4": "Comment puis-je accéder à mon dossier médical électronique?",
-            "faq-a4": "Vous pouvez accéder à votre dossier médical électronique en vous connectant à votre compte GeniDoc. Vous y trouverez tous vos rapports médicaux, résultats d'analyse, historique des rendez-vous et ordonnances en un seul endroit, organisé et facile à consulter.",
-            "faq-q5": "Quels sont les modes de paiement acceptés?",
-            "faq-a5": "GeniDoc accepte plusieurs modes de paiement: cartes bancaires (Visa, Mastercard, American Express), virements bancaires, portefeuilles numériques (Apple Pay, Google Pay) et paiements à la clinique. Les consultations sont remboursables par les assurances maladie partenaires.",
-            "faq-q6": "Comment puis-je contacter le support GeniDoc?",
-            "faq-a6": "Notre équipe support est disponible 24/7 via plusieurs canaux: chat en direct sur notre plateforme, email (support@genidoc.ma), téléphone (+212 5XX XXX XXX) et réseaux sociaux. Nous nous engageons à répondre à vos questions dans les 2 heures.",
-          },
-          en: {
-            "nav-home": "Home",
-            "nav-features": "Features",
-            "nav-services": "Services",
-            "nav-pricing": "Pricing",
-            "nav-faq": "FAQ",
-            "nav-testimonials": "Testimonials",
-            // Header buttons
-            "btn-login": "Login",
-            "btn-signup": "Sign Up",
-            "hero-title": "Intelligent Recruitment with AI",
-            "hero-subtitle":
-              "Find the best talents 10x faster with our AI algorithm",
-            "btn-start": "Start Free",
-            "btn-demo": "Request Demo",
-            "search-talent": "Search for talent",
-            "search-job": "Browse jobs",
-            "features-title": "Why Choose RecruitAI?",
-            "features-subtitle": "Powerful tools to transform your recruitment",
-            "feature-1": "Advanced AI Matching",
-            "feature-1-desc":
-              "Algorithm that analyzes 200+ criteria to find the best matches",
-            "feature-2": "Video Interviews",
-            "feature-2-desc": "Asynchronous interviews for more flexibility",
-            "feature-3": "Time Reduction",
-            "feature-3-desc": "Reduce your recruitment cycle by 50%",
-            "feature-4": "Predictive Analytics",
-            "feature-4-desc": "Predict candidate success before hiring",
-            "feature-5": "Easy Management",
-            "feature-5-desc": "Simple and intuitive interface for everyone",
-            "feature-6": "Support 24/7",
-            "feature-6-desc": "Expert team always available",
-            "services-title": "Our Services",
-            "cat-programming": "General Medicine",
-            "cat-design": "Cardiology",
-            "cat-marketing": "Pediatrics",
-            "cat-writing": "Dermatology",
-            "cat-video": "Gynecology",
-            "cat-business": "Ophthalmology",
-            "cat-ai": "Psychiatry",
-            "cat-music": "ENT",
-            "cat-consulting": "Radiology",
-            "testimonials-title": "See how our customers recruit better",
-            "testimonials-subtitle":
-              "From startup recruiters to large groups, everyone trusts RecruitAI.",
-            "faq-title": "Frequently Asked Questions",
-            "faq-1": "How does the AI matching algorithm work?",
-            "faq-1-answer":
-              "Our AI analyzes candidate CVs and compares them with target profiles. It evaluates 200+ criteria (skills, experience, location, etc.) to identify best matches with a relevance score.",
-            "faq-2": "How long does it take to hire via RecruitAI?",
-            "faq-2-answer":
-              "On average, our customers reduce recruitment cycle by 50%. Instead of 4-6 weeks, you can complete your hiring in 2 weeks with our AI automation.",
-            "faq-3": "Are asynchronous video interviews really effective?",
-            "faq-3-answer":
-              "Absolutely. Asynchronous interviews offer more flexibility to candidates, reduce no-shows by 80%, and allow recruiters to better evaluate responses without time constraints.",
-            "faq-4": "How is my recruitment data protected?",
-            "faq-4-answer":
-              "We use end-to-end encryption and comply with GDPR standards. Your data is stored on secure servers and you have full control of your information.",
-            "faq-genidoc-title": "Frequently Asked Questions about GeniDoc",
-            "faq-genidoc-subtitle": "Find answers to the most asked questions about our platform",
-            "faq-q1": "How can I book an appointment online with GeniDoc?",
-            "faq-a1": "You can book an appointment online in a few simple steps: 1) Search for your doctor or specialty, 2) Check available slots in real-time, 3) Select your preferred date and time, 4) Confirm your appointment. You will receive instant confirmation by email with all details.",
-            "faq-q2": "Is my medical data secure?",
-            "faq-a2": "Yes, data security is our top priority. GeniDoc uses SSL/TLS encryption, encrypted storage and complies with HIPAA and GDPR standards. Your medical information is never shared without your explicit consent.",
-            "faq-q3": "Can I consult a doctor via teleconsultation?",
-            "faq-a3": "Yes! GeniDoc offers video consultations for many specialties. You can choose teleconsultation when booking your appointment. You only need an internet connection and a web camera.",
-            "faq-q4": "How can I access my electronic medical record?",
-            "faq-a4": "You can access your electronic medical record by logging into your GeniDoc account. You will find all your medical reports, test results, appointment history and prescriptions in one organized place.",
-            "faq-q5": "What payment methods are accepted?",
-            "faq-a5": "GeniDoc accepts multiple payment methods: credit cards (Visa, Mastercard, American Express), bank transfers, digital wallets (Apple Pay, Google Pay) and clinic payments. Consultations are reimbursable by partner health insurance companies.",
-            "faq-q6": "How can I contact GeniDoc support?",
-            "faq-a6": "Our support team is available 24/7 through multiple channels: live chat on our platform, email (support@genidoc.ma), phone (+212 5XX XXX XXX) and social media. We commit to answering your questions within 2 hours.",
-          },
-          es: {
-            "nav-home": "Inicio",
-            "nav-features": "Características",
-            "nav-services": "Servicios",
-            "nav-pricing": "Precios",
-            "nav-faq": "Preguntas",
-            "nav-testimonials": "Testimonios",
-            "btn-login": "Iniciar Sesión",
-            "btn-signup": "Registrarse",
-            "hero-title": "Reclutamiento Inteligente con IA",
-            "hero-subtitle":
-              "Encuentra los mejores talentos 10x más rápido con nuestro algoritmo IA",
-            "btn-start": "Comenzar Gratis",
-            "btn-demo": "Solicitar Demo",
-            "search-talent": "Buscar talento",
-            "search-job": "Explorar empleos",
-            "features-title": "¿Por qué elegir RecruitAI?",
-            "features-subtitle":
-              "Herramientas poderosas para transformar tu reclutamiento",
-            "feature-1": "Emparejamiento IA Avanzado",
-            "feature-1-desc":
-              "Algoritmo que analiza 200+ criterios para encontrar los mejores matchs",
-            "feature-2": "Entrevistas de Video",
-            "feature-2-desc": "Entrevistas asincrónicas para más flexibilidad",
-            "feature-3": "Reducción de Tiempo",
-            "feature-3-desc": "Reduce tu ciclo de reclutamiento en 50%",
-            "feature-4": "Análisis Predictivo",
-            "feature-4-desc": "Predice el éxito de candidatos antes de contratar",
-            "feature-5": "Gestión Fácil",
-            "feature-5-desc": "Einfache und intuitive Benutzeroberfläche",
-            "feature-6": "Soporte 24/7",
-            "feature-6-desc": "Equipo de expertos siempre disponible",
-            "services-title": "Nuestros Servicios",
-            "cat-programming": "Medicina General",
-            "cat-design": "Cardiología",
-            "cat-marketing": "Pediatría",
-            "cat-writing": "Dermatología",
-            "cat-video": "Ginecología",
-            "cat-business": "Oftalmología",
-            "cat-ai": "Psiquiatría",
-            "cat-music": "Otorrinolaringología",
-            "cat-consulting": "Radiología",
-            "testimonials-title":
-              "Descubre cómo nuestros clientes contratan mejor",
-            "testimonials-subtitle":
-              "Desde reclutadores de startups hasta grandes grupos, todos confían en RecruitAI.",
-            "faq-title": "Preguntas Frecuentes",
-            "faq-1": "¿Cómo funciona el algoritmo de emparejamiento IA?",
-            "faq-1-answer":
-              "Nuestra IA analiza CVs de candidatos y los compara con perfiles buscados. Evalúa 200+ criterios (habilidades, experiencia, ubicación, etc.) para identificar los mejores matches.",
-            "faq-2": "¿Cuánto tiempo tarda contratar vía RecruitAI?",
-            "faq-2-answer":
-              "En promedio, nuestros clientes reducen el ciclo de reclutamiento en 50%. En lugar de 4-6 semanas, puedes completar tu contratación en 2 semanas.",
-            "faq-3": "¿Las entrevistas de video asincrónicas son realmente efectivas?",
-            "faq-3-answer":
-              "Absolutamente. Las entrevistas asincrónicas ofrecen más flexibilidad a los candidatos, reducen las no presentaciones en 80%, y permiten a los reclutadores evaluar mejor.",
-            "faq-4": "¿Cómo están protegidos mis datos de reclutamiento?",
-            "faq-4-answer":
-              "Usamos encriptación de extremo a extremo y cumplimos con estándares GDPR. Tus datos se almacenan en servidores seguros y tienes control total.",
-          },
-          de: {
-            "nav-home": "Startseite",
-            "nav-features": "Funktionen",
-            "nav-services": "Dienstleistungen",
-            "nav-pricing": "Preise",
-            "nav-faq": "FAQ",
-            "nav-testimonials": "Testimonials",
-            "btn-login": "Anmelden",
-            "btn-signup": "Registrieren",
-            "hero-title": "Intelligente Rekrutierung mit KI",
-            "hero-subtitle":
-              "Finden Sie die besten Talente 10x schneller mit unserem KI-Algorithmus",
-            "btn-start": "Kostenlos Starten",
-            "btn-demo": "Demo Anfordern",
-            "search-talent": "Talent suchen",
-            "search-job": "Jobs durchsuchen",
-            "features-title": "Warum RecruitAI wählen?",
-            "features-subtitle":
-              "Mächtige Tools um Ihre Rekrutierung zu transformieren",
-            "feature-1": "Fortgeschrittenes KI-Matching",
-            "feature-1-desc":
-              "Algorithmus der 200+ Kriterien analysiert um beste Matches zu finden",
-            "feature-2": "Video-Interviews",
-            "feature-2-desc": "Asynchrone Interviews für mehr Flexibilität",
-            "feature-3": "Zeitreduktion",
-            "feature-3-desc": "Reduzieren Sie Ihren Rekrutierungszyklus um 50%",
-            "feature-4": "Vorhersageanalytik",
-            "feature-4-desc": "Vorhersagen des Kandidatenerfolgs vor der Einstellung",
-            "feature-5": "Einfache Verwaltung",
-            "feature-5-desc": "Einfache und intuitive Benutzeroberfläche",
-            "feature-6": "Support 24/7",
-            "feature-6-desc": "Expertenteam immer verfügbar",
-            "services-title": "Unsere Dienstleistungen",
-            "cat-programming": "Allgemeinmedizin",
-            "cat-design": "Kardiologie",
-            "cat-marketing": "Pädiatrie",
-            "cat-writing": "Dermatologie",
-            "cat-video": "Gynäkologie",
-            "cat-business": "Augenheilkunde",
-            "cat-ai": "Psychiatrie",
-            "cat-music": "HNO",
-            "cat-consulting": "Radiologie",
-            "testimonials-title":
-              "Sehen Sie wie unsere Kunden besser rekrutieren",
-            "testimonials-subtitle":
-              "Von Startup-Recruitern bis zu großen Unternehmen vertrauen alle auf RecruitAI.",
-            "faq-title": "Häufig Gestellte Fragen",
-            "faq-1": "Wie funktioniert der KI-Matching-Algorithmus?",
-            "faq-1-answer":
-              "Unsere KI analysiert Kandidaten-CVs und vergleicht sie mit Zielprofile. Sie bewertet 200+ Kriterien um beste Matches zu identifizieren.",
-            "faq-2": "Wie lange dauert es, über RecruitAI einzustellen?",
-            "faq-2-answer":
-              "Im Durchschnitt reduzieren unsere Kunden den Rekrutierungszyklus um 50%. Statt 4-6 Wochen können Sie Ihre Einstellung in 2 Wochen abschließen.",
-            "faq-3": "Sind asynchrone Video-Interviews wirklich effektiv?",
-            "faq-3-answer":
-              "Absolut. Asynchrone Interviews bieten Kandidaten mehr Flexibilität, reduzieren No-Shows um 80%, und ermöglichen bessere Bewertungen.",
-            "faq-4": "Wie werden meine Rekrutierungsdaten geschützt?",
-            "faq-4-answer":
-              "Wir verwenden End-zu-End-Verschlüsselung und entsprechen GDPR-Standards. Ihre Daten werden auf sicheren Servern gespeichert.",
-          },
-          ar: {
-            "nav-home": "الرئيسية",
-            "nav-features": "المميزات",
-            "nav-services": "الخدمات",
-            "nav-pricing": "الأسعار",
-            "nav-faq": "الأسئلة",
-            "nav-testimonials": "الآراء",
-            "btn-login": "دخول",
-            "btn-signup": "تسجيل",
-            "hero-title": "التوظيف الذكي بالذكاء الاصطناعي",
-            "hero-subtitle":
-              "ابحث عن أفضل المواهب 10 مرات أسرع باستخدام خوارزمية الذكاء الاصطناعي",
-            "btn-start": "ابدأ مجانًا",
-            "btn-demo": "اطلب عرضًا توضيحيًا",
-            "search-talent": "ابحث عن موهبة",
-            "search-job": "استعرض الوظائف",
-            "features-title": "لماذا تختار RecruitAI؟",
-            "features-subtitle": "أدوات قوية لتحويل التوظيف الخاص بك",
-            "feature-1": "مطابقة ذكية متقدمة",
-            "feature-1-desc":
-              "خوارزمية تحلل 200+ معايير للعثور على أفضل المطابقات",
-            "feature-2": "مقابلات الفيديو",
-            "feature-2-desc": "مقابلات غير متزامنة لمزيد من المرونة",
-            "feature-3": "تقليل الوقت",
-            "feature-3-desc": "قلل دورة التوظيف الخاصة بك بنسبة 50%",
-            "feature-4": "التحليلات التنبؤية",
-            "feature-4-desc": "توقع نجاح المرشح قبل التوظيف",
-            "feature-5": "الإدارة السهلة",
-            "feature-5-desc": "واجهة بسيطة وسهلة الاستخدام",
-            "feature-6": "الدعم 24/7",
-            "feature-6-desc": "فريق الخبراء متاح دائمًا",
-            "services-title": "خدماتنا",
-            "cat-programming": "الطب العام",
-            "cat-design": "أمراض القلب",
-            "cat-marketing": "طب الأطفال",
-            "cat-writing": "الأمراض الجلدية",
-            "cat-video": "أمراض النساء",
-            "cat-business": "طب العيون",
-            "cat-ai": "الطب النفسي",
-            "cat-music": "أنف وأذن وحنجرة",
-            "cat-consulting": "الأشعة",
-            "testimonials-title": "انظر كيف يوظف عملاؤنا بشكل أفضل",
-            "testimonials-subtitle":
-              "من معيدي التوظيف في الشركات الناشئة إلى الشركات الكبرى، الجميع يثق في RecruitAI.",
-            "faq-title": "الأسئلة الشائعة",
-            "faq-1": "كيف تعمل خوارزمية المطابقة الذكية؟",
-            "faq-1-answer":
-              "تحلل الذكاء الاصطناعي الخاص بنا السير الذاتية للمرشحين وتقارنها مع الملفات المستهدفة. تقيم 200+ معايير للعثور على أفضل المطابقات.",
-            "faq-2": "كم من الوقت يستغرق التوظيف عبر RecruitAI؟",
-            "faq-2-answer":
-              "في المتوسط، يقلل عملاؤنا دورة التوظيف بنسبة 50%. بدلاً من 4-6 أسابيع، يمكنك إكمال التوظيف في أسبوعين.",
-            "faq-3": "هل مقابلات الفيديو غير المتزامنة فعالة حقًا؟",
-            "faq-3-answer":
-              "بالتأكيد. توفر المقابلات غير المتزامنة مرونة أكثر، وتقلل عدم الحضور بنسبة 80%، وتسمح بتقييم أفضل.",
-            "faq-4": "كيف يتم حماية بيانات التوظيف الخاصة بي؟",
-            "faq-4-answer":
-              "نستخدم التشفير من طرف إلى طرف ونمتثل لمعايير GDPR. يتم تخزين بيانات التوظيف الخاصة بك على خوادم آمنة.",
-          },
-        };
-
-        let currentLanguage = 'en';
-
-        // Function to change language
-        function changeLanguage(lang) {
-          currentLanguage = lang;
-          localStorage.setItem("language", lang);
-
-          // Update all elements with data-i18n attribute
-          document.querySelectorAll("[data-i18n]").forEach((element) => {
-            const key = element.getAttribute("data-i18n");
-            if (translations[lang] && translations[lang][key]) {
-              element.textContent = translations[lang][key];
-            }
-          });
-
-          // Update language dropdown
-          const langMap = { fr: "FR", en: "EN", es: "ES", de: "DE", ar: "AR" };
-          document.querySelector(".current-lang").textContent = langMap[lang];
-
-          // Update lang-option states
-          document.querySelectorAll(".lang-option").forEach((btn) => {
-            btn.classList.remove("active");
-            if (btn.getAttribute("data-lang") === lang) {
-              btn.classList.add("active");
-            }
-          });
-
-          // Close dropdown after selection
-          const dropdown = document.querySelector(".language-dropdown");
-          dropdown.classList.remove("active");
-
-          // Ne pas changer la direction du texte - toujours LTR
-          // Garder le positionnement images fixe
-          document.documentElement.lang = lang;
-        }
-
-        // Language dropdown toggle
-        const dropdownBtn = document.querySelector(".lang-dropdown-btn");
-        const dropdown = document.querySelector(".language-dropdown");
-        function updateLangBtn() {
-          if (dropdownBtn) {
-            if (currentLanguage === 'en') dropdownBtn.innerHTML = '<span style="margin-right:6px;">English</span> <svg style="vertical-align:middle;" width="16" height="16" viewBox="0 0 20 20"><path fill="#fff" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.06l3.71-3.83a.75.75 0 1 1 1.08 1.04l-4.25 4.39a.75.75 0 0 1-1.08 0L5.21 8.27a.75.75 0 0 1 .02-1.06z"/></svg>';
-            else if (currentLanguage === 'fr') dropdownBtn.innerHTML = '<span style="margin-right:6px;">Français</span> <svg style="vertical-align:middle;" width="16" height="16" viewBox="0 0 20 20"><path fill="#fff" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.06l3.71-3.83a.75.75 0 1 1 1.08 1.04l-4.25 4.39a.75.75 0 0 1-1.08 0L5.21 8.27a.75.75 0 0 1 .02-1.06z"/></svg>';
-            else if (currentLanguage === 'ar') dropdownBtn.innerHTML = '<span style="margin-right:6px;">العربية</span> <svg style="vertical-align:middle;" width="16" height="16" viewBox="0 0 20 20"><path fill="#fff" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.06l3.71-3.83a.75.75 0 1 1 1.08 1.04l-4.25 4.39a.75.75 0 0 1-1.08 0L5.21 8.27a.75.75 0 0 1 .02-1.06z"/></svg>';
-          }
-        }
-        dropdownBtn.addEventListener("click", function () {
-          dropdown.classList.toggle("active");
-        });
-        // Language option listeners
-        document.querySelectorAll(".lang-option").forEach((btn) => {
-          btn.addEventListener("click", function () {
-            const lang = this.getAttribute("data-lang");
-            currentLanguage = lang;
-            changeLanguage(lang);
-            updateLangBtn();
-            document.documentElement.lang = lang;
-            dropdown.classList.remove("active");
-            // Optionally, handle RTL for Arabic
-            if(lang==='ar') document.body.dir = 'rtl';
-            else document.body.dir = 'ltr';
-          });
-        });
-        // Close dropdown when clicking outside
-        document.addEventListener("click", function (e) {
-          if (!dropdown.contains(e.target)) {
-            dropdown.classList.remove("active");
-          }
-        });
-        // Initialize language on page load
-        changeLanguage(currentLanguage);
-        updateLangBtn();
-
-        // ============================================================
-        // TOP BAR DROPDOWN MENU HANDLER - Move to body for visibility
-        // ============================================================
-        const topBarDropdowns = document.querySelectorAll('.top-bar-dropdown');
-        let openPortal = null, openBtn = null;
-        function closeAnyPortal() {
-          document.querySelectorAll('.dropdown-portal').forEach(function(el) { el.remove(); });
-          openPortal = null; openBtn = null;
-        }
-        topBarDropdowns.forEach(dropdown => {
-          const btn = dropdown.querySelector('.top-bar-dropdown-btn');
-          const menu = dropdown.querySelector('.top-bar-dropdown-menu');
-          // Open on click or keyboard
-          function openDropdownPortal(e) {
-            if (e) e.preventDefault();
-            closeAnyPortal();
-            var rect = btn.getBoundingClientRect();
-            var portal = menu.cloneNode(true);
-            portal.classList.add('dropdown-portal');
-            portal.style.position = 'fixed';
-            let left = rect.left;
-            const portalWidth = rect.width;
-            if (left + portalWidth > window.innerWidth - 8) {
-              left = window.innerWidth - portalWidth - 8;
-              if (left < 8) left = 8;
-            }
-            portal.style.left = left + 'px';
-            // Calculer la hauteur réelle du menu cloné (portal)
-            // Forcer l'affichage du portal pour mesurer la vraie hauteur
-            portal.style.display = 'flex';
-            portal.style.opacity = '1';
-            portal.style.visibility = 'visible';
-            portal.style.position = 'fixed';
-            portal.style.left = '-9999px';
-            portal.style.top = '-9999px';
-            document.body.appendChild(portal);
-            let menuHeight = portal.offsetHeight;
-            if (!menuHeight || menuHeight < 40) menuHeight = 220; // fallback si vide
-            portal.remove();
-            const spaceBelow = window.innerHeight - rect.bottom;
-            const spaceAbove = rect.top;
-            let top = rect.bottom + window.scrollY;
-            if (spaceBelow < menuHeight && spaceAbove > menuHeight) {
-              top = rect.top + window.scrollY - menuHeight;
-            }
-            portal.style.top = top + 'px';
-            portal.style.minWidth = rect.width + 'px';
-            portal.style.maxHeight = 'calc(100vh - 32px)';
-            portal.style.overflowY = 'auto';
-            portal.style.zIndex = '2147483647'; // toujours au-dessus de tout
-            portal.style.opacity = '1';
-            portal.style.visibility = 'visible';
-            portal.style.transform = 'none';
-            portal.style.zIndex = '2147483647';
-            portal.style.pointerEvents = 'auto';
-            // Remove any pointer-events:none from children (in case cloned)
-            Array.from(portal.querySelectorAll('*')).forEach(function(el){
-              if (el.style.pointerEvents === 'none') el.style.pointerEvents = 'auto';
-            });
-            // Style visuel garanti (fond sombre, bordure bleue, padding, couleur texte)
-            portal.style.background = '#1f1f1f';
-            portal.style.border = '2px solid #2563eb';
-            portal.style.boxShadow = '0 4px 16px rgba(0,0,0,0.18)';
-            portal.style.borderRadius = '10px';
-            portal.style.display = 'flex';
-            portal.style.flexDirection = 'column';
-            portal.style.padding = '0';
-            // Style des liens (force la visibilité et la lisibilité)
-            Array.from(portal.querySelectorAll('a')).forEach(function(a){
-              a.style.color = '#fff';
-              a.style.background = '#1f1f1f';
-              a.style.padding = '12px 18px';
-              a.style.fontSize = '1rem';
-              a.style.textDecoration = 'none';
-              a.style.borderBottom = '1px solid #2563eb';
-              a.style.display = 'block';
-              a.style.whiteSpace = 'nowrap';
-              a.style.zIndex = '2147483647';
-              a.style.opacity = '1';
-              a.style.visibility = 'visible';
-              a.style.fontWeight = '600';
-              a.style.filter = 'none';
-              a.style.pointerEvents = 'auto'; // always clickable
-              a.tabIndex = 0; // ensure focusable
-              a.onkeydown = function(ev) {
-                if(ev.key==='Enter'||ev.key===' '){
-                  ev.preventDefault();
-                  a.click();
-                }
-              };
-            });
-            var links = portal.querySelectorAll('a');
-            if(links.length) links[links.length-1].style.borderBottom = 'none';
-            // Focus first link for accessibility
-            setTimeout(()=>{
-              let firstLink = portal.querySelector('a');
-              if(firstLink) firstLink.focus();
-            }, 10);
-            document.body.appendChild(portal);
-            openPortal = portal; openBtn = btn;
-            // Keep open on hover/focus
-            let hoverOnBtn = false, hoverOnPortal = false;
-            function checkClose() {
-              setTimeout(()=>{ if(!hoverOnBtn && !hoverOnPortal) closeAnyPortal(); }, 120);
-            }
-            btn.addEventListener('mouseenter', ()=>{ hoverOnBtn=true; });
-            btn.addEventListener('mouseleave', ()=>{ hoverOnBtn=false; checkClose(); });
-            portal.addEventListener('mouseenter', ()=>{ hoverOnPortal=true; });
-            portal.addEventListener('mouseleave', ()=>{ hoverOnPortal=false; checkClose(); });
-            // Close on click outside or ESC
-            function closePortal(e) {
-              if (!portal.contains(e.target) && e.target !== btn) {
-                closeAnyPortal();
-                document.removeEventListener('mousedown', closePortal);
-                document.removeEventListener('keydown', escListener);
-              }
-            }
-            function escListener(e) {
-              if (e.key === 'Escape') {
-                closeAnyPortal();
-                document.removeEventListener('mousedown', closePortal);
-                document.removeEventListener('keydown', escListener);
-              }
-              // Tab navigation: close if tabbing out
-              if (e.key === 'Tab' && openPortal) {
-                let focusable = Array.from(openPortal.querySelectorAll('a'));
-                let idx = focusable.indexOf(document.activeElement);
-                if ((e.shiftKey && idx === 0) || (!e.shiftKey && idx === focusable.length-1)) {
-                  closeAnyPortal();
-                }
-              }
-            }
-            document.addEventListener('mousedown', closePortal);
-            document.addEventListener('keydown', escListener);
-          }
-          btn.addEventListener('click', openDropdownPortal);
-          btn.addEventListener('keydown', function(e){
-            if(e.key==='Enter'||e.key===' '){ openDropdownPortal(e); }
-          });
-        });
-        // Close all portals on scroll or resize
-        window.addEventListener('scroll', closeAnyPortal);
-        window.addEventListener('resize', closeAnyPortal);
-
-        // ============================================================
-      })();
-    </script>
-    <!-- Chatbot Button (ouvre la fenêtre) -->
-    <button class="chatbot-toggle" id="chatbotBtn" aria-label="Ouvrir le chatbot" title="Assistance GeniDoc">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-      </svg>
-    </button>
-    <!-- Floating install button removed (replaced by CTA in testimonials) -->
-    <script>
-      // Ouvre/ferme le chatbot avec le bouton flottant
-      document.addEventListener('DOMContentLoaded', function() {
-        var chatbotBtn = document.getElementById('chatbotBtn');
-        var chatbotWindow = document.getElementById('genidoc-chatbot-window');
-        var closeBtn = document.getElementById('closeGenidocChatbot');
-        if(chatbotBtn && chatbotWindow) {
-          chatbotBtn.onclick = function(e) {
-            e.preventDefault();
-            if (chatbotWindow.style.display === 'flex') {
-              chatbotWindow.style.display = 'none';
-            } else {
-              chatbotWindow.style.display = 'flex';
-              chatbotWindow.style.animation = 'fadeInChatbot 0.35s cubic-bezier(.4,1.4,.6,1)';
-            }
-          };
-        }
-        if(closeBtn && chatbotWindow) {
-          closeBtn.onclick = function() {
-            chatbotWindow.style.display = 'none';
-          };
-        }
-      });
-    </script>
-    <script>
-      // Improved PWA install handler: wait for DOM, attach listeners, provide clearer iOS fallback
-      (function() {
-        let deferredPrompt = null;
-
-        function openGenidoc() {
-          try { window.location.href = 'https://genidoc.ma'; }
-          catch (err) { window.open('https://genidoc.ma', '_blank'); }
-        }
-
-        function showIOSInstallHint() {
-          // create a small temporary overlay with instructions
-          const id = 'ios-install-hint';
-          if (document.getElementById(id)) return;
-          const container = document.createElement('div');
-          container.id = id;
-          container.style.position = 'fixed';
-          container.style.left = '12px';
-          container.style.right = '12px';
-          container.style.bottom = '120px';
-          container.style.zIndex = '2147483648';
-          container.style.background = 'rgba(0,0,0,0.85)';
-          container.style.color = '#fff';
-          container.style.padding = '12px 14px';
-          container.style.borderRadius = '12px';
-          container.style.boxShadow = '0 6px 20px rgba(0,0,0,0.35)';
-          container.style.fontSize = '14px';
-          container.style.lineHeight = '1.2';
-          container.innerHTML = "<strong>Ajouter GeniDoc à l'écran d'accueil</strong><div style='margin-top:6px'>Appuyez sur le bouton " +
-            "<svg width='14' height='14' viewBox='0 0 24 24' style='vertical-align:middle;margin:0 6px;'><path d='M4 12h16' stroke='white' stroke-width='2' fill='none'/></svg> 'Partager' puis 'Ajouter à l'écran d'accueil'.</div>" +
-            "<div style='margin-top:8px;text-align:right'><button id='close_ios_install' style='background:#fff;color:#000;border:none;padding:6px 10px;border-radius:8px;font-weight:700'>Fermer</button></div>";
-          document.body.appendChild(container);
-          document.getElementById('close_ios_install').onclick = function(){ container.remove(); openGenidoc(); };
-          setTimeout(()=>{ try{ container.remove(); }catch(e){} }, 12000);
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-          const canonicalInstallBtn = document.getElementById('install-app-btn');
-          const actionButtons = Array.from(document.querySelectorAll('.install-app-action'));
-          const triggers = actionButtons.concat(canonicalInstallBtn ? [canonicalInstallBtn] : []);
-          if (triggers.length === 0) return;
-
-          // Show all triggers by default for discoverability (they may be hidden by CSS)
-          triggers.forEach((btn)=>{ try{ btn.style.display = 'inline-flex'; }catch(e){} });
-
-          window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            triggers.forEach((btn)=>{ try{ btn.style.display = 'inline-flex'; }catch(e){} });
-            console.log('beforeinstallprompt captured');
-          });
-
-          async function handleInstallClick(ev) {
-            ev.preventDefault();
-            const btn = ev.currentTarget;
-            btn.disabled = true;
-            console.log('install button clicked, deferredPrompt=', !!deferredPrompt);
-
-            if (deferredPrompt) {
-              try {
-                deferredPrompt.prompt();
-                const choice = await deferredPrompt.userChoice;
-                deferredPrompt = null;
-                console.log('PWA choice', choice);
-              } catch (err) {
-                console.warn('PWA prompt error', err);
-              }
-              btn.disabled = false;
-              openGenidoc();
-              return;
-            }
-
-            // iOS specific hint
-            if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-              showIOSInstallHint();
-              btn.disabled = false;
-              return;
-            }
-
-            openGenidoc();
-            btn.disabled = false;
-          }
-
-          triggers.forEach((t)=>{
-            try{
-              t.addEventListener('click', handleInstallClick);
-            }catch(e){}
-          });
-        });
-
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('/service-worker.js')
-            .then((reg) => console.log('ServiceWorker registered', reg))
-            .catch((err) => console.warn('ServiceWorker registration failed:', err));
-        }
-      })();
-    </script>
-  </body>
+  })();
+</script>
+</body>
 </html>

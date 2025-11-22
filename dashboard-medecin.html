@@ -118,12 +118,40 @@
     </style>
   </head>
   <body>
+    <div
+      id="site-banner"
+      role="status"
+      aria-live="polite"
+      style="
+        position: fixed;
+        top: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 2000;
+        display: none;
+        padding: 12px 18px;
+        border-radius: 8px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        font-weight: 600;
+        color: #fff;
+      "
+    ></div>
     <script>
       // Session/authentication check for dashboard-medecin.html
       (function () {
         var doctorId = localStorage.getItem('doctorId');
         if (!doctorId) {
-          window.location.href = 'auth.html';
+          // Show banner and allow user to re-login instead of an immediate redirect
+          try {
+            showBanner(
+              'Aucun doctorId trouvé. Veuillez vous connecter.',
+              'error',
+              5000
+            );
+          } catch (e) {}
+          setTimeout(function () {
+            window.location.href = 'auth.html';
+          }, 1800);
         }
       })();
       // secureFetch helper: attach token and handle 401/403 centrally
@@ -148,6 +176,46 @@
           throw new Error('Déconnecté');
         }
         return res;
+      }
+
+      // Simple in-page banner helper to replace alert()
+      function showBanner(message, type = 'info', timeout = 4500) {
+        try {
+          let el = document.getElementById('site-banner');
+          // If banner doesn't exist, create a lightweight non-blocking banner
+          if (!el) {
+            el = document.createElement('div');
+            el.id = 'site-banner';
+            el.style.position = 'fixed';
+            el.style.top = '12px';
+            el.style.left = '50%';
+            el.style.transform = 'translateX(-50%)';
+            el.style.zIndex = '2000';
+            el.style.display = 'none';
+            el.style.padding = '10px 14px';
+            el.style.borderRadius = '8px';
+            el.style.boxShadow = '0 6px 24px rgba(0,0,0,0.12)';
+            document.body.appendChild(el);
+          }
+          el.textContent = message;
+          el.style.display = 'block';
+          if (type === 'error') {
+            el.style.background = '#ef4444';
+            el.style.color = '#fff';
+          } else if (type === 'success') {
+            el.style.background = '#10b981';
+            el.style.color = '#fff';
+          } else {
+            el.style.background = '#1f2937';
+            el.style.color = '#fff';
+          }
+          clearTimeout(el._hideTimer);
+          el._hideTimer = setTimeout(() => {
+            el.style.display = 'none';
+          }, timeout);
+        } catch (e) {
+          console.warn('Banner error', e);
+        }
       }
     </script>
     <div class="dashboard-container">
@@ -182,6 +250,10 @@
       >
         <div
           id="modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
+          tabindex="-1"
           style="
             background: #fff;
             border-radius: 12px;
@@ -375,6 +447,7 @@
             month === 0 ? 11 : month - 1,
             month === 0 ? year - 1 : year
           );
+        prevBtn.setAttribute('aria-label', 'Précédent');
         const nextBtn = document.createElement('button');
         nextBtn.textContent = '>';
         nextBtn.onclick = () =>
@@ -383,6 +456,7 @@
             month === 11 ? 0 : month + 1,
             month === 11 ? year + 1 : year
           );
+        nextBtn.setAttribute('aria-label', 'Suivant');
         const monthNames = [
           'Janvier',
           'Février',
@@ -439,7 +513,11 @@
             } else if (date > daysInMonth) {
               td.innerHTML = '';
             } else {
-              td.innerHTML = `<div style='font-weight:600;'>${date}</div>`;
+              // Use DOM APIs instead of innerHTML for the date to avoid injection
+              const dayNumDiv = document.createElement('div');
+              dayNumDiv.style.fontWeight = '600';
+              dayNumDiv.textContent = String(date);
+              td.appendChild(dayNumDiv);
               // RDV du jour
               const dayStr = `${year}-${String(month + 1).padStart(
                 2,
@@ -449,12 +527,15 @@
                 (a.date || '').startsWith(dayStr)
               );
               dayApps.forEach((a) => {
-                const badge = document.createElement('div');
+                const badge = document.createElement('button');
+                badge.type = 'button';
+                badge.className = 'calendar-badge';
                 badge.textContent = `${a.time || ''} - ${
                   a.fullName || a.patientName || ''
                 } (${a.service || a.reason || ''})`;
                 badge.style.background = '#2056ae';
                 badge.style.color = '#fff';
+                badge.style.border = 'none';
                 badge.style.borderRadius = '6px';
                 badge.style.fontSize = '0.92em';
                 badge.style.margin = '2px 0';
@@ -464,6 +545,18 @@
                 }\nService: ${a.service || '-'}\nPatient: ${
                   a.fullName || a.patientName || ''
                 }`;
+                badge.setAttribute(
+                  'aria-label',
+                  `Rendez-vous ${a.time || ''} - ${
+                    a.fullName || a.patientName || ''
+                  }`
+                );
+                // Keyboard/click friendly: open patient history on enter/click if patient id available
+                badge.onclick = function () {
+                  if (a.patientId || a.genidocId || a.id) {
+                    viewPatientHistory(a.patientId || a.genidocId || a.id);
+                  }
+                };
                 td.appendChild(badge);
               });
               date++;
@@ -512,8 +605,9 @@
       async function fetchDoctorProfile() {
         const doctorId = getDoctorId();
         if (!doctorId) {
-          alert(
-            "Aucun doctorId trouvé dans l'URL ni dans le stockage local. Veuillez vous reconnecter."
+          showBanner(
+            "Aucun doctorId trouvé dans l'URL ni dans le stockage local. Veuillez vous reconnecter.",
+            'error'
           );
           document.getElementById('doctor-name').textContent =
             '[Aucun médecin connecté]';
@@ -567,8 +661,13 @@
         const doctorId = getDoctorId();
         const tbody = document.getElementById('appointments-list');
         if (!doctorId) {
-          tbody.innerHTML =
-            '<tr><td colspan="12">Erreur : aucun identifiant médecin trouvé.</td></tr>';
+          tbody.innerHTML = '';
+          const tr = document.createElement('tr');
+          const td = document.createElement('td');
+          td.setAttribute('colspan', '12');
+          td.textContent = 'Erreur : aucun identifiant médecin trouvé.';
+          tr.appendChild(td);
+          tbody.appendChild(tr);
           return;
         }
         try {
@@ -850,10 +949,15 @@
           }
           // navigation functions defined in global scope (moved)
         } catch (e) {
-          tbody.innerHTML =
-            '<tr><td colspan="12">Erreur de chargement : ' +
-            (e.message || e) +
-            '</td></tr>';
+          tbody.innerHTML = '';
+          const tr = document.createElement('tr');
+          const td = document.createElement('td');
+          td.setAttribute('colspan', '12');
+          td.textContent =
+            'Erreur de chargement : ' +
+            (e && e.message ? e.message : String(e));
+          tr.appendChild(td);
+          tbody.appendChild(tr);
         }
       }
 
@@ -883,7 +987,7 @@
       function showStats() {
         window.location.href = 'stats.html?doctorId=' + getDoctorId();
       }
-      function openDiagnosticModal(appointmentId, patientIdentifier) {
+      async function openDiagnosticModal(appointmentId, patientIdentifier) {
         // Open an in-page modal to add diagnostic (safe DOM construction)
         const title = 'Ajouter diagnostic';
         const body = document.getElementById('modal-body');
@@ -894,11 +998,13 @@
         const strong = document.createElement('strong');
         strong.textContent = 'Patient:';
         patientDiv.appendChild(strong);
-        patientDiv.appendChild(document.createTextNode(' ' + (patientIdentifier || '')));
+        const infoSpan = document.createElement('span');
+        infoSpan.textContent = ' ' + (patientIdentifier || '');
+        patientDiv.appendChild(infoSpan);
         container.appendChild(patientDiv);
 
         const label = document.createElement('label');
-        label.textContent = 'Résumé du diagnostic';
+        label.textContent = 'Résumé du diagnostic du patient';
         container.appendChild(label);
 
         const textarea = document.createElement('textarea');
@@ -911,9 +1017,44 @@
 
         body.appendChild(container);
 
+        // Try to fetch patient details to display a friendly name + GD id when possible
+        if (patientIdentifier) {
+          try {
+            const res = await secureFetch(
+              '/api/patient/' + encodeURIComponent(patientIdentifier)
+            ).catch(() => null);
+            if (res) {
+              const pj = await res.json().catch(() => null);
+              if (pj && pj.success && pj.data) {
+                const p = pj.data;
+                const name =
+                  p.fullName ||
+                  (p.firstName &&
+                    p.lastName &&
+                    p.firstName + ' ' + p.lastName) ||
+                  p.name ||
+                  null;
+                const gid =
+                  p.genidocId || p.genidoc || p.genidocId || patientIdentifier;
+                infoSpan.textContent =
+                  ' ' +
+                  (name
+                    ? name + ' (' + (gid || patientIdentifier) + ')'
+                    : gid || patientIdentifier);
+              }
+            }
+          } catch (e) {
+            // ignore fetch errors, keep the identifier shown
+            console.warn('Patient fetch failed', e);
+          }
+        }
+
         openModal(title, async () => {
-          const text = (document.getElementById('diag-text') || { value: '' }).value.trim();
-          if (!text) return alert('Veuillez saisir le diagnostic.');
+          const text = (
+            document.getElementById('diag-text') || { value: '' }
+          ).value.trim();
+          if (!text)
+            return showBanner('Veuillez saisir le diagnostic.', 'error');
           try {
             const payload = {
               appointmentId: appointmentId,
@@ -930,10 +1071,13 @@
               closeModal();
               fetchAppointments();
             } else {
-              alert(j.message || 'Erreur lors de l'enregistrement');
+              showBanner(
+                j.message || "Erreur lors de l'enregistrement",
+                'error'
+              );
             }
           } catch (e) {
-            alert('Erreur réseau');
+            showBanner('Erreur réseau', 'error');
           }
         });
       }
@@ -948,7 +1092,9 @@
         const strong = document.createElement('strong');
         strong.textContent = 'Patient:';
         patientDiv.appendChild(strong);
-        patientDiv.appendChild(document.createTextNode(' ' + (patientIdentifier || '')));
+        patientDiv.appendChild(
+          document.createTextNode(' ' + (patientIdentifier || ''))
+        );
         container.appendChild(patientDiv);
 
         const label = document.createElement('label');
@@ -966,8 +1112,11 @@
         body.appendChild(container);
 
         openModal(title, async () => {
-          const text = (document.getElementById('presc-text') || { value: '' }).value.trim();
-          if (!text) return alert('Veuillez saisir la prescription.');
+          const text = (
+            document.getElementById('presc-text') || { value: '' }
+          ).value.trim();
+          if (!text)
+            return showBanner('Veuillez saisir la prescription.', 'error');
           try {
             const payload = {
               appointmentId: appointmentId,
@@ -984,10 +1133,13 @@
               closeModal();
               fetchAppointments();
             } else {
-              alert(j.message || 'Erreur lors de l'enregistrement');
+              showBanner(
+                j.message || "Erreur lors de l'enregistrement",
+                'error'
+              );
             }
           } catch (e) {
-            alert('Erreur réseau');
+            showBanner('Erreur réseau', 'error');
           }
         });
       }
@@ -1015,7 +1167,7 @@
           const body = document.getElementById('modal-body');
           body.innerHTML = '';
           const loadingDiv = document.createElement('div');
-          loadingDiv.textContent = 'Chargement de l\'historique...';
+          loadingDiv.textContent = "Chargement de l'historique...";
           body.appendChild(loadingDiv);
           try {
             const res = await secureFetch(
@@ -1057,7 +1209,8 @@
             } else {
               body.innerHTML = '';
               const errDiv = document.createElement('div');
-              errDiv.textContent = 'Erreur: ' + (j.message || 'Impossible de charger');
+              errDiv.textContent =
+                'Erreur: ' + (j.message || 'Impossible de charger');
               body.appendChild(errDiv);
             }
           } catch (e) {
@@ -1071,13 +1224,20 @@
 
       // Modal helpers
       let _modalSaveHandler = null;
+      let _previousActiveElement = null;
+      let _modalKeyHandler = null;
       function openModal(title, onSave) {
         const backdrop = document.getElementById('modal-backdrop');
+        const modalEl = document.getElementById('modal');
         const titleEl = document.getElementById('modal-title');
         const saveBtn = document.getElementById('modal-save');
         const closeBtn = document.getElementById('modal-close');
         titleEl.textContent = title || '';
+        // show
         backdrop.style.display = 'flex';
+        backdrop.setAttribute('aria-hidden', 'false');
+        modalEl.setAttribute('aria-hidden', 'false');
+        _previousActiveElement = document.activeElement;
         _modalSaveHandler = onSave;
         saveBtn.onclick = async function () {
           if (typeof _modalSaveHandler === 'function') {
@@ -1090,13 +1250,62 @@
           }
         };
         closeBtn.onclick = closeModal;
+
+        // Basic focus trap and ESC handling
+        _modalKeyHandler = function (e) {
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            closeModal();
+            return;
+          }
+          if (e.key === 'Tab') {
+            const focusable = modalEl.querySelectorAll(
+              'button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])'
+            );
+            if (!focusable.length) return;
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (e.shiftKey) {
+              if (document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+              }
+            } else {
+              if (document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+              }
+            }
+          }
+        };
+        document.addEventListener('keydown', _modalKeyHandler);
+        // move focus into modal
+        setTimeout(() => {
+          modalEl.focus();
+        }, 10);
       }
       function closeModal() {
         const backdrop = document.getElementById('modal-backdrop');
+        const modalEl = document.getElementById('modal');
         const body = document.getElementById('modal-body');
         backdrop.style.display = 'none';
+        backdrop.setAttribute('aria-hidden', 'true');
+        modalEl.setAttribute('aria-hidden', 'true');
         body.innerHTML = '';
         _modalSaveHandler = null;
+        if (typeof _modalKeyHandler === 'function') {
+          document.removeEventListener('keydown', _modalKeyHandler);
+          _modalKeyHandler = null;
+        }
+        try {
+          if (
+            _previousActiveElement &&
+            typeof _previousActiveElement.focus === 'function'
+          ) {
+            _previousActiveElement.focus();
+          }
+        } catch (e) {}
+        _previousActiveElement = null;
       }
 
       // Initialisation
@@ -1104,7 +1313,7 @@
         try {
           // If this is a demo row id, simulate success without calling API
           if (String(appointmentId || '').startsWith('demo-')) {
-            alert('Simulation: statut mis à jour (demo)');
+            showBanner('Simulation: statut mis à jour (demo)', 'success');
             // Update local agendaAppointments for calendar view
             agendaAppointments = (agendaAppointments || []).map((a) => {
               if (a.id === appointmentId) a.status = newStatus;
@@ -1122,13 +1331,17 @@
           if (result.success) {
             fetchAppointments();
           } else {
-            alert(
-              result.message || 'Erreur lors de la mise à jour du rendez-vous'
+            showBanner(
+              result.message || 'Erreur lors de la mise à jour du rendez-vous',
+              'error'
             );
           }
         } catch (e) {
           if (e.message === 'Déconnecté') return;
-          alert('Erreur réseau lors de la mise à jour du rendez-vous');
+          showBanner(
+            'Erreur réseau lors de la mise à jour du rendez-vous',
+            'error'
+          );
         }
       }
 
@@ -1144,7 +1357,11 @@
         const installBtn = document.getElementById('install-app-btn');
 
         function openGenidoc() {
-          try { window.location.href = 'https://genidoc.ma'; } catch (e) { window.open('https://genidoc.ma', '_blank'); }
+          try {
+            window.location.href = 'https://genidoc.ma';
+          } catch (e) {
+            window.open('https://genidoc.ma', '_blank');
+          }
         }
 
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -1159,13 +1376,23 @@
             ev.preventDefault();
             installBtn.disabled = true;
             if (deferredPrompt) {
-              try { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; } catch (err) { console.warn(err); }
+              try {
+                deferredPrompt.prompt();
+                await deferredPrompt.userChoice;
+                deferredPrompt = null;
+              } catch (err) {
+                console.warn(err);
+              }
               installBtn.disabled = false;
               openGenidoc();
               return;
             }
             if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-              alert("Pour ajouter GeniDoc à l'écran d'accueil : appuyez sur le bouton 'Partager' puis 'Ajouter à l'écran d'accueil'. Vous serez ensuite redirigé vers genidoc.ma.");
+              showBanner(
+                "Pour ajouter GeniDoc à l'écran d'accueil : appuyez sur le bouton 'Partager' puis 'Ajouter à l'écran d'accueil'. Vous serez ensuite redirigé vers genidoc.ma.",
+                'info',
+                7000
+              );
               openGenidoc();
               installBtn.disabled = false;
               return;
@@ -1176,7 +1403,9 @@
         }
 
         if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+          navigator.serviceWorker
+            .register('/service-worker.js')
+            .catch(() => {});
         }
       })();
     </script>
